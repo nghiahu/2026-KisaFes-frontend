@@ -1,0 +1,174 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useDispatch } from 'react-redux';
+import { authService } from '../../services/auth.service';
+import { setRegistrationData } from '../../store/slices/authSlice';
+
+const registerSchema = z.object({
+  fullName: z.string().min(2, 'Full name is too short'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must contain uppercase, lowercase, number and special char'),
+  agreeTerms: z.boolean().refine(val => val, 'You must agree to the terms')
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
+
+export default function RegisterForm() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormValues) => {
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      // Check if email exists
+      const checkRes = await authService.checkEmail(data.email);
+      if (checkRes.data) {
+        setErrorMsg('Email already exists');
+        setLoading(false);
+        return;
+      }
+      
+      // Send OTP
+      await authService.sendOtp(data.email);
+      
+      // Save data to Redux
+      dispatch(setRegistrationData({
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
+      }));
+
+      // Navigate to OTP page
+      navigate('/signup/otp');
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="mb-5">
+        <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
+        <p className="text-sm text-gray-600 mt-1">Start your free trial.</p>
+      </div>
+
+      {errorMsg && <div className="mb-3 p-2 bg-red-100 text-red-600 text-sm rounded">{errorMsg}</div>}
+
+      <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            FULL NAME
+          </label>
+          <input
+            type="text"
+            placeholder="John Doe"
+            {...register('fullName')}
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            EMAIL
+          </label>
+          <input
+            type="email"
+            placeholder="you@company.com"
+            {...register('email')}
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">PASSWORD</label>
+          <input
+            type="password"
+            placeholder="••••••••"
+            {...register('password')}
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+        </div>
+
+        <label className="flex items-center gap-2">
+          <input type="checkbox" {...register('agreeTerms')} className="w-3 h-3 rounded border-gray-300" />
+          <span className="text-xs text-gray-600">
+            I agree to the{' '}
+            <a href="#" className="text-blue-600 hover:underline">
+              Terms
+            </a>
+            {' '}and{' '}
+            <a href="#" className="text-blue-600 hover:underline">
+              Privacy Policy
+            </a>
+          </span>
+        </label>
+        {errors.agreeTerms && <p className="text-red-500 text-xs">{errors.agreeTerms.message}</p>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition duration-200 mt-1"
+        >
+          {loading ? 'Creating...' : 'Create Account'}
+        </button>
+      </form>
+
+      <div className="mt-4">
+        <div className="relative mb-3">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200"></div>
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="px-2 bg-white text-gray-500">OR</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/google'}>
+            <span>G</span>
+            <span className="hidden sm:inline">Google</span>
+          </button>
+          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/github'}>
+            <span>⚫</span>
+            <span className="hidden sm:inline">GitHub</span>
+          </button>
+        </div>
+      </div>
+
+      <p className="mt-3 text-center text-gray-600 text-xs">
+        Already have an account?{' '}
+        <a href="/login" className="text-blue-600 font-semibold hover:text-blue-700">
+          Log in
+        </a>
+      </p>
+
+      <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-center gap-2 text-xs text-gray-500">
+        <a href="#" className="hover:text-gray-700">
+          Privacy
+        </a>
+        <span>•</span>
+        <span>© 2024 KisaFres</span>
+      </div>
+    </>
+  );
+}
