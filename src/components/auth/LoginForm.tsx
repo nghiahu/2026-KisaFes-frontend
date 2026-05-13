@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useDispatch } from 'react-redux';
-import { authService } from '../../services/auth.service';
-import { loginSuccess } from '../../store/slices/authSlice';
+import { useAuthActions } from '../../hooks/useAuthActions';
+import { Icons } from '../../assets/icons';
+import { useState } from 'react';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email or username is required'),
@@ -15,10 +13,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const { loading, errorMsg, loginUser } = useAuthActions();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -29,28 +25,14 @@ export default function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    setLoading(true);
-    setErrorMsg('');
     try {
-      // Backend expects 'username' field which acts as email/username
       const payload = {
         username: data.email,
         password: data.password
       };
-      const res = await authService.login(payload);
-      
-      const authData = res.data;
-      dispatch(loginSuccess({
-        user: authData.user,
-        token: authData.accessToken
-      }));
-
-      // Navigate to home after successful login
-      navigate('/');
-    } catch (err: any) {
-      setErrorMsg(err?.message || 'Invalid credentials');
-    } finally {
-      setLoading(false);
+      await loginUser(payload);
+    } catch (err) {
+      // Error is handled in the hook
     }
   };
 
@@ -80,17 +62,27 @@ export default function LoginForm() {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="block text-xs font-semibold text-gray-700">PASSWORD</label>
-            <a href="#" className="text-xs text-blue-600 hover:text-blue-700 font-semibold">
+            <a href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-700 font-semibold">
               Forgot?
             </a>
           </div>
-          <input
-            type="password"
-            placeholder="••••••••"
-            {...register('password')}
-            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
-          />
-          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+          <div>
+            <div className="relative">
+              <input type={showPassword ? "text" : "password"}
+                placeholder="••••••••" {...register('password')}
+                className={`w-full px-3 py-2 pr-10 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+                  errors.password ? 'border-red-500' : 'border-gray-300'}`}/>
+              <button type="button" onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                {showPassword ? (
+                  <Icons.eyeOff size={18} />
+                ) : (
+                  <Icons.eye size={18} />
+                )}
+              </button>
+            </div>
+            {errors.password && (<p className="text-red-500 text-xs mt-1">{errors.password.message}</p>)}
+          </div>
         </div>
 
         <label className="flex items-center gap-2">

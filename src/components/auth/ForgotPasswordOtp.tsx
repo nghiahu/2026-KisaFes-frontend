@@ -1,28 +1,28 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { clearRegistrationData } from "../../store/slices/authSlice";
+import { clearResetPasswordData, setResetPasswordData } from "../../store/slices/authSlice";
 import type { RootState } from "../../store";
 import { useAuthActions } from "../../hooks/useAuthActions";
 
-export default function OtpForm() {
+export default function ForgotPasswordOtp() {
   const OTP_LENGTH = 6;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  const email = useSelector((state: RootState) => state.auth.registrationData?.email);
-  const { loading, errorMsg, setErrorMsg, verifyOtp, resendOtp } = useAuthActions();
+
+  const email = useSelector((state: RootState) => state.auth.resetPasswordData?.email);
+  const { loading, errorMsg, setErrorMsg, verifyResetPasswordOtp, sendResetPasswordOtp } = useAuthActions();
 
   const [otp, setOtp] = useState<string[]>(new Array(OTP_LENGTH).fill(""));
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  
+
   const [countdown, setCountdown] = useState(120);
   const [tokenExpired, setTokenExpired] = useState(false);
   const [redirectCountdown, setRedirectCountdown] = useState(5);
 
   useEffect(() => {
     if (!email) {
-      navigate('/signup');
+      navigate('/forgot-password');
     }
   }, [email, navigate]);
 
@@ -37,8 +37,8 @@ export default function OtpForm() {
     if (!tokenExpired) return;
 
     if (redirectCountdown <= 0) {
-      dispatch(clearRegistrationData());
-      navigate('/signup');
+      dispatch(clearResetPasswordData());
+      navigate('/forgot-password');
       return;
     }
 
@@ -118,13 +118,29 @@ export default function OtpForm() {
       setErrorMsg('Vui lòng nhập đủ 6 chữ số.');
       return;
     }
-    
-    await verifyOtp(email!, otpValue, () => setTokenExpired(true));
+
+    try {
+      const verifyToken = await verifyResetPasswordOtp(email!, otpValue);
+      dispatch(setResetPasswordData({ verifyToken }));
+      navigate('/forgot-password/reset');
+    } catch {
+      const expiredIndicators = ['expired', 'hết hạn', 'invalid or expired'];
+      const isExpired = expiredIndicators.some((keyword) =>
+        (errorMsg || '').toLowerCase().includes(keyword)
+      );
+      if (isExpired) {
+        setTokenExpired(true);
+      }
+    }
   };
 
   const handleResend = async () => {
     if (countdown > 0) return;
-    await resendOtp(email!, () => setCountdown(120));
+    const success = await sendResetPasswordOtp(email!);
+    if (success) {
+      setCountdown(120);
+      setOtp(new Array(OTP_LENGTH).fill(""));
+    }
   };
 
   return (
@@ -136,27 +152,27 @@ export default function OtpForm() {
           </div>
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
-              Token đã hết hạn
+              Mã đã hết hạn
             </h1>
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              Mã xác thực của bạn đã hết hạn. Vui lòng đăng ký lại để nhận mã mới.
+              Mã xác thực của bạn đã hết hạn. Vui lòng thử lại.
             </p>
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-left text-sm text-slate-700">
-            <p className="font-semibold text-slate-900">Chuyển về đăng ký sau:</p>
+            <p className="font-semibold text-slate-900">Chuyển về nhập email sau:</p>
             <p className="mt-2 text-lg">{redirectCountdown} giây</p>
           </div>
 
           <button
             type="button"
             onClick={() => {
-              dispatch(clearRegistrationData());
-              navigate('/signup');
+              dispatch(clearResetPasswordData());
+              navigate('/forgot-password');
             }}
             className="mt-4 inline-flex w-full items-center justify-center rounded-3xl bg-blue-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-blue-700"
           >
-            Quay về trang đăng ký ngay
+            Quay về nhập email ngay
           </button>
         </div>
       ) : (
@@ -166,7 +182,7 @@ export default function OtpForm() {
               Xác thực OTP
             </h1>
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              Mã 6 chữ số đã được gửi đến {email}. Vui lòng kiểm tra và nhập vào bên dưới.
+              Mã 6 chữ số đã được gửi đến <span className="font-medium text-slate-700">{email}</span>. Vui lòng kiểm tra và nhập vào bên dưới.
             </p>
           </div>
 
@@ -216,7 +232,16 @@ export default function OtpForm() {
           </form>
 
           <div className="mt-8 border-t border-slate-200 pt-4 text-center text-xs text-slate-400">
-            Gặp sự cố? Liên hệ bộ phận hỗ trợ kỹ thuật.
+            <button
+              type="button"
+              onClick={() => {
+                dispatch(clearResetPasswordData());
+                navigate('/login');
+              }}
+              className="text-blue-600 hover:text-blue-700 font-semibold"
+            >
+              Quay về đăng nhập
+            </button>
           </div>
         </>
       )}

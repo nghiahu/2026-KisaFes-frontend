@@ -7,7 +7,10 @@ import {
   BadgePlus,
   MonitorUp,
   Link,
-  LockKeyhole
+  LockKeyhole,
+  EyeOff,
+  Eye
+
 } from 'lucide-react';
 
 export const Icons = {
@@ -20,4 +23,6 @@ export const Icons = {
   monitorUp: MonitorUp,
   link: Link,
   lockKeyhole: LockKeyhole,
+  eyeOff: EyeOff,
+  eye: Eye,
 };

@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../../services/auth.service";
 import { clearRegistrationData } from "../../store/slices/authSlice";
 import type { RootState } from "../../store";
+import { useAuthActions } from "../../hooks/useAuthActions";
 
 export default function ProfileUpdateForm() {
   const navigate = useNavigate();
@@ -14,8 +14,7 @@ export default function ProfileUpdateForm() {
   const [bio, setBio] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const { loading, errorMsg, completeProfile } = useAuthActions();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -42,51 +41,19 @@ export default function ProfileUpdateForm() {
   };
 
   const handleRegister = async (isSkip: boolean) => {
-    if (!regData) return;
-    setLoading(true);
-    setErrorMsg("");
-
-    try {
-      let avatarUrl = "";
-      if (!isSkip && avatarFile) {
-        // Upload image
-        const uploadRes = await authService.uploadAvatar(avatarFile);
-        avatarUrl = uploadRes.data;
-      }
-
-      // Check username if user changed it
-      const finalUsername = isSkip ? regData.email!.split('@')[0] : username;
-      const checkUserRes = await authService.checkUsername(finalUsername);
-      if (checkUserRes.data) {
-         setErrorMsg("Username already exists. Please choose another one.");
-         setLoading(false);
-         return;
-      }
-
-      await authService.register({
-        fullName: regData.fullName,
-        email: regData.email,
-        password: regData.password,
-        verifyToken: regData.verifyToken,
-        username: finalUsername,
-        bio: isSkip ? "" : bio,
-        avatar: avatarUrl
-      });
-
-      dispatch(clearRegistrationData());
-      navigate('/login');
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Registration failed.");
-    } finally {
-      setLoading(false);
-    }
+    await completeProfile(username, bio, avatarFile, isSkip, () => {
+      setTimeout(() => {
+        dispatch(clearRegistrationData());
+        navigate('/signup');
+      }, 2000);
+    });
   };
 
   const nameInitial = regData?.fullName ? regData.fullName.substring(0, 2).toUpperCase() : "NN";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-3xl rounded-[32px] bg-white p-8 shadow-[0_30px_60px_rgba(15,23,42,0.12)] sm:p-10">
+    <div className="w-full px-4 py-8">
+      <div className="w-full max-w-2xl mx-auto rounded-[32px] bg-white p-8 shadow-[0_30px_60px_rgba(15,23,42,0.12)] sm:p-10">
         <div className="flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
             <div>

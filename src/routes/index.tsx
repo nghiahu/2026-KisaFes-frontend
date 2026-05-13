@@ -1,13 +1,19 @@
-import { createBrowserRouter } from 'react-router-dom'
-import LandingLayout from '../layouts/LandingLayout'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import AuthLayout from '../layouts/AuthLayout'
-import WelcomeBack from '../pages/WelcomeBack'
 import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler'
+import LandingLayout from '../layouts/LandingLayout'
+import ProfileLayout from '../layouts/ProfileLayout'
+import ProfileSettings from '../pages/ProfileSettings'
 
 export const router = createBrowserRouter([
-  {
+   {
     path: '/',
-    element: <LandingLayout />,
+    element: <Navigate to="/software/kisa" replace />
+  },
+
+  {
+    path: '/software/kisa',
+    element: <LandingLayout/>
   },
   {
     path: '/login',
@@ -26,8 +32,34 @@ export const router = createBrowserRouter([
     element: <AuthLayout />,
   },
   {
-    path: '/welcome',
-    element: <WelcomeBack />,
+    path: '/forgot-password',
+    element: <AuthLayout />,
+  },
+  {
+    path: '/forgot-password/otp',
+    element: <AuthLayout />,
+  },
+  {
+    path: '/forgot-password/reset',
+    element: <AuthLayout />,
+  },
+  {
+    path: '/profile',
+    element: <ProfileLayout />,
+    children: [
+      {
+        path: '',
+        element: <ProfileSettings />,
+      },
+      {
+        path: 'security',
+        element: <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-200"><h2 className="text-xl font-bold">Bảo mật</h2><p className="mt-2 text-slate-500">Tính năng đang được phát triển.</p></div>,
+      },
+      {
+        path: 'notifications',
+        element: <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-200"><h2 className="text-xl font-bold">Thông báo</h2><p className="mt-2 text-slate-500">Tính năng đang được phát triển.</p></div>,
+      }
+    ]
   },
   {
     path: '/oauth2/redirect',

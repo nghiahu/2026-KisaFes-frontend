@@ -12,17 +12,27 @@ interface AuthState {
     verifyToken?: string;
   } | null;
 
+  // Trạng thái cho luồng quên mật khẩu
+  resetPasswordData: {
+    email?: string;
+    verifyToken?: string;
+  } | null;
+
   // Xác thực người dùng
   isAuthenticated: boolean;
   user: any | null;
   token: string | null;
 }
 
+// Khôi phục userInfo từ localStorage
+const storedUser = localStorage.getItem('user');
+
 const initialState: AuthState = {
   registrationData: null,
-  isAuthenticated: !!localStorage.getItem('access_token'),
-  user: null,
-  token: localStorage.getItem('access_token') || null,
+  resetPasswordData: null,
+  isAuthenticated: false,
+  user: storedUser ? JSON.parse(storedUser) : null,
+  token: null,
 };
 
 const authSlice = createSlice({
@@ -38,21 +48,42 @@ const authSlice = createSlice({
     clearRegistrationData: (state) => {
       state.registrationData = null;
     },
+    setResetPasswordData: (state, action: PayloadAction<Partial<NonNullable<AuthState['resetPasswordData']>>>) => {
+      if (!state.resetPasswordData) {
+        state.resetPasswordData = {};
+      }
+      state.resetPasswordData = { ...state.resetPasswordData, ...action.payload };
+    },
+    clearResetPasswordData: (state) => {
+      state.resetPasswordData = null;
+    },
     loginSuccess: (state, action: PayloadAction<{ user: any; token: string }>) => {
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;
-      localStorage.setItem('access_token', action.payload.token);
+
+      // Chỉ lưu userInfo vào localStorage
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
+    },
+    setToken: (state, action: PayloadAction<string>) => {
+      state.token = action.payload;
+      state.isAuthenticated = true;
+    },
+    setUser: (state, action: PayloadAction<any>) => {
+      state.user = action.payload;
+      localStorage.setItem('user', JSON.stringify(action.payload));
     },
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
-      localStorage.removeItem('access_token');
+
+      // Xóa userInfo khỏi localStorage
+      localStorage.removeItem('user');
     },
   },
 });
 
-export const { setRegistrationData, clearRegistrationData, loginSuccess, logout } = authSlice.actions;
+export const { setRegistrationData, clearRegistrationData, setResetPasswordData, clearResetPasswordData, loginSuccess, setToken, setUser, logout } = authSlice.actions;
 
 export default authSlice.reducer;
