@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 :root {
   color-scheme: light;
@@ -28,12 +28,7 @@ body {
 }
 
 /* Typography */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
 }
 
@@ -56,7 +51,6 @@ button {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -67,7 +61,6 @@ button {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
@@ -78,7 +71,6 @@ button {
     opacity: 0;
     transform: translateX(30px) rotate(-20deg) scale(0.82);
   }
-
   to {
     opacity: 1;
     transform: translateX(0) rotate(-12deg) scale(0.96);
@@ -90,7 +82,6 @@ button {
     opacity: 0;
     transform: translateX(-30px) rotate(20deg) scale(0.82);
   }
-
   to {
     opacity: 1;
     transform: translateX(0) rotate(12deg) scale(0.96);
@@ -102,7 +93,6 @@ button {
     opacity: 0;
     transform: translateY(22px) rotate(10deg) scale(0.88);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) rotate(3deg) scale(1);
@@ -147,104 +137,7 @@ button {
   from {
     width: 100%;
   }
-
   to {
     width: 0%;
   }
 }
-
-/* ==================== Session Expired Modal ==================== */
-@keyframes sessionModalFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes sessionModalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px) scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.session-expired-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  animation: sessionModalFadeIn 0.25s ease-out;
-}
-
-.session-expired-modal {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 2.5rem 2rem 2rem;
-  max-width: 400px;
-  width: 90%;
-  text-align: center;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
-  animation: sessionModalSlideUp 0.35s ease-out;
-}
-
-.session-expired-icon {
-  margin-bottom: 1.25rem;
-  display: flex;
-  justify-content: center;
-}
-
-.session-expired-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 0.5rem;
-}
-
-.session-expired-message {
-  font-size: 0.9rem;
-  color: #666666;
-  margin: 0 0 1.75rem;
-  line-height: 1.5;
-}
-
-.session-expired-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
-}
-
-.session-expired-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4);
-}
-
-.session-expired-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 102, 255, 0.3);
-}
-

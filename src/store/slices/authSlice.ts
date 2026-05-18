@@ -22,6 +22,7 @@ interface AuthState {
   isAuthenticated: boolean;
   user: any | null;
   token: string | null;
+  isInitialized: boolean;
 }
 
 // Khôi phục userInfo từ localStorage
@@ -33,6 +34,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   user: storedUser ? JSON.parse(storedUser) : null,
   token: null,
+  isInitialized: !storedUser,
 };
 
 const authSlice = createSlice({
@@ -61,6 +63,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;
+      state.isInitialized = true;
 
       // Chỉ lưu userInfo vào localStorage
       localStorage.setItem('user', JSON.stringify(action.payload.user));
@@ -68,6 +71,9 @@ const authSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
       state.isAuthenticated = true;
+    },
+    setInitialized: (state, action: PayloadAction<boolean>) => {
+      state.isInitialized = action.payload;
     },
     setUser: (state, action: PayloadAction<any>) => {
       state.user = action.payload;
@@ -77,6 +83,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
+      state.isInitialized = true;
 
       // Xóa userInfo khỏi localStorage
       localStorage.removeItem('user');
@@ -84,6 +91,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setRegistrationData, clearRegistrationData, setResetPasswordData, clearResetPasswordData, loginSuccess, setToken, setUser, logout } = authSlice.actions;
+export const { setRegistrationData, clearRegistrationData, setResetPasswordData, clearResetPasswordData, loginSuccess, setToken, setInitialized, setUser, logout } = authSlice.actions;
 
 export default authSlice.reducer;

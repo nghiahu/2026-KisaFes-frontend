@@ -1,5 +1,3 @@
-import Footer from '../components/landing/Footer'
-import Header from '../components/landing/Header'
 import { useEffect, useState } from 'react';
 import type { User } from '../types/user.interface';
 import defaultAvatar from "../assets/avatar_def_man.png"
@@ -83,7 +81,7 @@ export default function WelcomeBack() {
 
               {/* Button */}
               <a
-                href="#"
+                href="/workspace"
                 className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-amber-400"
               >
                 Go to KisaFres

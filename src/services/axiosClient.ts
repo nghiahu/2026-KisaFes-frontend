@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { store } from '../store';
-import { setToken, logout } from '../store/slices/authSlice';
+import { setToken } from '../store/slices/authSlice';
+import { sessionExpiredEvent } from '../utils/sessionExpiredEvent';
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -45,7 +46,32 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/refresh') {
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+    
+    if (error.response?.status === 401) {
+      // 0. Loại trừ các request xác thực (như login, register, logout, checkEmail) ngoại trừ refresh
+      const isAuthRequest = originalRequest.url?.includes('/auth/');
+      const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');
+      if (isAuthRequest && !isRefreshRequest) {
+        return Promise.reject(error.response?.data || error);
+      }
+
+      // Nếu Client không có token (chưa đăng nhập hoặc đã đăng xuất), bỏ qua việc refresh/hiển thị modal
+      const currentToken = store.getState().auth.token;
+      if (!currentToken) {
+        return Promise.reject(error.response?.data || error);
+      }
+
+      // 1. Nếu đây là request đã được retry một lần rồi mà vẫn lỗi 401
+      // Hoặc là request gọi refresh token bị lỗi 401 (không bao giờ retry)
+      if (originalRequest._retry || isRefreshRequest) {
+        sessionExpiredEvent.emit();
+        return Promise.reject(error.response?.data || error);
+      }
+
+      // 2. Nếu đang có một request khác tiến hành refresh token song song
       if (isRefreshing) {
         return new Promise(function(resolve, reject) {
           failedQueue.push({ resolve, reject });
@@ -57,14 +83,19 @@ axiosClient.interceptors.response.use(
         });
       }
 
+      // 3. Bắt đầu luồng refresh token
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
+        const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
         const res = await axios.post(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'}/auth/refresh`,
+          `${baseURL}/auth/refresh`,
           {},
-          { withCredentials: true }
+          { 
+            withCredentials: true,
+            timeout: 10000 // Giới hạn 10 giây để tránh bị treo vô hạn
+          }
         );
         
         const newAccessToken = res.data?.accessToken || res.data?.data?.accessToken;
@@ -79,7 +110,8 @@ axiosClient.interceptors.response.use(
         }
       } catch (err) {
         processQueue(err, null);
-        store.dispatch(logout());
+        // Hiển thị modal "Hết phiên đăng nhập" thay vì logout ngay
+        sessionExpiredEvent.emit();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

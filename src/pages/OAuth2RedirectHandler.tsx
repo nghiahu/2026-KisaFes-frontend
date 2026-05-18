@@ -24,7 +24,7 @@ export default function OAuth2RedirectHandler() {
   ) => {
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/v1/auth/oauth2/callback',
+        '/api/v1/auth/oauth2/callback',
         {},
         {
           headers: {
