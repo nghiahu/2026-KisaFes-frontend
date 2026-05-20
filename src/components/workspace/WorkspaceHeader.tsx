@@ -1,33 +1,37 @@
 import { useState, useEffect } from 'react';
 import { Icons } from '../../assets/icons';
-import type { User } from '../../types/user.interface';
 import UserDropdown from '../common/UserDropdown';
 import NotificationDropdown from './NotificationDropdown';
-import { notificationService } from '../../services/notification.service';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchNotifications } from '../../store/slices/notificationSlice';
 
 export default function WorkspaceHeader() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [user, setUser] = useState<User | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+  const dispatch = useAppDispatch();
+  const notifications = useAppSelector(state => state.notification.notifications);
 
-    const fetchInitialCount = async () => {
-      try {
-        const data = await notificationService.getMyNotifications();
-        const pending = data.filter(n => n.status === 'PENDING').length;
-        setUnreadCount(pending);
-      } catch (error) {
-        console.error('Failed to load initial notifications count:', error);
-      }
-    };
-    fetchInitialCount();
-  }, []);
+  // Read user directly from Redux store — always in sync with login/logout
+  const rawUser = useAppSelector(state => state.auth.user);
+
+  // Normalize field names to handle API response inconsistency (fullname vs fullName)
+  const user = rawUser ? {
+    ...rawUser,
+    fullName: rawUser.fullName || rawUser.fullname || rawUser.full_name || '',
+    userName: rawUser.userName || rawUser.username || rawUser.user_name || '',
+    avatar: rawUser.avatar || rawUser.avatarUrl || rawUser.avatar_url || null,
+  } : null;
+
+  useEffect(() => {
+    dispatch(fetchNotifications());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const pending = notifications.filter((n: any) => n.status === 'PENDING').length;
+    setUnreadCount(pending);
+  }, [notifications]);
 
   return (
     <header className="h-16 shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 md:px-6 flex items-center justify-between z-30 sticky top-0">

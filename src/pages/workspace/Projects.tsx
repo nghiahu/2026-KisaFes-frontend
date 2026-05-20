@@ -5,9 +5,10 @@ import { useSelector } from 'react-redux';
 import { AlertCircle, Ban, Star, Users, Settings, Trash2 } from 'lucide-react';
 import defaultMan from '../../assets/avatar_def_man.png';
 import type { Project, ProjectStatus } from '../../types/project.interface';
-import { projectService } from '../../services/project.service';
-import categoryService from '../../services/category.service';
 import type { Category } from '../../types/category.interface';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchProjects } from '../../store/slices/projectSlice';
+import { fetchCategories } from '../../store/slices/categorySlice';
 
 export default function Projects() {
   const navigate = useNavigate();
@@ -24,58 +25,56 @@ export default function Projects() {
   const [sortBy, setSortBy] = useState<string>('updatedAt-desc');
   
   const user = useSelector((state: any) => state.auth.user);
+  
+  const dispatch = useAppDispatch();
+  const { projects: backendProjects, loading: isProjectsLoading } = useAppSelector((state) => state.project);
+  const { categories: backendCategories, loading: isCategoriesLoading } = useAppSelector((state) => state.category);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const [projectsData, categoriesData] = await Promise.all([
-          projectService.getAllProjects(),
-          categoryService.getAllCategories()
-        ]);
-        
-        setCategories(categoriesData);
-        
-        // Map backend projects to frontend Project interface
-        const mappedProjects: Project[] = projectsData.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          code: p.code,
-          description: p.description,
-          category: categoriesData.find(c => c.id === p.categoryId)?.name || 'General',
-          status: 'ACTIVE', // Default status as backend doesn't have it yet in root
-          progress: p.totalTasksCount > 0 ? Math.round((p.completedTasksCount / p.totalTasksCount) * 100) : 0,
-          members: p.members?.map((m: any) => ({
-            id: m.id,
-            name: m.name,
-            avatar: m.avatar || defaultMan
-          })) || [],
-          isFavorite: p.favoriteBy?.includes(user?.userId),
-          dueDate: p.deadlineDisplay || 'Not set',
-          updatedAt: new Date(p.updatedAt).toLocaleDateString(),
-          lead: p.members?.[0] ? {
-            id: p.members[0].id,
-            name: p.members[0].name,
-            avatar: p.members[0].avatar || defaultMan
-          } : undefined,
-          activeSprintName: p.activeSprintName || 'No active sprint',
-          completedTasksCount: p.completedTasksCount || 0,
-          totalTasksCount: p.totalTasksCount || 0,
-          blockedTasksCount: p.blockedTasksCount || 0,
-          openIssuesCount: p.openIssuesCount || 0,
-          deadlineDisplay: p.deadlineDisplay || 'Not set'
-        }));
+    dispatch(fetchProjects());
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
-        setProjects(mappedProjects);
-      } catch (error) {
-        console.error('Failed to fetch projects:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  useEffect(() => {
+    setCategories(backendCategories);
+    if (backendProjects) {
+      // Map backend projects to frontend Project interface
+      const mappedProjects: Project[] = backendProjects.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        code: p.code,
+        description: p.description,
+        category: backendCategories.find(c => c.id === p.categoryId)?.name || 'General',
+        status: 'ACTIVE', // Default status as backend doesn't have it yet in root
+        progress: p.totalTasksCount > 0 ? Math.round((p.completedTasksCount / p.totalTasksCount) * 100) : 0,
+        members: p.members?.map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          avatar: m.avatar || defaultMan
+        })) || [],
+        isFavorite: p.favoriteBy?.includes(user?.userId),
+        dueDate: p.deadlineDisplay || 'Not set',
+        updatedAt: new Date(p.updatedAt).toLocaleDateString(),
+        lead: p.members?.[0] ? {
+          id: p.members[0].id,
+          name: p.members[0].name,
+          avatar: p.members[0].avatar || defaultMan
+        } : undefined,
+        activeSprintName: p.activeSprintName || 'No active sprint',
+        completedTasksCount: p.completedTasksCount || 0,
+        totalTasksCount: p.totalTasksCount || 0,
+        blockedTasksCount: p.blockedTasksCount || 0,
+        openIssuesCount: p.openIssuesCount || 0,
+        deadlineDisplay: p.deadlineDisplay || 'Not set'
+      }));
 
-    fetchData();
-  }, [user]);
+      setProjects(mappedProjects);
+    }
+  }, [backendProjects, backendCategories, user]);
+
+  useEffect(() => {
+    setIsLoading(isProjectsLoading || isCategoriesLoading);
+  }, [isProjectsLoading, isCategoriesLoading]);
 
   const toggleFavorite = (id: string) => {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, isFavorite: !p.isFavorite } : p));

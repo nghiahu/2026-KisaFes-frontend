@@ -19,8 +19,16 @@ export const useAuthActions = () => {
     try {
       const res = await authService.login(payload);
       const authData = res.data;
+      // Normalize user data to fix field name mismatches (API may return fullname vs fullName)
+      const rawUser = authData.user;
+      const normalizedUser = {
+        ...rawUser,
+        fullName: rawUser.fullName || rawUser.fullname || rawUser.full_name || '',
+        userName: rawUser.userName || rawUser.username || rawUser.user_name || '',
+        avatar: rawUser.avatar || rawUser.avatarUrl || rawUser.avatar_url || null,
+      };
       dispatch(loginSuccess({
-        user: authData.user,
+        user: normalizedUser,
         token: authData.accessToken,
       }));
       navigate('/');

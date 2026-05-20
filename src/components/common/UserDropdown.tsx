@@ -51,7 +51,7 @@ export default function UserDropdown({ user, variant = 'landing' }: UserDropdown
           onClick={() => setDropdownOpen(!dropdownOpen)}
         >
           <img
-            src={user.avatarUrl || defaultAvatar}
+            src={user.avatar || defaultAvatar}
             alt="Avatar"
             className="h-full w-full object-cover"
           />
@@ -105,10 +105,10 @@ export default function UserDropdown({ user, variant = 'landing' }: UserDropdown
         className="flex items-center gap-3 rounded-2xl p-1 border border-slate-200 bg-white px-3 shadow-sm cursor-pointer transition hover:border-blue-300 hover:shadow-md"
       >
         <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-orange-500">
-          <img src={user.avatarUrl || defaultAvatar} alt="User Avatar" className="h-full w-full object-cover"/>
+          <img src={user.avatar || defaultAvatar} alt="User Avatar" className="h-full w-full object-cover"/>
         </div>
         <span className="hidden text-sm font-semibold text-slate-700 sm:inline">
-          {user.fullname}
+          {user.fullName}
         </span>
         <svg
           className={`hidden sm:block h-4 w-4 text-slate-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}

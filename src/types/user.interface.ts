@@ -1,9 +1,9 @@
 export interface User {
   id: string
-  username: string
-  fullname: string
+  userName: string
+  fullName: string
   email: string
-  avatarUrl: string | null
+  avatar: string | null
   bio?: string
   isPublic?: boolean
   roles: string[]

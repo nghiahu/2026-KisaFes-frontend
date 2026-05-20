@@ -25,16 +25,32 @@ interface AuthState {
   isInitialized: boolean;
 }
 
+// Function to normalize user data to camelCase and clean up legacy/duplicated fields
+const normalizeUser = (user: any) => {
+  if (!user) return null;
+  return {
+    id: user.id || user._id || '',
+    userName: user.userName || user.username || user.user_name || '',
+    fullName: user.fullName || user.fullname || user.full_name || '',
+    email: user.email || '',
+    avatar: user.avatar || user.avatarUrl || user.avatar_url || null,
+    bio: user.bio || '',
+    isPublic: user.isPublic !== undefined ? user.isPublic : (user.is_public !== undefined ? user.is_public : false),
+    roles: Array.isArray(user.roles) ? user.roles : [],
+  };
+};
+
 // Khôi phục userInfo từ localStorage
 const storedUser = localStorage.getItem('user');
+const initialUser = storedUser ? normalizeUser(JSON.parse(storedUser)) : null;
 
 const initialState: AuthState = {
   registrationData: null,
   resetPasswordData: null,
-  isAuthenticated: false,
-  user: storedUser ? JSON.parse(storedUser) : null,
+  isAuthenticated: false, // Bắt đầu là false để bắt buộc kiểm tra/refresh token trước
+  user: initialUser,
   token: null,
-  isInitialized: !storedUser,
+  isInitialized: !storedUser, // Nếu không có storedUser thì đã init xong, ngược lại chờ refresh token
 };
 
 const authSlice = createSlice({
@@ -60,13 +76,14 @@ const authSlice = createSlice({
       state.resetPasswordData = null;
     },
     loginSuccess: (state, action: PayloadAction<{ user: any; token: string }>) => {
+      const normalized = normalizeUser(action.payload.user);
       state.isAuthenticated = true;
-      state.user = action.payload.user;
+      state.user = normalized;
       state.token = action.payload.token;
       state.isInitialized = true;
 
       // Chỉ lưu userInfo vào localStorage
-      localStorage.setItem('user', JSON.stringify(action.payload.user));
+      localStorage.setItem('user', JSON.stringify(normalized));
     },
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
@@ -76,8 +93,9 @@ const authSlice = createSlice({
       state.isInitialized = action.payload;
     },
     setUser: (state, action: PayloadAction<any>) => {
-      state.user = action.payload;
-      localStorage.setItem('user', JSON.stringify(action.payload));
+      const normalized = normalizeUser(action.payload);
+      state.user = normalized;
+      localStorage.setItem('user', JSON.stringify(normalized));
     },
     logout: (state) => {
       state.isAuthenticated = false;

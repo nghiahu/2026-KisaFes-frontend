@@ -11,10 +11,9 @@ export default function ProtectedRoute({
   children,
 }: ProtectedRouteProps) {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
-  const storedUser = localStorage.getItem("user")
 
-  // Nếu không được xác thực trong memory VÀ không có user trong localStorage
-  if (!isAuthenticated && !storedUser) {
+  // Nếu không được xác thực, chuyển hướng về trang login
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
 

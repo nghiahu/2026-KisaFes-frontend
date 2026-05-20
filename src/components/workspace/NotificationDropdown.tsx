@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
-import { notificationService, type NotificationResponse } from '../../services/notification.service';
+import { type NotificationResponse } from '../../services/notification.service';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchNotifications, acceptInvitation, declineInvitation } from '../../store/slices/notificationSlice';
 import { Icons } from '../../assets/icons';
 import { X } from 'lucide-react';
 
@@ -9,27 +11,13 @@ interface NotificationDropdownProps {
 }
 
 export default function NotificationDropdown({ onClose, onNotificationsCountChange }: NotificationDropdownProps) {
-  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { notifications, loading } = useAppSelector(state => state.notification);
   const [actioningId, setActioningId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true);
-      const data = await notificationService.getMyNotifications();
-      setNotifications(data);
-      const pendingCount = data.filter(n => n.status === 'PENDING').length;
-      onNotificationsCountChange(pendingCount);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchNotifications();
+    dispatch(fetchNotifications());
 
     // Click outside listener
     function handleClickOutside(event: MouseEvent) {
@@ -41,14 +29,12 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [dispatch, onClose]);
 
   const handleAccept = async (id: string) => {
     try {
       setActioningId(id);
-      await notificationService.acceptInvitation(id);
-      // Reload notifications to update UI
-      await fetchNotifications();
+      await dispatch(acceptInvitation(id)).unwrap();
     } catch (error) {
       console.error('Failed to accept invitation:', error);
     } finally {
@@ -59,9 +45,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
   const handleDecline = async (id: string) => {
     try {
       setActioningId(id);
-      await notificationService.declineInvitation(id);
-      // Reload notifications to update UI
-      await fetchNotifications();
+      await dispatch(declineInvitation(id)).unwrap();
     } catch (error) {
       console.error('Failed to decline invitation:', error);
     } finally {

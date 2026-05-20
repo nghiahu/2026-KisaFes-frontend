@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Icons } from '../../assets/icons';
-import categoryService from '../../services/category.service';
-import { projectService } from '../../services/project.service';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchCategories } from '../../store/slices/categorySlice';
+import { createProject } from '../../store/slices/projectSlice';
 import { authService } from '../../services/auth.service';
 import { AlertTriangle, Info, XCircle } from 'lucide-react';
 import type { Category } from '../../types/category.interface';
@@ -29,8 +30,10 @@ const ALL_PERMISSIONS = [
 export default function CreateProject() {
   const navigate = useNavigate();
   const currentUser = useSelector((state: any) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const categories = useAppSelector(state => state.category.categories);
+
   const [activeTab, setActiveTab] = useState<'basic' | 'team' | 'roles' | 'workflow'>('basic');
-  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -68,16 +71,8 @@ export default function CreateProject() {
 
   // Fetch categories on mount
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await categoryService.getAllCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   // Update defaults when category changes
   useEffect(() => {
@@ -181,7 +176,7 @@ export default function CreateProject() {
         statuses,
         boardColumns
       };
-      await projectService.createProject(finalData);
+      await dispatch(createProject(finalData)).unwrap();
       
       setIsSubmitting(false);
       setShowSuccess(true);

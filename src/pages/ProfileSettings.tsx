@@ -3,8 +3,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch } from 'react-redux';
-import { userService } from '../services/userService';
 import type { UpdateProfilePayload } from '../services/userService';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchProfile, updateProfile } from '../store/slices/userSlice';
 import { authService } from '../services/auth.service';
 import defaultAvatar from '../assets/avatar_def_man.png';
 import type { User } from '../types/user.interface';
@@ -29,7 +30,8 @@ export default function ProfileSettings() {
   const [successMsg, setSuccessMsg] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { profile: apiUser, loading: isProfileLoading } = useAppSelector(state => state.user);
 
   const {
     register,
@@ -44,42 +46,36 @@ export default function ProfileSettings() {
   const bioValue = watch('bio') || '';
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await userService.getMyProfile();
-        // Do axiosClient interceptor đã trả về response.data (tức là ResponseWrapper)
-        const responseData = response as any;
-        const apiUser = responseData.data; // Đây chính là UserProfileResponse
+    dispatch(fetchProfile());
+  }, [dispatch]);
 
-        const mappedUser: User = {
-          id: apiUser.id,
-          email: apiUser.email,
-          fullname: apiUser.fullName,
-          username: apiUser.userName,
-          avatarUrl: apiUser.avatar,
-          bio: apiUser.bio,
-          isPublic: apiUser.isPublic,
-          roles: [] // Mặc định không dùng trong UI này
-        };
+  useEffect(() => {
+    if (apiUser) {
+      const mappedUser: User = {
+        id: apiUser.id,
+        email: apiUser.email,
+        fullName: apiUser.fullName,
+        userName: apiUser.userName,
+        avatar: apiUser.avatar,
+        bio: apiUser.bio,
+        isPublic: apiUser.isPublic,
+        roles: [] // Mặc định không dùng trong UI này
+      };
 
-        setUser(mappedUser);
-        setIsPublic(apiUser.isPublic ?? false);
-        setAvatarPreview(apiUser.avatar || null);
+      setUser(mappedUser);
+      setIsPublic(apiUser.isPublic ?? false);
+      setAvatarPreview(apiUser.avatar || null);
 
-        reset({
-          fullName: apiUser.fullName,
-          userName: apiUser.userName,
-          bio: apiUser.bio || '',
-        });
-      } catch (err: any) {
-        setErrorMsg('Không thể tải thông tin cá nhân');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [reset]);
+      reset({
+        fullName: apiUser.fullName,
+        userName: apiUser.userName,
+        bio: apiUser.bio || '',
+      });
+      setLoading(false);
+    } else if (!isProfileLoading) {
+      setLoading(false);
+    }
+  }, [apiUser, isProfileLoading, reset]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -121,16 +117,14 @@ export default function ProfileSettings() {
         avatar: avatarPreview,
       };
 
-      const response = await userService.updateMyProfile(payload);
-      const responseData = response as any;
-      const updatedApiUser = responseData.data;
+      const updatedApiUser = await dispatch(updateProfile(payload)).unwrap();
 
       const mappedUpdatedUser: User = {
         id: updatedApiUser.id,
         email: updatedApiUser.email,
-        fullname: updatedApiUser.fullName,
-        username: updatedApiUser.userName,
-        avatarUrl: updatedApiUser.avatar,
+        fullName: updatedApiUser.fullName,
+        userName: updatedApiUser.userName,
+        avatar: updatedApiUser.avatar,
         bio: updatedApiUser.bio,
         isPublic: updatedApiUser.isPublic,
         roles: []
@@ -138,8 +132,6 @@ export default function ProfileSettings() {
 
       setUser(mappedUpdatedUser);
       setSuccessMsg('Cập nhật thông tin thành công!');
-
-      // Update local storage and redux so Header updates immediately
       localStorage.setItem('user', JSON.stringify(mappedUpdatedUser));
       dispatch(loginSuccess({ user: mappedUpdatedUser, token: localStorage.getItem('token') || '' })); // Assuming we can just update the user part
 
@@ -177,7 +169,7 @@ export default function ProfileSettings() {
             </div>
           </div>
 
-          <h2 className="text-xl font-bold text-slate-900">{user?.fullname}</h2>
+          <h2 className="text-xl font-bold text-slate-900">{user?.fullName}</h2>
           {bioValue && (
             <p className="text-sm text-slate-500 mt-1 line-clamp-2">{bioValue}</p>
           )}
@@ -284,12 +276,12 @@ export default function ProfileSettings() {
               type="button"
               onClick={() => {
                 reset({
-                  fullName: user?.fullname,
-                  userName: user?.username,
+                  fullName: user?.fullName,
+                  userName: user?.userName,
                   bio: user?.bio || '',
                 });
                 setIsPublic(user?.isPublic ?? false);
-                setAvatarPreview(user?.avatarUrl || null);
+                setAvatarPreview(user?.avatar || null);
               }}
               className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
             >

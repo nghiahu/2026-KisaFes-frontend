@@ -10,6 +10,7 @@ import Dashboard from '../pages/workspace/Dashboard'
 import Projects from '../pages/workspace/Projects'
 import CreateProject from '../pages/workspace/CreateProject'
 import ProjectDetail from '../pages/workspace/ProjectDetail'
+import ProtectedRoute from './ProtectedRoute'
 
 export const router = createBrowserRouter([
   {
@@ -53,7 +54,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/profile',
-        element: <ProfileLayout />,
+        element: <ProtectedRoute><ProfileLayout /></ProtectedRoute>,
         children: [
           {
             path: '',
@@ -71,7 +72,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/workspace',
-        element: <WorkspaceLayout />,
+        element: <ProtectedRoute><WorkspaceLayout /></ProtectedRoute>,
         children: [
           {
             path: '',

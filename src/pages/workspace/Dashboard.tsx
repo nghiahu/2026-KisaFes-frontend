@@ -8,10 +8,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
-    if (userData) setUser(JSON.parse(userData));
+    if (userData) {
+      const raw = JSON.parse(userData);
+      // Normalize to handle API field naming inconsistency
+      setUser({
+        ...raw,
+        fullName: raw.fullName || raw.fullname || raw.full_name || '',
+        userName: raw.userName || raw.username || raw.user_name || '',
+      });
+    }
   }, []);
 
-  const firstName = user?.fullname?.split(' ').slice(-1)[0] || 'User';
+  const firstName = user?.fullName?.split(' ').slice(-1)[0] || 'User';
 
   const getGreeting = () => {
     const hour = new Date().getHours();

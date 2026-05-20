@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import HeaderNav from "./HeaderNav"
 import { Icons } from "../../assets/icons"
 import type { User } from "../../types/user.interface"
@@ -14,7 +15,13 @@ export default function Header() {
     const userData = localStorage.getItem("user")
 
     if (userData) {
-      setUser(JSON.parse(userData))
+      const raw = JSON.parse(userData)
+      setUser({
+        ...raw,
+        fullName: raw.fullName || raw.fullname || raw.full_name || "",
+        userName: raw.userName || raw.username || raw.user_name || "",
+        avatar: raw.avatar || raw.avatarUrl || raw.avatar_url || "",
+      })
     } else {
       setUser(null)
     }
@@ -24,7 +31,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r bg-white/90 backdrop-blur-sm py-2">
       <nav className="container-custom flex items-center justify-between px-6 py-6">
-        
+
         {/* Logo & Brand */}
         <a href="/" className="flex items-center gap-12">
           <div className="flex items-center gap-3">
@@ -81,22 +88,22 @@ export default function Header() {
           <span className="hidden h-6 w-px bg-slate-200 sm:block" />
 
           {user ? (
-          <div className="flex items-center gap-3">
-            <a href="/workspace" className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
-              Go to KisaFres
-            </a>
+            <div className="flex items-center gap-3">
+              <Link to="/workspace" className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+                Go to KisaFres
+              </Link>
 
-            {/* User Avatar + Dropdown */}
-            <UserDropdown user={user} variant="landing" />
-          </div>
-        ) : (
-          <a
-            href="/login"
-            className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition duration-200"
-          >
-            Sign in
-          </a>
-        )}
+              {/* User Avatar + Dropdown */}
+              <UserDropdown user={user} variant="landing" />
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition duration-200"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </nav>
     </header>
