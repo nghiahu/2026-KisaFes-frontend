@@ -39,13 +39,13 @@ export default function ProjectDetail() {
     if (!projectId) return;
     dispatch(fetchCategories());
     dispatch(fetchProjectById(projectId));
-    dispatch(fetchTasksByProject(projectId));
+    dispatch(fetchTasksByProject({ projectId }));
     setActiveTab('list');
   }, [projectId, dispatch]);
 
   useEffect(() => {
-    setLoading(isProjectLoading || isCategoriesLoading || isTasksLoading);
-  }, [isProjectLoading, isCategoriesLoading, isTasksLoading]);
+    setLoading(isProjectLoading || isCategoriesLoading);
+  }, [isProjectLoading, isCategoriesLoading]);
 
   useEffect(() => {
     if (backendProject) {

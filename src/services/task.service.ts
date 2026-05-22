@@ -13,8 +13,8 @@ export interface TaskCreateRequest {
 }
 
 export const taskService = {
-  getTasksByProjectId: async (projectId: string): Promise<any[]> => {
-    const response = await axiosClient.get(`/tasks/project/${projectId}`);
+  getTasksByProjectId: async (projectId: string, params?: any): Promise<any> => {
+    const response = await axiosClient.get(`/tasks/project/${projectId}`, { params });
     return response.data;
   },
   createTask: async (data: TaskCreateRequest): Promise<any> => {

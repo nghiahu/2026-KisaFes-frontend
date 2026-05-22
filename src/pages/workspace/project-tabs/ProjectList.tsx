@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Icons } from '../../../assets/icons';
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateTaskStatus, createTask, fetchTasksByProject, updateTaskAssignee, updateTaskPriority } from '../../../store/slices/taskSlice';
 import defaultAvatar from '../../../assets/avatar_def_man.png';
 
@@ -32,6 +32,9 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isItemsPerPageOpen, setIsItemsPerPageOpen] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const { totalElements, totalPages } = useAppSelector(state => state.task);
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -109,6 +112,24 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
       window.removeEventListener('scroll', handleScroll, true);
     };
   }, [showTypeDropdown, isCreatingTask, activeStatusDropdownId, activeAssigneeDropdownId, activePriorityDropdownId]);
+
+  // Fetch from backend when pagination or search changes
+  useEffect(() => {
+    if (projectId) {
+      // Debounce search slightly or just fetch directly
+      const timer = setTimeout(() => {
+        dispatch(fetchTasksByProject({
+          projectId,
+          params: {
+            page: currentPage,
+            size: itemsPerPage,
+            keyword: searchKeyword || undefined
+          }
+        }));
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [projectId, currentPage, itemsPerPage, searchKeyword, dispatch]);
 
   // Auto-focus search input when assignee dropdown opens
   useEffect(() => {
@@ -205,13 +226,11 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     return p ? p.color : 'text-slate-500';
   };
 
-  // Pagination Logic
-  const totalPages = Math.max(1, Math.ceil(tasks.length / itemsPerPage));
-  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
-  
+  // Pagination Logic (Backend)
+  const validCurrentPage = Math.min(Math.max(1, currentPage), Math.max(1, totalPages));
   const startIndex = (validCurrentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, tasks.length);
-  const currentTasks = tasks.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + tasks.length, totalElements);
+  const currentTasks = tasks; // Backend already paginated
 
 
   return (
@@ -225,6 +244,11 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
             <input
               type="text"
               placeholder="Search work"
+              value={searchKeyword}
+              onChange={(e) => {
+                setSearchKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
               className="pl-8 pr-3 py-1.5 w-44 bg-slate-50/50 border border-slate-200 hover:border-slate-300 focus:border-blue-500 focus:bg-white rounded-lg text-xs font-semibold text-slate-700 outline-none transition-all shadow-sm"
             />
           </div>
@@ -678,7 +702,14 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                       </span>
                       <button
                         onClick={() => {
-                          if (projectId) dispatch(fetchTasksByProject(projectId));
+                          if (projectId) dispatch(fetchTasksByProject({
+                            projectId,
+                            params: {
+                              page: currentPage,
+                              size: itemsPerPage,
+                              keyword: searchKeyword || undefined
+                            }
+                          }));
                         }}
                         className="p-1 text-slate-400 hover:text-slate-600 rounded shrink-0"
                         title="Reset tasks"
@@ -774,7 +805,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
       <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100 bg-white shrink-0 mt-auto">
         <div className="flex items-center gap-4">
           <span className="text-xs font-medium text-slate-500">
-            Showing {tasks.length === 0 ? 0 : startIndex + 1} to {endIndex} of {tasks.length} results
+            Showing {totalElements === 0 ? 0 : startIndex + 1} to {endIndex} of {totalElements} results
           </span>
           <div className="relative" ref={itemsPerPageRef}>
             <button
