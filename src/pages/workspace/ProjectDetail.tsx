@@ -122,19 +122,19 @@ export default function ProjectDetail() {
 
   const tabs = isScrum
     ? [
-        baseTabs[0], // Summary
-        baseTabs[1], // List
-        baseTabs[2], // Board (Kanban-style)
-        scrumTabs[0], // Backlog
-        scrumTabs[1], // Sprint Board
-        scrumTabs[2], // Roadmap
-        scrumTabs[3], // Issues
-        baseTabs[3], // Calendar
-        baseTabs[4], // Code
-        baseTabs[5], // Docs
-        baseTabs[6], // Forms
-        baseTabs[7], // Development
-      ]
+      baseTabs[0], // Summary
+      baseTabs[1], // List
+      baseTabs[2], // Board (Kanban-style)
+      scrumTabs[0], // Backlog
+      scrumTabs[1], // Sprint Board
+      scrumTabs[2], // Roadmap
+      scrumTabs[3], // Issues
+      baseTabs[3], // Calendar
+      baseTabs[4], // Code
+      baseTabs[5], // Docs
+      baseTabs[6], // Forms
+      baseTabs[7], // Development
+    ]
     : baseTabs;
 
   if (loading) {
@@ -162,7 +162,7 @@ export default function ProjectDetail() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50/30 animate-in fade-in duration-300">
+    <div className="flex flex-col h-[calc(100vh-88px)] bg-slate-50/30 animate-in fade-in duration-300">
       {/* Top Breadcrumbs & Back Navigation */}
       <div className="flex items-center gap-1.5 px-6 pt-5 text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
         <button
@@ -183,16 +183,15 @@ export default function ProjectDetail() {
           </div>
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">{currentProject.name}</h1>
           {/* Methodology badge */}
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-widest border ${
-            currentProject.methodology === 'SCRUM'
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-widest border ${currentProject.methodology === 'SCRUM'
               ? 'bg-violet-50 text-violet-600 border-violet-200'
               : 'bg-cyan-50 text-cyan-600 border-cyan-200'
-          }`}>
-            {currentProject.methodology === 'SCRUM' 
-              ? <><Icons.zap size={12} className="text-violet-500" /> SCRUM</> 
+            }`}>
+            {currentProject.methodology === 'SCRUM'
+              ? <><Icons.zap size={12} className="text-violet-500" /> SCRUM</>
               : <><Icons.kanbanSquare size={12} className="text-teal-500" /> KANBAN</>}
           </span>
-          <button 
+          <button
             onClick={() => setShowInviteModal(true)}
             className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors shrink-0"
             title="Invite to project"
@@ -257,17 +256,17 @@ export default function ProjectDetail() {
         {activeTab === 'roadmap' && <ProjectRoadmap />}
         {activeTab === 'issues' && <ProjectIssues tasks={tasks} />}
         {activeTab === 'members' && (
-          <ProjectMembers 
-            currentProject={currentProject} 
-            onUpdate={() => dispatch(fetchProjectById(projectId!))} 
+          <ProjectMembers
+            currentProject={currentProject}
+            onUpdate={() => dispatch(fetchProjectById(projectId!))}
           />
         )}
       </div>
 
       {/* Modals */}
       {showInviteModal && (
-        <InviteMemberModal 
-          onClose={() => setShowInviteModal(false)} 
+        <InviteMemberModal
+          onClose={() => setShowInviteModal(false)}
           projectName={currentProject.name}
           projectId={currentProject.id}
         />

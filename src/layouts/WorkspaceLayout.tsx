@@ -14,7 +14,7 @@ export default function WorkspaceLayout() {
       />
       <div className={`flex flex-col flex-1 min-w-0 overflow-hidden transition-all duration-300`}>
         <WorkspaceHeader />
-        <main className="flex-1 overflow-y-auto p-5 md:p-8">
+        <main className="flex-1 overflow-y-auto p-2 md:p-2">
           <Outlet />
         </main>
       </div>

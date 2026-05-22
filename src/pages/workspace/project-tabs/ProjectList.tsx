@@ -18,7 +18,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskType, setNewTaskType] = useState('Epic');
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+  const [dropdownPos, setDropdownPos] = useState<any>({ top: 0, left: 0, bottom: 'auto' });
   const [activeStatusDropdownId, setActiveStatusDropdownId] = useState<string | null>(null);
   const [statusDropdownPos, setStatusDropdownPos] = useState({ top: 0, left: 0 });
   // Assignee dropdown state
@@ -28,6 +28,10 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   // Priority dropdown state
   const [activePriorityDropdownId, setActivePriorityDropdownId] = useState<string | null>(null);
   const [priorityDropdownPos, setPriorityDropdownPos] = useState({ top: 0, left: 0 });
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isItemsPerPageOpen, setIsItemsPerPageOpen] = useState(false);
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,6 +40,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const assigneeDropdownRef = useRef<HTMLDivElement>(null);
   const assigneeSearchRef = useRef<HTMLInputElement>(null);
   const priorityDropdownRef = useRef<HTMLDivElement>(null);
+  const itemsPerPageRef = useRef<HTMLDivElement>(null);
 
   // Project members list for assignee dropdown
   const projectMembers: any[] = currentProject?.members?.filter((m: any) => m.active !== false) || [];
@@ -69,6 +74,11 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
       const isOutsidePriorityDropdown = priorityDropdownRef.current ? !priorityDropdownRef.current.contains(event.target as Node) : true;
       if (isOutsidePriorityDropdown) {
         setActivePriorityDropdownId(null);
+      }
+
+      const isOutsideItemsPerPage = itemsPerPageRef.current ? !itemsPerPageRef.current.contains(event.target as Node) : true;
+      if (isOutsideItemsPerPage) {
+        setIsItemsPerPageOpen(false);
       }
 
       const isOutsideInlineRow = inlineRowRef.current ? !inlineRowRef.current.contains(event.target as Node) : true;
@@ -110,7 +120,12 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const handleToggleDropdown = () => {
     if (!showTypeDropdown && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+      const spaceBelow = window.innerHeight - rect.bottom;
+      if (spaceBelow < 160) { // Nếu không đủ chỗ dưới
+        setDropdownPos({ top: 'auto', bottom: window.innerHeight - rect.top + 4, left: rect.left });
+      } else {
+        setDropdownPos({ top: rect.bottom + 4, bottom: 'auto', left: rect.left });
+      }
     }
     setShowTypeDropdown(!showTypeDropdown);
   };
@@ -174,10 +189,10 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
 
   const PRIORITIES = [
     { label: 'Highest', icon: <Icons.chevronsUp size={12} className="text-rose-500" />, color: 'text-rose-600' },
-    { label: 'High',    icon: <Icons.chevronUp size={12} className="text-orange-500" />, color: 'text-orange-500' },
-    { label: 'Medium',  icon: <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />, color: 'text-amber-500' },
-    { label: 'Low',     icon: <Icons.chevronDown size={12} className="text-blue-400" />, color: 'text-blue-400' },
-    { label: 'Lowest',  icon: <Icons.chevronsDown size={12} className="text-slate-400" />, color: 'text-slate-400' },
+    { label: 'High', icon: <Icons.chevronUp size={12} className="text-orange-500" />, color: 'text-orange-500' },
+    { label: 'Medium', icon: <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />, color: 'text-amber-500' },
+    { label: 'Low', icon: <Icons.chevronDown size={12} className="text-blue-400" />, color: 'text-blue-400' },
+    { label: 'Lowest', icon: <Icons.chevronsDown size={12} className="text-slate-400" />, color: 'text-slate-400' },
   ];
 
   const getPriorityIcon = (priority: string | null | undefined) => {
@@ -189,6 +204,14 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     const p = PRIORITIES.find(x => x.label?.toLowerCase() === (priority || '').toLowerCase());
     return p ? p.color : 'text-slate-500';
   };
+
+  // Pagination Logic
+  const totalPages = Math.max(1, Math.ceil(tasks.length / itemsPerPage));
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, tasks.length);
+  const currentTasks = tasks.slice(startIndex, endIndex);
 
 
   return (
@@ -268,7 +291,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
               </tr>
             </thead>
             <tbody>
-              {tasks.map((task, index) => {
+              {currentTasks.map((task, index) => {
                 const typeInfo = (() => {
                   const t = (task.type || '').toLowerCase();
                   switch (t) {
@@ -293,15 +316,15 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                     </td>
 
                     {/* Work */}
-                    <td className="py-3.5 px-4 font-semibold text-slate-800 text-xs">
-                      <div className="flex items-center gap-2.5 min-w-0">
+                    <td className="py-3.5 px-4 font-semibold text-slate-800 text-xs max-w-[350px]">
+                      <div className="flex items-center gap-2.5 min-w-0 w-full">
                         <span className={`w-4 h-4 rounded ${typeInfo.bg} flex items-center justify-center ${typeInfo.color} shrink-0 font-black shadow-sm`} title={typeInfo.label}>
                           {typeInfo.icon}
                         </span>
                         <span className="text-blue-600 hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap">
-                          {task.taskKey || `ISSUE-${String(index + 1).padStart(2, '0')}`}
+                          {task.taskKey || `ISSUE-${String(startIndex + index + 1).padStart(2, '0')}`}
                         </span>
-                        <span className="text-slate-700 group-hover:text-blue-600 transition-colors truncate whitespace-nowrap">{task.title}</span>
+                        <span className="text-slate-700 group-hover:text-blue-600 transition-colors truncate flex-1" title={task.title}>{task.title}</span>
 
                         <span className="opacity-0 group-hover:opacity-100 flex items-center gap-1.5 ml-2 transition-all shrink-0">
                           <Icons.arrowUpRight size={12} className="text-slate-400 hover:text-slate-600 cursor-pointer" />
@@ -338,7 +361,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                             <Icons.user size={10} />
                           </div>
                         )}
-                        <span className={hasAssignee ? 'text-slate-700 font-medium' : 'text-slate-400 font-medium'}>
+                        <span className={`truncate ${hasAssignee ? 'text-slate-700 font-medium' : 'text-slate-400 font-medium'}`} title={task.assigneeName || 'Unassigned'}>
                           {task.assigneeName || 'Unassigned'}
                         </span>
                         <Icons.chevronDown size={10} className="ml-auto text-slate-300 opacity-0 group-hover/assignee:opacity-100 transition-opacity shrink-0" />
@@ -459,7 +482,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                           alt={task.reporterName || 'Reporter'}
                           className="w-5 h-5 rounded-full object-cover shrink-0 border border-slate-200"
                         />
-                        <span className="text-slate-700">{task.reporterName || 'Unassigned'}</span>
+                        <span className="text-slate-700 truncate" title={task.reporterName || 'Unassigned'}>{task.reporterName || 'Unassigned'}</span>
                       </div>
                     </td>
 
@@ -479,11 +502,10 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                           }
                         }}
                         title={task.type === 'epic' ? 'Epic luôn có priority Medium' : undefined}
-                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all w-full text-left ${
-                          task.type === 'epic'
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all w-full text-left ${task.type === 'epic'
                             ? 'cursor-default opacity-70'
                             : 'hover:bg-slate-100 cursor-pointer group/priority'
-                        } ${activePriorityDropdownId === task.id ? 'bg-blue-50 ring-1 ring-blue-200' : ''}`}
+                          } ${activePriorityDropdownId === task.id ? 'bg-blue-50 ring-1 ring-blue-200' : ''}`}
                       >
                         <span className={`flex items-center justify-center shrink-0 ${getPriorityColor(task.priority)}`}>
                           {getPriorityIcon(task.priority)}
@@ -508,9 +530,8 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                               <button
                                 key={p.label}
                                 onClick={() => handlePrioritySelect(task, p.label)}
-                                className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${
-                                  isSelected ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
-                                }`}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                                  }`}
                               >
                                 <span className="shrink-0">{p.icon}</span>
                                 <span>{p.label}</span>
@@ -686,7 +707,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                           <div
                             ref={dropdownRef}
                             className="fixed w-[180px] bg-white border border-slate-200 shadow-xl rounded-[4px] py-1.5 z-[9999]"
-                            style={{ top: dropdownPos.top, left: dropdownPos.left }}
+                            style={{ top: dropdownPos.top, bottom: dropdownPos.bottom, left: dropdownPos.left }}
                           >
                             <div className="px-1">
                               <button onClick={() => { setNewTaskType('Epic'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-3 px-3 py-1.5 text-[14px] rounded-[3px] text-left ${newTaskType === 'Epic' ? 'bg-[#EEF2FF] text-[#3B82F6] border-l-2 border-[#3B82F6]' : 'text-slate-700 hover:bg-slate-50 border-l-2 border-transparent'}`}>
@@ -746,6 +767,105 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Pagination Space */}
+      <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100 bg-white shrink-0 mt-auto">
+        <div className="flex items-center gap-4">
+          <span className="text-xs font-medium text-slate-500">
+            Showing {tasks.length === 0 ? 0 : startIndex + 1} to {endIndex} of {tasks.length} results
+          </span>
+          <div className="relative" ref={itemsPerPageRef}>
+            <button
+              onClick={() => setIsItemsPerPageOpen(!isItemsPerPageOpen)}
+              className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 rounded-md transition-colors shadow-sm"
+            >
+              {itemsPerPage} / page
+              <Icons.chevronDown size={12} className={`transition-transform text-slate-400 ${isItemsPerPageOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isItemsPerPageOpen && (
+              <div className="absolute bottom-full left-0 mb-1.5 w-[110px] bg-white border border-slate-200 shadow-xl rounded-lg py-1.5 z-50 overflow-hidden">
+                {[10, 20, 50, 100].map(num => (
+                  <button
+                    key={num}
+                    onClick={() => {
+                      setItemsPerPage(num);
+                      setCurrentPage(1);
+                      setIsItemsPerPageOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${
+                      itemsPerPage === num 
+                        ? 'bg-blue-50 text-blue-600 font-bold' 
+                        : 'text-slate-700 hover:bg-slate-50 font-medium'
+                    }`}
+                  >
+                    <span>{num}</span>
+                    <span className="text-slate-400 font-normal">/ page</span>
+                    {itemsPerPage === num && <Icons.check size={11} className="ml-auto text-blue-500 shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={validCurrentPage === 1}
+            title="Previous page"
+            className={`p-1.5 rounded-md text-xs font-semibold border transition-all flex items-center justify-center ${
+              validCurrentPage === 1 
+                ? 'text-slate-400 bg-slate-50 border-slate-200/60 cursor-not-allowed opacity-70' 
+                : 'text-slate-600 bg-white hover:bg-slate-50 border-slate-200 shadow-sm active:scale-95'
+            }`}
+          >
+            <Icons.chevronLeft size={16} />
+          </button>
+          
+          <div className="flex items-center gap-0.5 px-2">
+            {Array.from({ length: totalPages }).map((_, i) => {
+              const pageNum = i + 1;
+              if (
+                totalPages <= 5 || 
+                pageNum === 1 || 
+                pageNum === totalPages || 
+                (pageNum >= validCurrentPage - 1 && pageNum <= validCurrentPage + 1)
+              ) {
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`min-w-[28px] h-7 flex items-center justify-center rounded-md text-xs transition-all ${
+                      validCurrentPage === pageNum
+                        ? 'font-bold bg-blue-600 text-white shadow-sm shadow-blue-500/20 ring-1 ring-blue-600'
+                        : 'font-medium text-slate-600 bg-transparent hover:bg-slate-100'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              }
+              if (pageNum === validCurrentPage - 2 || pageNum === validCurrentPage + 2) {
+                return <span key={pageNum} className="text-slate-400 text-[10px] px-1 font-bold tracking-widest">...</span>;
+              }
+              return null;
+            })}
+          </div>
+
+          <button 
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={validCurrentPage === totalPages}
+            title="Next page"
+            className={`p-1.5 rounded-md text-xs font-semibold border transition-all flex items-center justify-center ${
+              validCurrentPage === totalPages 
+                ? 'text-slate-400 bg-slate-50 border-slate-200/60 cursor-not-allowed opacity-70' 
+                : 'text-slate-600 bg-white hover:bg-slate-50 border-slate-200 shadow-sm active:scale-95'
+            }`}
+          >
+            <Icons.chevronRight size={16} />
+          </button>
         </div>
       </div>
     </div>

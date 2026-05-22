@@ -359,7 +359,7 @@ function ProjectCard({
   return (
     <div
       onClick={() => navigate(`/workspace/projects/${project.id}`)}
-      className="group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col gap-4"
+      className="group bg-white rounded-2xl mt-2 border border-slate-200/80 shadow-sm hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col gap-4"
     >
       {/* Row 1 — Methodology badge + ··· */}
       <div className="flex items-center justify-between">
@@ -537,8 +537,8 @@ function ProjectListItem({
           {project.status.toUpperCase()}
         </span>
         <span className={`px-2.5 py-1 rounded-full text-[9px] font-black tracking-widest ${isScrum
-            ? 'bg-indigo-50 text-indigo-500'
-            : 'bg-teal-50 text-teal-500'
+          ? 'bg-indigo-50 text-indigo-500'
+          : 'bg-teal-50 text-teal-500'
           }`}>
           {isScrum ? 'SCRUM' : 'KANBAN'}
         </span>
