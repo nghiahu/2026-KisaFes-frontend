@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Icons } from '../../../assets/icons';
 import { useAppDispatch } from '../../../store/hooks';
-import { updateTaskStatus, createTask, fetchTasksByProject } from '../../../store/slices/taskSlice';
+import { updateTaskStatus, createTask, fetchTasksByProject, updateTaskAssignee, updateTaskPriority } from '../../../store/slices/taskSlice';
+import defaultAvatar from '../../../assets/avatar_def_man.png';
 
 interface ProjectListProps {
   projectId: string;
@@ -18,13 +19,35 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const [newTaskType, setNewTaskType] = useState('Epic');
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+  const [activeStatusDropdownId, setActiveStatusDropdownId] = useState<string | null>(null);
+  const [statusDropdownPos, setStatusDropdownPos] = useState({ top: 0, left: 0 });
+  // Assignee dropdown state
+  const [activeAssigneeDropdownId, setActiveAssigneeDropdownId] = useState<string | null>(null);
+  const [assigneeDropdownPos, setAssigneeDropdownPos] = useState({ top: 0, left: 0 });
+  const [assigneeSearch, setAssigneeSearch] = useState('');
+  // Priority dropdown state
+  const [activePriorityDropdownId, setActivePriorityDropdownId] = useState<string | null>(null);
+  const [priorityDropdownPos, setPriorityDropdownPos] = useState({ top: 0, left: 0 });
+
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inlineRowRef = useRef<HTMLTableRowElement>(null);
+  const statusDropdownRef = useRef<HTMLDivElement>(null);
+  const assigneeDropdownRef = useRef<HTMLDivElement>(null);
+  const assigneeSearchRef = useRef<HTMLInputElement>(null);
+  const priorityDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Project members list for assignee dropdown
+  const projectMembers: any[] = currentProject?.members?.filter((m: any) => m.active !== false) || [];
+
+  const filteredMembers = projectMembers.filter((m: any) =>
+    !assigneeSearch.trim() ||
+    (m.name || '').toLowerCase().includes(assigneeSearch.toLowerCase()) ||
+    (m.email || '').toLowerCase().includes(assigneeSearch.toLowerCase())
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Check if click is outside both the dropdown and the trigger
       const isOutsideDropdown = dropdownRef.current ? !dropdownRef.current.contains(event.target as Node) : true;
       const isOutsideTrigger = triggerRef.current ? !triggerRef.current.contains(event.target as Node) : true;
 
@@ -32,22 +55,42 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
         setShowTypeDropdown(false);
       }
 
-      // Check if click is outside the inline create row
+      const isOutsideStatusDropdown = statusDropdownRef.current ? !statusDropdownRef.current.contains(event.target as Node) : true;
+      if (isOutsideStatusDropdown) {
+        setActiveStatusDropdownId(null);
+      }
+
+      const isOutsideAssigneeDropdown = assigneeDropdownRef.current ? !assigneeDropdownRef.current.contains(event.target as Node) : true;
+      if (isOutsideAssigneeDropdown) {
+        setActiveAssigneeDropdownId(null);
+        setAssigneeSearch('');
+      }
+
+      const isOutsidePriorityDropdown = priorityDropdownRef.current ? !priorityDropdownRef.current.contains(event.target as Node) : true;
+      if (isOutsidePriorityDropdown) {
+        setActivePriorityDropdownId(null);
+      }
+
       const isOutsideInlineRow = inlineRowRef.current ? !inlineRowRef.current.contains(event.target as Node) : true;
       if (isCreatingTask && isOutsideInlineRow && isOutsideDropdown) {
         setIsCreatingTask(false);
       }
     };
 
-    // Also handle scroll to close dropdown because portal doesn't move automatically
     const handleScroll = () => {
       if (showTypeDropdown) setShowTypeDropdown(false);
+      if (activeStatusDropdownId) setActiveStatusDropdownId(null);
+      if (activeAssigneeDropdownId) {
+        setActiveAssigneeDropdownId(null);
+        setAssigneeSearch('');
+      }
+      if (activePriorityDropdownId) setActivePriorityDropdownId(null);
     };
 
-    if (showTypeDropdown || isCreatingTask) {
+    if (showTypeDropdown || isCreatingTask || activeStatusDropdownId || activeAssigneeDropdownId || activePriorityDropdownId) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    if (showTypeDropdown) {
+    if (showTypeDropdown || activeStatusDropdownId || activeAssigneeDropdownId || activePriorityDropdownId) {
       window.addEventListener('scroll', handleScroll, true);
     }
 
@@ -55,7 +98,14 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
       document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [showTypeDropdown, isCreatingTask]);
+  }, [showTypeDropdown, isCreatingTask, activeStatusDropdownId, activeAssigneeDropdownId, activePriorityDropdownId]);
+
+  // Auto-focus search input when assignee dropdown opens
+  useEffect(() => {
+    if (activeAssigneeDropdownId && assigneeSearchRef.current) {
+      setTimeout(() => assigneeSearchRef.current?.focus(), 50);
+    }
+  }, [activeAssigneeDropdownId]);
 
   const handleToggleDropdown = () => {
     if (!showTypeDropdown && triggerRef.current) {
@@ -82,17 +132,70 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     }
   };
 
+  const handleAssigneeSelect = async (task: any, member: any | null) => {
+    setActiveAssigneeDropdownId(null);
+    setAssigneeSearch('');
+
+    const newAssigneeId = member ? member.id : null;
+    const newAssigneeName = member ? member.name : 'Unassigned';
+
+    // Optimistic update
+    setTasks(prev => prev.map(t =>
+      t.id === task.id ? { ...t, assigneeId: newAssigneeId, assigneeName: newAssigneeName } : t
+    ));
+
+    try {
+      if (task.dbId) {
+        await dispatch(updateTaskAssignee({ taskId: task.dbId, assigneeId: newAssigneeId })).unwrap();
+      }
+    } catch (err) {
+      console.error("Failed to update assignee:", err);
+      // Rollback on error
+      setTasks(prev => prev.map(t =>
+        t.id === task.id ? { ...t, assigneeId: task.assigneeId, assigneeName: task.assigneeName } : t
+      ));
+    }
+  };
+
+  const handlePrioritySelect = async (task: any, priority: string) => {
+    setActivePriorityDropdownId(null);
+    const oldPriority = task.priority;
+    // Optimistic update
+    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, priority } : t));
+    try {
+      if (task.dbId) {
+        await dispatch(updateTaskPriority({ taskId: task.dbId, priority })).unwrap();
+      }
+    } catch (err) {
+      console.error('Failed to update priority:', err);
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, priority: oldPriority } : t));
+    }
+  };
+
+  const PRIORITIES = [
+    { label: 'Highest', icon: <Icons.chevronsUp size={12} className="text-rose-500" />, color: 'text-rose-600' },
+    { label: 'High',    icon: <Icons.chevronUp size={12} className="text-orange-500" />, color: 'text-orange-500' },
+    { label: 'Medium',  icon: <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />, color: 'text-amber-500' },
+    { label: 'Low',     icon: <Icons.chevronDown size={12} className="text-blue-400" />, color: 'text-blue-400' },
+    { label: 'Lowest',  icon: <Icons.chevronsDown size={12} className="text-slate-400" />, color: 'text-slate-400' },
+  ];
+
+  const getPriorityIcon = (priority: string | null | undefined) => {
+    const p = PRIORITIES.find(x => x.label?.toLowerCase() === (priority || '').toLowerCase());
+    return p ? p.icon : <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />;
+  };
+
+  const getPriorityColor = (priority: string | null | undefined) => {
+    const p = PRIORITIES.find(x => x.label?.toLowerCase() === (priority || '').toLowerCase());
+    return p ? p.color : 'text-slate-500';
+  };
+
+
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-white">
       {/* Toolbar Row */}
       <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-3 bg-white border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-3">
-          {/* Ask AI Button */}
-          {/* <button className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-700 transition-all shadow-sm">
-            <Icons.sparkles size={13} className="text-violet-500 fill-violet-100" />
-            <span>Ask AI</span>
-          </button> */}
-
           {/* Search Bar */}
           <div className="relative">
             <Icons.search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -166,7 +269,22 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
             </thead>
             <tbody>
               {tasks.map((task, index) => {
-                const isStory = task.type === 'story';
+                const typeInfo = (() => {
+                  const t = (task.type || '').toLowerCase();
+                  switch (t) {
+                    case 'epic': return { icon: <Icons.zap size={10} className="fill-current" />, bg: 'bg-violet-100', color: 'text-violet-600', label: 'Epic' };
+                    case 'story': return { icon: <Icons.zap size={10} className="fill-current" />, bg: 'bg-emerald-100', color: 'text-emerald-600', label: 'Story' };
+                    case 'incident':
+                    case 'bug': return { icon: <Icons.alertCircle size={10} />, bg: 'bg-rose-100', color: 'text-rose-600', label: 'Incident' };
+                    case 'service request': return { icon: <Icons.alertCircle size={10} />, bg: 'bg-amber-100', color: 'text-amber-600', label: 'Service Request' };
+                    case 'task':
+                    default: return { icon: <Icons.checkSquare size={10} />, bg: 'bg-blue-100', color: 'text-blue-600', label: 'Task' };
+                  }
+                })();
+
+                const isAssigneeOpen = activeAssigneeDropdownId === task.id;
+                const hasAssignee = task.assigneeName && task.assigneeName !== 'Unassigned';
+
                 return (
                   <tr key={task.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group">
                     {/* Checkbox */}
@@ -177,15 +295,9 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                     {/* Work */}
                     <td className="py-3.5 px-4 font-semibold text-slate-800 text-xs">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        {isStory ? (
-                          <span className="w-4 h-4 rounded bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 font-black shadow-sm" title="Story">
-                            <Icons.zap size={10} />
-                          </span>
-                        ) : (
-                          <span className="w-4 h-4 rounded bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 font-black shadow-sm" title="Task">
-                            <Icons.check size={10} />
-                          </span>
-                        )}
+                        <span className={`w-4 h-4 rounded ${typeInfo.bg} flex items-center justify-center ${typeInfo.color} shrink-0 font-black shadow-sm`} title={typeInfo.label}>
+                          {typeInfo.icon}
+                        </span>
                         <span className="text-blue-600 hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap">
                           {task.taskKey || `ISSUE-${String(index + 1).padStart(2, '0')}`}
                         </span>
@@ -199,60 +311,230 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                     </td>
 
                     {/* Assignee */}
-                    <td className="py-3.5 px-4 text-slate-500 text-xs font-semibold">
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-                          <Icons.user size={10} />
-                        </div>
-                        <span className={!task.assigneeName || task.assigneeName === 'Unassigned' ? 'text-slate-400 font-medium' : 'text-slate-600'}>
+                    <td className="py-3.5 px-4 text-xs font-semibold">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (isAssigneeOpen) {
+                            setActiveAssigneeDropdownId(null);
+                            setAssigneeSearch('');
+                          } else {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setAssigneeDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                            setActiveAssigneeDropdownId(task.id);
+                            setAssigneeSearch('');
+                          }
+                        }}
+                        className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-all hover:bg-slate-100 cursor-pointer group/assignee w-full text-left ${isAssigneeOpen ? 'bg-blue-50 ring-1 ring-blue-200' : ''}`}
+                      >
+                        {hasAssignee ? (
+                          <img
+                            src={task.assigneeAvatar || defaultAvatar}
+                            alt={task.assigneeName}
+                            className="w-5 h-5 rounded-full object-cover shrink-0 border border-slate-200"
+                          />
+                        ) : (
+                          <div className="w-5 h-5 rounded-full bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0">
+                            <Icons.user size={10} />
+                          </div>
+                        )}
+                        <span className={hasAssignee ? 'text-slate-700 font-medium' : 'text-slate-400 font-medium'}>
                           {task.assigneeName || 'Unassigned'}
                         </span>
-                      </div>
+                        <Icons.chevronDown size={10} className="ml-auto text-slate-300 opacity-0 group-hover/assignee:opacity-100 transition-opacity shrink-0" />
+                      </button>
+
+                      {/* Assignee Dropdown Portal */}
+                      {isAssigneeOpen && createPortal(
+                        <div
+                          ref={assigneeDropdownRef}
+                          className="fixed w-[230px] bg-white border border-slate-200 shadow-2xl rounded-xl py-2 z-[9999] overflow-hidden"
+                          style={{ top: assigneeDropdownPos.top, left: assigneeDropdownPos.left }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Search bar */}
+                          <div className="px-3 pb-2 border-b border-slate-100">
+                            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                              <Icons.search size={12} className="text-slate-400 shrink-0" />
+                              <input
+                                ref={assigneeSearchRef}
+                                type="text"
+                                placeholder="Tìm người dùng..."
+                                value={assigneeSearch}
+                                onChange={(e) => setAssigneeSearch(e.target.value)}
+                                className="flex-1 text-[12px] text-slate-700 bg-transparent outline-none placeholder:text-slate-400"
+                              />
+                              {assigneeSearch && (
+                                <button
+                                  onClick={() => setAssigneeSearch('')}
+                                  className="text-slate-400 hover:text-slate-600 shrink-0"
+                                >
+                                  <Icons.x size={11} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Member list */}
+                          <div className="max-h-[220px] overflow-y-auto py-1">
+                            {/* Unassigned option */}
+                            {(!assigneeSearch.trim() || 'unassigned'.includes(assigneeSearch.toLowerCase())) && (
+                              <button
+                                onClick={() => handleAssigneeSelect(task, null)}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${!hasAssignee ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50'
+                                  }`}
+                              >
+                                <div className="w-6 h-6 rounded-full bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0">
+                                  <Icons.user size={11} />
+                                </div>
+                                <span>Unassigned</span>
+                                {!hasAssignee && (
+                                  <Icons.check size={12} className="ml-auto text-blue-500 shrink-0" />
+                                )}
+                              </button>
+                            )}
+
+                            {/* Members */}
+                            {filteredMembers.length > 0 && (
+                              <>
+                                {!assigneeSearch.trim() && (
+                                  <div className="px-3 py-1 mt-1">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thành viên dự án</span>
+                                  </div>
+                                )}
+                                {filteredMembers.map((member: any) => {
+                                  const isSelected = task.assigneeId === member.id;
+                                  return (
+                                    <button
+                                      key={member.id}
+                                      onClick={() => handleAssigneeSelect(task, member)}
+                                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                      <img
+                                        src={member.avatar || defaultAvatar}
+                                        alt={member.name}
+                                        className="w-6 h-6 rounded-full object-cover shrink-0 border border-slate-200"
+                                      />
+                                      <div className="flex flex-col min-w-0">
+                                        <span className="truncate font-semibold">{member.name}</span>
+                                        {member.email && (
+                                          <span className="truncate text-[10px] text-slate-400 font-normal">{member.email}</span>
+                                        )}
+                                      </div>
+                                      {isSelected && (
+                                        <Icons.check size={12} className="ml-auto text-blue-500 shrink-0" />
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </>
+                            )}
+
+                            {/* No search results */}
+                            {filteredMembers.length === 0 && assigneeSearch.trim() && (
+                              <div className="px-3 py-4 text-center">
+                                <Icons.userX size={20} className="text-slate-300 mx-auto mb-1" />
+                                <p className="text-[11px] text-slate-400">Không tìm thấy người dùng</p>
+                              </div>
+                            )}
+
+                            {/* No members at all */}
+                            {projectMembers.length === 0 && (
+                              <div className="px-3 py-4 text-center">
+                                <p className="text-[11px] text-slate-400">Chưa có thành viên nào</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>,
+                        document.body
+                      )}
                     </td>
 
                     {/* Reporter */}
                     <td className="py-3.5 px-4 text-slate-600 text-xs font-bold">
                       <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[8px] font-black shrink-0 shadow-inner">
-                          {task.reporterName ? task.reporterName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'NN'}
-                        </div>
+                        <img
+                          src={task.reporterAvatar || defaultAvatar}
+                          alt={task.reporterName || 'Reporter'}
+                          className="w-5 h-5 rounded-full object-cover shrink-0 border border-slate-200"
+                        />
                         <span className="text-slate-700">{task.reporterName || 'Unassigned'}</span>
                       </div>
                     </td>
 
                     {/* Priority */}
-                    <td className="py-3.5 px-4 text-xs font-bold text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-slate-400 flex items-center justify-center">
-                          <Icons.equal size={12} strokeWidth={3} />
+                    <td className="py-3.5 px-4 text-xs font-semibold">
+                      <button
+                        disabled={task.type === 'epic'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (task.type === 'epic') return;
+                          if (activePriorityDropdownId === task.id) {
+                            setActivePriorityDropdownId(null);
+                          } else {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setPriorityDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                            setActivePriorityDropdownId(task.id);
+                          }
+                        }}
+                        title={task.type === 'epic' ? 'Epic luôn có priority Medium' : undefined}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all w-full text-left ${
+                          task.type === 'epic'
+                            ? 'cursor-default opacity-70'
+                            : 'hover:bg-slate-100 cursor-pointer group/priority'
+                        } ${activePriorityDropdownId === task.id ? 'bg-blue-50 ring-1 ring-blue-200' : ''}`}
+                      >
+                        <span className={`flex items-center justify-center shrink-0 ${getPriorityColor(task.priority)}`}>
+                          {getPriorityIcon(task.priority)}
                         </span>
-                        <span>{task.priority}</span>
-                      </div>
+                        <span className={getPriorityColor(task.priority)}>{task.priority || 'Medium'}</span>
+                        {task.type !== 'epic' && (
+                          <Icons.chevronDown size={10} className="ml-auto text-slate-300 opacity-0 group-hover/priority:opacity-100 transition-opacity shrink-0" />
+                        )}
+                      </button>
+
+                      {/* Priority Dropdown Portal */}
+                      {activePriorityDropdownId === task.id && createPortal(
+                        <div
+                          ref={priorityDropdownRef}
+                          className="fixed w-[160px] bg-white border border-slate-200 shadow-2xl rounded-xl py-1.5 z-[9999] overflow-hidden"
+                          style={{ top: priorityDropdownPos.top, left: priorityDropdownPos.left }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {PRIORITIES.map((p) => {
+                            const isSelected = (task.priority || 'Medium').toLowerCase() === p.label.toLowerCase();
+                            return (
+                              <button
+                                key={p.label}
+                                onClick={() => handlePrioritySelect(task, p.label)}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${
+                                  isSelected ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                                }`}
+                              >
+                                <span className="shrink-0">{p.icon}</span>
+                                <span>{p.label}</span>
+                                {isSelected && <Icons.check size={11} className="ml-auto text-blue-500 shrink-0" />}
+                              </button>
+                            );
+                          })}
+                        </div>,
+                        document.body
+                      )}
                     </td>
 
                     {/* Status */}
                     <td className="py-3.5 px-4">
                       <div className="relative inline-block">
                         <button
-                          onClick={async (e) => {
+                          onClick={(e) => {
                             e.stopPropagation();
-                            if (!currentProject || !currentProject.statuses || currentProject.statuses.length === 0) return;
-
-                            const statuses = currentProject.statuses;
-                            const currentIndex = statuses.findIndex((s: any) => s.label === task.status || s.statusId === task.statusId);
-                            const nextStatusObj = statuses[(currentIndex + 1) % statuses.length];
-                            const nextStatusId = nextStatusObj.statusId;
-                            const nextStatusLabel = nextStatusObj.label;
-
-                            // Update UI immediately for responsiveness
-                            setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: nextStatusLabel, statusId: nextStatusId } : t));
-
-                            try {
-                              if (task.dbId) {
-                                await dispatch(updateTaskStatus({ taskId: task.dbId, statusId: nextStatusId })).unwrap();
-                              }
-                            } catch (err) {
-                              console.error("Failed to update status in backend:", err);
+                            if (activeStatusDropdownId === task.id) {
+                              setActiveStatusDropdownId(null);
+                            } else {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setStatusDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                              setActiveStatusDropdownId(task.id);
                             }
                           }}
                           className={`flex items-center gap-1 px-2 py-0.5 border rounded text-[9px] font-black tracking-wider uppercase transition-colors shadow-sm ${task.status === 'Done' || task.status?.toLowerCase().includes('done') || task.status?.toLowerCase().includes('hoàn thành')
@@ -265,6 +547,48 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                           <span>{task.status}</span>
                           <span className="text-[7px] text-slate-400">▼</span>
                         </button>
+
+                        {/* Status Dropdown (Portal) */}
+                        {activeStatusDropdownId === task.id && createPortal(
+                          <div
+                            ref={statusDropdownRef}
+                            className="fixed w-[180px] bg-white border border-slate-200 shadow-xl rounded-[4px] py-1.5 z-[9999]"
+                            style={{ top: statusDropdownPos.top, left: statusDropdownPos.left }}
+                          >
+                            <div className="px-1 max-h-[250px] overflow-y-auto">
+                              {currentProject?.statuses?.map((statusObj: any) => {
+                                const isSelected = statusObj.label === task.status || statusObj.statusId === task.statusId;
+                                return (
+                                  <button
+                                    key={statusObj.statusId}
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      setActiveStatusDropdownId(null);
+                                      if (isSelected) return;
+
+                                      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: statusObj.label, statusId: statusObj.statusId } : t));
+                                      try {
+                                        if (task.dbId) {
+                                          await dispatch(updateTaskStatus({ taskId: task.dbId, statusId: statusObj.statusId })).unwrap();
+                                        }
+                                      } catch (err) {
+                                        console.error("Failed to update status in backend:", err);
+                                      }
+                                    }}
+                                    className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] font-semibold rounded-[3px] text-left transition-colors ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50'
+                                      }`}
+                                  >
+                                    <div className="w-4 flex items-center justify-center shrink-0">
+                                      {isSelected && <Icons.check size={12} className="text-blue-600" />}
+                                    </div>
+                                    <span className="truncate">{statusObj.label}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>,
+                          document.body
+                        )}
                       </div>
                     </td>
 
@@ -343,7 +667,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 w-full max-w-[1050px] bg-white border-2 border-[#3B82F6] rounded-[4px] p-[3px] shadow-sm relative">
-                      {/* Dropdown trigger */}
+                      {/* Task type dropdown trigger */}
                       <div className="relative shrink-0">
                         <button
                           ref={triggerRef}
@@ -357,7 +681,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                           <Icons.chevronDown size={14} className="text-slate-500" />
                         </button>
 
-                        {/* Dropdown Menu (Portal) */}
+                        {/* Task type dropdown (Portal) */}
                         {showTypeDropdown && createPortal(
                           <div
                             ref={dropdownRef}

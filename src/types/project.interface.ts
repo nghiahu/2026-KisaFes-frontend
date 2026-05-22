@@ -1,4 +1,5 @@
 export type ProjectStatus = 'ACTIVE' | 'ON HOLD' | 'COMPLETED' | 'PLANNING' | 'AT RISK';
+export type ProjectMethodology = 'SCRUM' | 'KANBAN';
 
 export interface ProjectMember {
   id: string;
@@ -13,6 +14,7 @@ export interface Project {
   description: string;
   category: string;
   status: ProjectStatus;
+  methodology: ProjectMethodology;
   progress: number;
   members: ProjectMember[];
   isFavorite: boolean;
@@ -26,3 +28,4 @@ export interface Project {
   openIssuesCount?: number;
   deadlineDisplay?: string;
 }
+

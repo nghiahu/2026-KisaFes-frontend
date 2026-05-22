@@ -53,6 +53,7 @@ export default function LoginForm() {
           <input
             type="text"
             placeholder="name@company.com"
+            autoComplete="username"
             {...register('email')}
             className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
           />
@@ -69,7 +70,9 @@ export default function LoginForm() {
           <div>
             <div className="relative">
               <input type={showPassword ? "text" : "password"}
-                placeholder="••••••••" {...register('password')}
+                placeholder="••••••••" 
+                autoComplete="current-password"
+                {...register('password')}
                 className={`w-full px-3 py-2 pr-10 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${
                   errors.password ? 'border-red-500' : 'border-gray-300'}`}/>
               <button type="button" onClick={() => setShowPassword(!showPassword)}

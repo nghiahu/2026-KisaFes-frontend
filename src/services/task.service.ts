@@ -24,5 +24,14 @@ export const taskService = {
   updateTaskStatus: async (taskId: string, statusId: string): Promise<any> => {
     const response = await axiosClient.patch(`/tasks/${taskId}/status?statusId=${statusId}`);
     return response.data;
+  },
+  updateTaskAssignee: async (taskId: string, assigneeId: string | null): Promise<any> => {
+    const params = assigneeId ? `?assigneeId=${assigneeId}` : '';
+    const response = await axiosClient.patch(`/tasks/${taskId}/assignee${params}`);
+    return response.data;
+  },
+  updateTaskPriority: async (taskId: string, priority: string): Promise<any> => {
+    const response = await axiosClient.patch(`/tasks/${taskId}/priority?priority=${encodeURIComponent(priority)}`);
+    return response.data;
   }
 };

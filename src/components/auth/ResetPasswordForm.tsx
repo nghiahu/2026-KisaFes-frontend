@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useAuthActions } from '../../hooks/useAuthActions';
 import { clearResetPasswordData } from '../../store/slices/authSlice';
 import { Icons } from '../../assets/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { RootState } from '../../store';
 
 const resetPasswordSchema = z.object({
@@ -44,8 +44,13 @@ export default function ResetPasswordForm() {
   });
 
   // Redirect if missing data
+  useEffect(() => {
+    if (!resetData?.email || !resetData?.verifyToken) {
+      navigate('/forgot-password', { replace: true });
+    }
+  }, [resetData, navigate]);
+
   if (!resetData?.email || !resetData?.verifyToken) {
-    navigate('/forgot-password');
     return null;
   }
 

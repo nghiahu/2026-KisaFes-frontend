@@ -17,4 +17,8 @@ export const userService = {
   updateMyProfile: (data: UpdateProfilePayload) => {
     return axiosClient.put<{ data: User }>('/users/me', data);
   },
+
+  searchUsers: (keyword: string) => {
+    return axiosClient.get(`/users/search`, { params: { keyword } });
+  },
 };

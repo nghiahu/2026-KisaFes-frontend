@@ -5,7 +5,7 @@ import { Icons } from '../../assets/icons';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchCategories } from '../../store/slices/categorySlice';
 import { createProject } from '../../store/slices/projectSlice';
-import { authService } from '../../services/auth.service';
+import { userService } from '../../services/userService';
 import { AlertTriangle, Info, XCircle } from 'lucide-react';
 import type { Category } from '../../types/category.interface';
 
@@ -21,10 +21,60 @@ interface ProjectStatus {
   color: string;
 }
 
-const ALL_PERMISSIONS = [
-  'PROJECT_VIEW', 'PROJECT_UPDATE', 'PROJECT_DELETE',
-  'TASK_CREATE', 'TASK_VIEW', 'TASK_UPDATE', 'TASK_DELETE',
-  'BOARD_UPDATE', 'MEMBER_INVITE', 'MEMBER_REMOVE', 'ROLE_MANAGE'
+const PERMISSION_GROUPS = [
+  {
+    name: 'Dự án',
+    permissions: [
+      { id: 'PROJECT_VIEW', label: 'Xem dự án' },
+      { id: 'PROJECT_UPDATE', label: 'Cập nhật dự án' },
+      { id: 'PROJECT_CREATE', label: 'Tạo dự án' },
+      { id: 'PROJECT_DELETE', label: 'Xóa dự án' },
+      { id: 'PROJECT_ARCHIVE', label: 'Lưu trữ dự án' },
+    ]
+  },
+  {
+    name: 'Công việc',
+    permissions: [
+      { id: 'TASK_VIEW', label: 'Xem công việc' },
+      { id: 'TASK_CREATE', label: 'Tạo công việc' },
+      { id: 'TASK_UPDATE', label: 'Sửa công việc' },
+      { id: 'TASK_DELETE', label: 'Xóa công việc' },
+      { id: 'TASK_ASSIGN', label: 'Giao việc' },
+      { id: 'TASK_CHANGE_STATUS', label: 'Đổi trạng thái' },
+    ]
+  },
+  {
+    name: 'Bảng (Board)',
+    permissions: [
+      { id: 'BOARD_VIEW', label: 'Xem bảng' },
+      { id: 'BOARD_UPDATE', label: 'Cấu hình bảng' },
+    ]
+  },
+  {
+    name: 'Thành viên',
+    permissions: [
+      { id: 'MEMBER_INVITE', label: 'Mời thành viên' },
+      { id: 'MEMBER_REMOVE', label: 'Xóa thành viên' },
+      { id: 'MEMBER_UPDATE_ROLE', label: 'Đổi quyền thành viên' },
+    ]
+  },
+  {
+    name: 'Bình luận & Đính kèm',
+    permissions: [
+      { id: 'COMMENT_CREATE', label: 'Tạo bình luận' },
+      { id: 'COMMENT_UPDATE', label: 'Sửa bình luận' },
+      { id: 'COMMENT_DELETE', label: 'Xóa bình luận' },
+      { id: 'ATTACHMENT_UPLOAD', label: 'Tải file' },
+      { id: 'ATTACHMENT_DELETE', label: 'Xóa file' },
+    ]
+  },
+  {
+    name: 'Phân quyền',
+    permissions: [
+      { id: 'ROLE_MANAGE', label: 'Quản lý Role' },
+      { id: 'PERMISSION_MANAGE', label: 'Quản lý Phân quyền' },
+    ]
+  }
 ];
 
 export default function CreateProject() {
@@ -41,10 +91,15 @@ export default function CreateProject() {
     categoryId: '',
   });
 
+  const [methodology, setMethodology] = useState<'SCRUM' | 'KANBAN'>('KANBAN');
+
   const [members, setMembers] = useState<string[]>([]);
   const [emailInput, setEmailInput] = useState('');
-  const [isValidatingEmail, setIsValidatingEmail] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
   const [roles, setRoles] = useState<ProjectRole[]>([]);
+  const [activeRoleIndex, setActiveRoleIndex] = useState(0);
   const [statuses, setStatuses] = useState<ProjectStatus[]>([]);
   const [boardColumns, setBoardColumns] = useState<any[]>([]);
 
@@ -94,44 +149,52 @@ export default function CreateProject() {
     }
   }, [formData.categoryId, categories]);
 
-  const addMember = async () => {
-    const trimmedEmail = emailInput.trim();
-    if (!trimmedEmail) return;
+  // Debounced Search Users
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      const keyword = emailInput.trim();
+      if (!keyword) {
+        setSearchResults([]);
+        setSearchDropdownOpen(false);
+        return;
+      }
+      
+      setIsSearching(true);
+      try {
+        const res: any = await userService.searchUsers(keyword);
+        // axiosClient đã tự động return response.data (ResponseWrapper)
+        // Nên danh sách user thực sự nằm ở res.data
+        const fetchedUsers = res.data || [];
+        
+        // Filter out users already in members
+        const filteredUsers = fetchedUsers.filter((u: any) => 
+          !members.includes(u.email)
+        );
+        setSearchResults(filteredUsers);
+        setSearchDropdownOpen(true);
+      } catch (error) {
+        console.error('Failed to search users:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400);
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail)) {
-      showAlert("Định dạng email không hợp lệ!", "Lỗi định dạng", "error");
-      return;
-    }
+    return () => clearTimeout(delayDebounceFn);
+  }, [emailInput, members, currentUser]);
 
-    if (members.includes(trimmedEmail)) {
+  const addSelectedMember = (email: string) => {
+    if (members.includes(email)) {
       showAlert("Thành viên này đã được thêm vào danh sách mời!", "Trùng lặp", "warning");
       return;
     }
-
-    if (currentUser?.email && trimmedEmail.toLowerCase() === currentUser.email.toLowerCase()) {
+    if (currentUser?.email && email.toLowerCase() === currentUser.email.toLowerCase()) {
       showAlert("Bạn không thể tự mời chính mình vào dự án!", "Cảnh báo", "warning");
       return;
     }
-
-    setIsValidatingEmail(true);
-    try {
-      const res: any = await authService.checkEmail(trimmedEmail);
-      const exists = res.data; 
-
-      if (exists) {
-        setMembers([...members, trimmedEmail]);
-        setEmailInput('');
-      } else {
-        showAlert(`Người dùng với email ${trimmedEmail} không tồn tại trên hệ thống!`, "Không tìm thấy", "error");
-      }
-    } catch (error) {
-      console.error('Error validating email:', error);
-      showAlert("Không thể xác thực email. Vui lòng kiểm tra lại kết nối mạng!", "Lỗi hệ thống", "error");
-    } finally {
-      setIsValidatingEmail(false);
-    }
+    setMembers([...members, email]);
+    setEmailInput('');
+    setSearchDropdownOpen(false);
   };
 
   const removeMember = (email: string) => {
@@ -149,8 +212,27 @@ export default function CreateProject() {
     setRoles(newRoles);
   };
 
+  const toggleGroupPermissions = (roleIdx: number, groupPermissions: string[]) => {
+    const newRoles = [...roles];
+    const role = newRoles[roleIdx];
+    const allIncluded = groupPermissions.every(p => role.permissions.includes(p));
+    
+    if (allIncluded) {
+      role.permissions = role.permissions.filter(p => !groupPermissions.includes(p));
+    } else {
+      const newSet = new Set([...role.permissions, ...groupPermissions]);
+      role.permissions = Array.from(newSet);
+    }
+    setRoles(newRoles);
+  };
+
   const removeRole = (idx: number) => {
     setRoles(roles.filter((_, i) => i !== idx));
+    if (activeRoleIndex === idx) {
+      setActiveRoleIndex(Math.max(0, idx - 1));
+    } else if (activeRoleIndex > idx) {
+      setActiveRoleIndex(activeRoleIndex - 1);
+    }
   };
 
   const removeStatus = (idx: number) => {
@@ -171,6 +253,7 @@ export default function CreateProject() {
     try {
       const finalData = {
         ...formData,
+        methodology,
         members,
         roles,
         statuses,
@@ -272,6 +355,78 @@ export default function CreateProject() {
           {activeTab === 'basic' && (
             <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-right-4 duration-300">
               <SectionHeader title="Project Details" description="Basic information about your project." />
+
+              {/* Methodology Selector */}
+              <div className="flex flex-col gap-3">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Project Methodology</label>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Scrum Card */}
+                  <button
+                    type="button"
+                    onClick={() => setMethodology('SCRUM')}
+                    className={`relative flex flex-col items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-200 overflow-hidden ${
+                      methodology === 'SCRUM'
+                        ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-100'
+                        : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/30'
+                    }`}
+                  >
+                    <img
+                      src="https://internship.rikkei.edu.vn/assets/scrum-illustration.svg"
+                      alt="Scrum methodology"
+                      className={`w-full h-32 object-contain transition-all duration-300 ${
+                        methodology === 'SCRUM' ? 'scale-105' : 'opacity-70 group-hover:opacity-100'
+                      }`}
+                    />
+                    <div className="text-center">
+                      <h4 className={`font-black text-base transition-colors ${
+                        methodology === 'SCRUM' ? 'text-violet-800' : 'text-slate-700'
+                      }`}>Scrum</h4>
+                      <p className={`text-[11px] font-semibold mt-0.5 transition-colors ${
+                        methodology === 'SCRUM' ? 'text-violet-500' : 'text-slate-400'
+                      }`}>Sprint-based delivery</p>
+                    </div>
+                    {methodology === 'SCRUM' && (
+                      <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center">
+                        <span className="text-white text-[10px] font-black">✓</span>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Kanban Card */}
+                  <button
+                    type="button"
+                    onClick={() => setMethodology('KANBAN')}
+                    className={`relative flex flex-col items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-200 overflow-hidden ${
+                      methodology === 'KANBAN'
+                        ? 'border-cyan-500 bg-cyan-50 shadow-lg shadow-cyan-100'
+                        : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/30'
+                    }`}
+                  >
+                    <img
+                      src="https://internship.rikkei.edu.vn/assets/kaban-illistration.svg"
+                      alt="Kanban methodology"
+                      className={`w-full h-32 object-contain transition-all duration-300 ${
+                        methodology === 'KANBAN' ? 'scale-105' : 'opacity-70 group-hover:opacity-100'
+                      }`}
+                    />
+                    <div className="text-center">
+                      <h4 className={`font-black text-base transition-colors ${
+                        methodology === 'KANBAN' ? 'text-cyan-800' : 'text-slate-700'
+                      }`}>Kanban</h4>
+                      <p className={`text-[11px] font-semibold mt-0.5 transition-colors ${
+                        methodology === 'KANBAN' ? 'text-cyan-500' : 'text-slate-400'
+                      }`}>Continuous flow</p>
+                    </div>
+                    {methodology === 'KANBAN' && (
+                      <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center">
+                        <span className="text-white text-[10px] font-black">✓</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+
               <div className="grid grid-cols-2 gap-8">
                 <InputGroup label="Project Name" value={formData.name} onChange={(val) => setFormData({ ...formData, name: val })} placeholder="e.g. Apollo Mission" />
                 <InputGroup label="Project Key" value={formData.code} onChange={(val) => setFormData({ ...formData, code: val.toUpperCase() })} placeholder="APO" />
@@ -320,31 +475,68 @@ export default function CreateProject() {
           {activeTab === 'team' && (
             <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-300">
               <SectionHeader title="Invite Team" description="Add members by email and assign them to roles later." />
-              <div className="flex gap-3 items-center w-full">
-                <div className="flex-1 relative">
+              <div className="flex flex-col gap-1 w-full">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <Icons.search size={20} />
+                  </div>
                   <input
-                    type="email"
-                    disabled={isValidatingEmail}
-                    className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold disabled:bg-slate-100 disabled:text-slate-400"
-                    placeholder="Enter email address..."
+                    type="text"
+                    className="w-full bg-slate-50 border border-slate-200 pl-11 pr-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold"
+                    placeholder="Search users by name or email..."
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addMember()}
+                    onFocus={() => {
+                      if (searchResults.length > 0) setSearchDropdownOpen(true);
+                    }}
+                    onBlur={() => {
+                      // Timeout to allow click event on dropdown items
+                      setTimeout(() => setSearchDropdownOpen(false), 200);
+                    }}
                   />
-                  {isValidatingEmail && (
+                  {isSearching && (
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
                       <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   )}
+
+                  {/* Search Dropdown */}
+                  {searchDropdownOpen && emailInput.trim() !== '' && (
+                    <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-60 overflow-y-auto overflow-hidden">
+                      {searchResults.length > 0 ? (
+                        <div className="p-2">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-1">Kết quả tìm kiếm</div>
+                          {searchResults.map((user) => (
+                            <button
+                              key={user.id}
+                              type="button"
+                              onClick={() => addSelectedMember(user.email)}
+                              className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors text-left"
+                            >
+                              {user.avatar ? (
+                                <img src={user.avatar} alt={user.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100" />
+                              ) : (
+                                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                                  {user.fullName?.charAt(0) || user.email?.charAt(0)}
+                                </div>
+                              )}
+                              <div>
+                                <div className="font-bold text-slate-800">{user.fullName || "User"}</div>
+                                <div className="text-xs text-slate-500">{user.email}</div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        !isSearching && (
+                          <div className="p-6 text-center text-slate-500 text-sm font-medium">
+                            Không tìm thấy người dùng nào phù hợp.
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
                 </div>
-                <button
-                  type="button"
-                  disabled={isValidatingEmail || !emailInput}
-                  onClick={addMember}
-                  className="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 transition-all flex items-center gap-2"
-                >
-                  {isValidatingEmail ? 'Checking...' : 'Invite'}
-                </button>
               </div>
 
               <div className="flex flex-col gap-3">
@@ -369,57 +561,114 @@ export default function CreateProject() {
               <SectionHeader title="Roles & Permissions" description="Define what each team member can do." />
 
               <div className="flex flex-col gap-6">
-                {roles.map((role, idx) => (
-                  <div key={idx} className="bg-slate-50/50 border border-slate-200 rounded-3xl p-6">
+                {/* Horizontal Role Tabs */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-100 hide-scrollbar">
+                  {roles.map((role, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveRoleIndex(idx)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                        activeRoleIndex === idx 
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-200' 
+                          : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 hover:text-slate-800'
+                      }`}
+                    >
+                      <Icons.lockKeyhole size={16} />
+                      {role.name || 'Unnamed Role'}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setRoles([...roles, { name: 'New Role', permissions: [] }]);
+                      setActiveRoleIndex(roles.length);
+                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 border border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:border-blue-400 hover:text-blue-500 transition-all whitespace-nowrap bg-slate-50"
+                  >
+                    <Icons.plus size={16} />
+                    Add Role
+                  </button>
+                </div>
+
+                {/* Active Role Content */}
+                {roles.length > 0 && activeRoleIndex >= 0 && activeRoleIndex < roles.length ? (
+                  <div className="bg-slate-50/50 border border-slate-200 rounded-3xl p-6">
                     <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-200">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                          <Icons.lockKeyhole size={20} />
+                          <Icons.pencil size={20} />
                         </div>
                         <input
                           className="text-lg font-bold bg-transparent outline-none border-b border-transparent focus:border-blue-500 px-1"
-                          value={role.name}
+                          value={roles[activeRoleIndex].name}
+                          placeholder="Role Name"
                           onChange={(e) => {
                             const newRoles = [...roles];
-                            newRoles[idx].name = e.target.value;
+                            newRoles[activeRoleIndex].name = e.target.value;
                             setRoles(newRoles);
                           }}
                         />
                       </div>
                       <button 
-                        onClick={() => removeRole(idx)}
-                        className="text-rose-500 hover:text-rose-700 p-2 transition-colors"
+                        onClick={() => removeRole(activeRoleIndex)}
+                        className="flex items-center gap-2 text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                       >
-                        <Icons.plus size={20} className="rotate-45" />
+                        <Icons.trash2 size={16} />
+                        Xóa Role
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {ALL_PERMISSIONS.map(perm => (
-                        <button
-                          key={perm}
-                          type="button"
-                          onClick={() => togglePermission(idx, perm)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[0.65rem] font-black tracking-wider transition-all border ${role.permissions.includes(perm)
-                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                            : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
-                            }`}
-                        >
-                          <div className={`w-3 h-3 rounded-full ${role.permissions.includes(perm) ? 'bg-emerald-500' : 'bg-slate-200'}`} />
-                          {perm.replace('_', ' ')}
-                        </button>
-                      ))}
+                    <div className="space-y-6 mt-4">
+                      {PERMISSION_GROUPS.map((group) => {
+                        const groupPermIds = group.permissions.map(p => p.id);
+                        const allIncluded = groupPermIds.every(p => roles[activeRoleIndex].permissions.includes(p));
+                        const someIncluded = groupPermIds.some(p => roles[activeRoleIndex].permissions.includes(p));
+
+                        return (
+                          <div key={group.name} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                              <h4 className="font-bold text-sm text-slate-800">{group.name}</h4>
+                              <button
+                                type="button"
+                                onClick={() => toggleGroupPermissions(activeRoleIndex, groupPermIds)}
+                                className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
+                                  allIncluded ? 'bg-blue-100 text-blue-700' : 
+                                  someIncluded ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
+                              >
+                                {allIncluded ? 'Bỏ chọn hết' : 'Chọn tất cả'}
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                              {group.permissions.map((perm) => {
+                                const isChecked = roles[activeRoleIndex].permissions.includes(perm.id);
+                                return (
+                                  <label key={perm.id} className="flex items-center gap-3 cursor-pointer group">
+                                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                                      isChecked ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300 group-hover:border-blue-400'
+                                    }`}>
+                                      {isChecked && <Icons.check size={12} className="text-white" />}
+                                    </div>
+                                    <span className={`text-xs select-none transition-colors ${isChecked ? 'text-slate-800 font-bold' : 'text-slate-600'}`}>
+                                      {perm.label}
+                                    </span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                ))}
-
-                <button
-                  onClick={() => setRoles([...roles, { name: 'New Role', permissions: [] }])}
-                  className="flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-bold hover:border-blue-400 hover:text-blue-500 transition-all"
-                >
-                  <Icons.plus size={20} />
-                  Add Custom Role
-                </button>
+                ) : (
+                  <div className="text-center py-10 bg-slate-50 border border-slate-200 border-dashed rounded-3xl">
+                    <div className="w-12 h-12 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Icons.lockKeyhole size={24} />
+                    </div>
+                    <h3 className="text-slate-700 font-bold">Chưa có Role nào</h3>
+                    <p className="text-slate-500 text-sm mt-1">Hãy thêm role mới để cấu hình phân quyền cho dự án.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}

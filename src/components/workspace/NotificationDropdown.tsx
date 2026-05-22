@@ -18,7 +18,9 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
 
   useEffect(() => {
     dispatch(fetchNotifications());
+  }, [dispatch]);
 
+  useEffect(() => {
     // Click outside listener
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -29,7 +31,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [dispatch, onClose]);
+  }, [onClose]);
 
   const handleAccept = async (id: string) => {
     try {
