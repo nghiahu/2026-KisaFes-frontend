@@ -14,6 +14,7 @@ export interface CategoryRole {
 export interface CategoryBoardColumn {
   name: string;
   mappedStatusIds: string[];
+  defaultStatusId: string;
   position: number;
 }
 

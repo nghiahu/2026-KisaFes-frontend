@@ -10,6 +10,7 @@ export interface TaskCreateRequest {
   storyPoints?: number;
   assigneeId?: string;
   type?: string;
+  dueDate?: string | null;
 }
 
 export const taskService = {
@@ -32,6 +33,19 @@ export const taskService = {
   },
   updateTaskPriority: async (taskId: string, priority: string): Promise<any> => {
     const response = await axiosClient.patch(`/tasks/${taskId}/priority?priority=${encodeURIComponent(priority)}`);
+    return response.data;
+  },
+  updateTaskDueDate: async (taskId: string, dueDate: string | null): Promise<any> => {
+    const params = dueDate ? `?dueDate=${encodeURIComponent(dueDate)}` : '';
+    const response = await axiosClient.patch(`/tasks/${taskId}/due-date${params}`);
+    return response.data;
+  },
+  updateTaskTitle: async (taskId: string, title: string): Promise<any> => {
+    const response = await axiosClient.patch(`/tasks/${taskId}/title?title=${encodeURIComponent(title)}`);
+    return response.data;
+  },
+  deleteTask: async (taskId: string): Promise<any> => {
+    const response = await axiosClient.delete(`/tasks/${taskId}`);
     return response.data;
   }
 };

@@ -359,7 +359,7 @@ function ProjectCard({
   return (
     <div
       onClick={() => navigate(`/workspace/projects/${project.id}`)}
-      className="group bg-white rounded-2xl mt-2 border border-slate-200/80 shadow-sm hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col gap-4"
+      className="group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col gap-4 h-full"
     >
       {/* Row 1 — Methodology badge + ··· */}
       <div className="flex items-center justify-between">
@@ -408,7 +408,7 @@ function ProjectCard({
       </div>
 
       {/* Row 2 — Title + description */}
-      <div>
+      <div className="flex-1">
         <h3 className="text-[17px] font-bold text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-1 leading-snug">
           {project.name}
         </h3>

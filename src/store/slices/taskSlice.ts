@@ -77,6 +77,42 @@ export const updateTaskPriority = createAsyncThunk(
   }
 );
 
+export const updateTaskDueDate = createAsyncThunk(
+  'task/updateTaskDueDate',
+  async ({ taskId, dueDate }: { taskId: string; dueDate: string | null }, { rejectWithValue }) => {
+    try {
+      const response = await taskService.updateTaskDueDate(taskId, dueDate);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update task due date');
+    }
+  }
+);
+
+export const updateTaskTitle = createAsyncThunk(
+  'task/updateTaskTitle',
+  async ({ taskId, title }: { taskId: string; title: string }, { rejectWithValue }) => {
+    try {
+      const response = await taskService.updateTaskTitle(taskId, title);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update task title');
+    }
+  }
+);
+
+export const deleteTask = createAsyncThunk(
+  'task/deleteTask',
+  async (taskId: string, { rejectWithValue }) => {
+    try {
+      await taskService.deleteTask(taskId);
+      return taskId;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to delete task');
+    }
+  }
+);
+
 const taskSlice = createSlice({
   name: 'task',
   initialState,
@@ -115,8 +151,10 @@ const taskSlice = createSlice({
         state.error = null;
       })
       .addCase(createTask.fulfilled, (state, action) => {
+        // We do not push to state.tasks here because it breaks pagination UI.
+        // Instead, we rely on the component dispatching fetchTasksByProject to refresh the data.
         if (action.payload) {
-          state.tasks.push(action.payload);
+          state.totalElements += 1; // Opting to just update total count
         }
       })
       .addCase(createTask.rejected, (state, action) => {
@@ -169,6 +207,50 @@ const taskSlice = createSlice({
         }
       })
       .addCase(updateTaskPriority.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      // updateTaskDueDate
+      .addCase(updateTaskDueDate.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(updateTaskDueDate.fulfilled, (state, action) => {
+        const updatedTask = action.payload;
+        if (updatedTask && updatedTask.id) {
+          const index = state.tasks.findIndex((t) => t.id === updatedTask.id);
+          if (index !== -1) {
+            state.tasks[index] = updatedTask;
+          }
+        }
+      })
+      .addCase(updateTaskDueDate.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      // updateTaskTitle
+      .addCase(updateTaskTitle.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(updateTaskTitle.fulfilled, (state, action) => {
+        const updatedTask = action.payload;
+        if (updatedTask && updatedTask.id) {
+          const index = state.tasks.findIndex((t) => t.id === updatedTask.id);
+          if (index !== -1) {
+            state.tasks[index] = updatedTask;
+          }
+        }
+      })
+      .addCase(updateTaskTitle.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      // deleteTask
+      .addCase(deleteTask.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        const deletedTaskId = action.payload;
+        state.tasks = state.tasks.filter(t => t.id !== deletedTaskId && t.dbId !== deletedTaskId);
+        state.totalElements = Math.max(0, state.totalElements - 1);
+      })
+      .addCase(deleteTask.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

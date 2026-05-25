@@ -23,6 +23,7 @@ import {
   Plus,
   Users,
   Calendar,
+  CalendarPlus,
   MoreHorizontal,
   SlidersHorizontal,
   Leaf,
@@ -74,7 +75,9 @@ import {
   Trash2,
   Shield,
   X,
-  UserX
+  UserX,
+  Bookmark,
+  CornerDownLeft
 } from 'lucide-react';
 
 export const Icons = {
@@ -102,6 +105,7 @@ export const Icons = {
   plus: Plus,
   users: Users,
   calendar: Calendar,
+  calendarPlus: CalendarPlus,
   moreHorizontal: MoreHorizontal,
   slidersHorizontal: SlidersHorizontal,
   leaf: Leaf,
@@ -154,4 +158,6 @@ export const Icons = {
   shield: Shield,
   x: X,
   userX: UserX,
+  bookmark: Bookmark,
+  cornerDownLeft: CornerDownLeft,
 };

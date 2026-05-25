@@ -15,9 +15,11 @@ import ProjectSprint from './project-tabs/ProjectSprint';
 import ProjectRoadmap from './project-tabs/ProjectRoadmap';
 import ProjectIssues from './project-tabs/ProjectIssues';
 import ProjectMembers from './project-tabs/ProjectMembers';
+import ProjectSettings from './project-tabs/ProjectSettings';
+import ProjectCalendar from './project-tabs/ProjectCalendar';
 import InviteMemberModal from '../../components/workspace/InviteMemberModal';
 
-type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'docs' | 'forms' | 'development' | 'backlog' | 'sprint' | 'roadmap' | 'issues';
+type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
 
 export default function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -73,6 +75,7 @@ export default function ProjectDetail() {
         completedTasksCount: completedCount,
         members: backendProject.members || [],
         statuses: backendProject.statuses || [],
+        boardColumns: backendProject.boardColumns || [],
         customRoles: backendProject.customRoles || [],
         ownerId: backendProject.ownerId
       });
@@ -107,9 +110,8 @@ export default function ProjectDetail() {
     { id: 'board' as TabType, label: 'Board', icon: Icons.kanbanSquare },
     { id: 'calendar' as TabType, label: 'Calendar', icon: Icons.calendar },
     { id: 'members' as TabType, label: 'Members', icon: Icons.users },
-    { id: 'docs' as TabType, label: 'Docs', icon: Icons.fileText },
     { id: 'forms' as TabType, label: 'Forms', icon: Icons.clipboardList },
-    { id: 'development' as TabType, label: 'Development', icon: Icons.gitBranch },
+    { id: 'settings' as TabType, label: 'Settings', icon: Icons.settings },
   ];
 
   // Scrum-specific tabs inserted after Board
@@ -130,10 +132,9 @@ export default function ProjectDetail() {
       scrumTabs[2], // Roadmap
       scrumTabs[3], // Issues
       baseTabs[3], // Calendar
-      baseTabs[4], // Code
-      baseTabs[5], // Docs
-      baseTabs[6], // Forms
-      baseTabs[7], // Development
+      baseTabs[4], // Members
+      baseTabs[5], // Forms
+      baseTabs[6], // Settings
     ]
     : baseTabs;
 
@@ -184,8 +185,8 @@ export default function ProjectDetail() {
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">{currentProject.name}</h1>
           {/* Methodology badge */}
           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-widest border ${currentProject.methodology === 'SCRUM'
-              ? 'bg-violet-50 text-violet-600 border-violet-200'
-              : 'bg-cyan-50 text-cyan-600 border-cyan-200'
+            ? 'bg-violet-50 text-violet-600 border-violet-200'
+            : 'bg-cyan-50 text-cyan-600 border-cyan-200'
             }`}>
             {currentProject.methodology === 'SCRUM'
               ? <><Icons.zap size={12} className="text-violet-500" /> SCRUM</>
@@ -241,9 +242,6 @@ export default function ProjectDetail() {
             </button>
           );
         })}
-        <button className="px-2 py-2.5 text-slate-400 hover:text-slate-600 -mb-[2px] shrink-0">
-          <Icons.plus size={14} />
-        </button>
       </div>
 
       {/* Dynamic Tabs Content Viewport */}
@@ -251,12 +249,19 @@ export default function ProjectDetail() {
         {activeTab === 'overview' && <ProjectOverview currentProject={currentProject} tasks={tasks} setActiveTab={setActiveTab} />}
         {activeTab === 'list' && <ProjectList projectId={projectId!} currentProject={currentProject} tasks={tasks} setTasks={setTasks} />}
         {activeTab === 'board' && <ProjectBoard currentProject={currentProject} tasks={tasks} />}
+        {activeTab === 'calendar' && <ProjectCalendar currentProject={currentProject} tasks={tasks} />}
         {activeTab === 'backlog' && <ProjectBacklog tasks={tasks} setActiveTab={setActiveTab} />}
         {activeTab === 'sprint' && <ProjectSprint projectId={projectId!} tasks={tasks} />}
         {activeTab === 'roadmap' && <ProjectRoadmap />}
         {activeTab === 'issues' && <ProjectIssues tasks={tasks} />}
         {activeTab === 'members' && (
           <ProjectMembers
+            currentProject={currentProject}
+            onUpdate={() => dispatch(fetchProjectById(projectId!))}
+          />
+        )}
+        {activeTab === 'settings' && (
+          <ProjectSettings
             currentProject={currentProject}
             onUpdate={() => dispatch(fetchProjectById(projectId!))}
           />
