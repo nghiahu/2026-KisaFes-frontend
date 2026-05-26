@@ -8,13 +8,13 @@ import type { Category } from '../../types/category.interface';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProjects } from '../../store/slices/projectSlice';
 import { fetchCategories } from '../../store/slices/categorySlice';
+import { Skeleton } from '../../components/ui/skeleton';
 
 export default function Projects() {
   const navigate = useNavigate();
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [projects, setProjects] = useState<Project[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeDropdownProjectId, setActiveDropdownProjectId] = useState<string | null>(null);
 
   // Filter & Search states
@@ -72,9 +72,7 @@ export default function Projects() {
     }
   }, [backendProjects, backendCategories, user]);
 
-  useEffect(() => {
-    setIsLoading(isProjectsLoading || isCategoriesLoading);
-  }, [isProjectsLoading, isCategoriesLoading]);
+  const isLoading = isProjectsLoading || isCategoriesLoading;
 
   const toggleFavorite = (id: string) => {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, isFavorite: !p.isFavorite } : p));
@@ -245,10 +243,65 @@ export default function Projects() {
       {/* Content Section */}
       <div className="flex flex-col gap-10">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-slate-500 font-bold animate-pulse">Loading projects...</p>
-          </div>
+          <>
+            {/* Skeleton section header */}
+            <div className="flex flex-col gap-5">
+              <Skeleton className="h-3 w-20 bg-slate-200" />
+              <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
+                {Array.from({ length: 6 }).map((_, i) =>
+                  viewType === 'grid' ? (
+                    <div key={i} className="bg-white rounded-2xl p-5 border border-slate-200/80 flex flex-col gap-4 h-full min-h-[300px]">
+                      {/* Badge row */}
+                      <div className="flex items-center justify-between">
+                        <Skeleton className="h-5 w-16 rounded-full bg-slate-100" />
+                        <Skeleton className="w-7 h-7 rounded-lg bg-slate-100" />
+                      </div>
+                      {/* Title + description */}
+                      <div className="flex flex-col gap-2 flex-1">
+                        <Skeleton className="h-5 w-3/4 bg-slate-200" />
+                        <Skeleton className="h-3 w-full bg-slate-100" />
+                        <Skeleton className="h-3 w-5/6 bg-slate-100" />
+                      </div>
+                      {/* Progress */}
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex justify-between">
+                          <Skeleton className="h-3 w-16 bg-slate-100" />
+                          <Skeleton className="h-3 w-8 bg-slate-100" />
+                        </div>
+                        <Skeleton className="h-[5px] w-full rounded-full bg-slate-100" />
+                      </div>
+                      {/* Stat chips */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <Skeleton className="h-12 rounded-xl bg-slate-100" />
+                        <Skeleton className="h-12 rounded-xl bg-slate-100" />
+                      </div>
+                      {/* Footer */}
+                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                        <div className="flex -space-x-2">
+                          {[0,1,2].map(j => <Skeleton key={j} className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white" />)}
+                        </div>
+                        <Skeleton className="h-3 w-16 bg-slate-100" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div key={i} className="bg-white rounded-2xl px-6 py-4 border border-slate-100 flex items-center justify-between gap-8">
+                      <Skeleton className="h-10 w-20 rounded-xl bg-slate-100" />
+                      <div className="flex flex-col flex-1 gap-2">
+                        <Skeleton className="h-4 w-48 bg-slate-200" />
+                        <Skeleton className="h-3 w-32 bg-slate-100" />
+                      </div>
+                      <Skeleton className="h-10 w-20 bg-slate-100" />
+                      <Skeleton className="h-10 w-36 bg-slate-100" />
+                      <Skeleton className="h-10 w-24 bg-slate-100" />
+                      <div className="flex -space-x-2">
+                        {[0,1].map(j => <Skeleton key={j} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white" />)}
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          </>
         ) : (
           <>
             {/* Favorites Row */}

@@ -77,7 +77,10 @@ import {
   X,
   UserX,
   Bookmark,
-  CornerDownLeft
+  CornerDownLeft,
+  MousePointer2,
+  Edit3,
+  MinusSquare
 } from 'lucide-react';
 
 export const Icons = {
@@ -160,4 +163,7 @@ export const Icons = {
   userX: UserX,
   bookmark: Bookmark,
   cornerDownLeft: CornerDownLeft,
+  mousePointer2: MousePointer2,
+  edit3: Edit3,
+  minusSquare: MinusSquare,
 };

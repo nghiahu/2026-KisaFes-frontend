@@ -44,6 +44,22 @@ export const taskService = {
     const response = await axiosClient.patch(`/tasks/${taskId}/title?title=${encodeURIComponent(title)}`);
     return response.data;
   },
+  updateTaskDescription: async (taskId: string, description: string): Promise<any> => {
+    const response = await axiosClient.patch(`/tasks/${taskId}/description`, { description });
+    return response.data;
+  },
+  addSubTask: async (taskId: string, title: string): Promise<any> => {
+    const response = await axiosClient.post(`/tasks/${taskId}/subtasks`, { title });
+    return response.data;
+  },
+  toggleSubTask: async (taskId: string, subtaskId: string): Promise<any> => {
+    const response = await axiosClient.patch(`/tasks/${taskId}/subtasks/${subtaskId}/toggle`);
+    return response.data;
+  },
+  deleteSubTask: async (taskId: string, subtaskId: string): Promise<any> => {
+    const response = await axiosClient.delete(`/tasks/${taskId}/subtasks/${subtaskId}`);
+    return response.data;
+  },
   deleteTask: async (taskId: string): Promise<any> => {
     const response = await axiosClient.delete(`/tasks/${taskId}`);
     return response.data;

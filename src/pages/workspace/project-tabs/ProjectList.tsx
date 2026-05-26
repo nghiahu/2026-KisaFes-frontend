@@ -4,6 +4,8 @@ import { Icons } from '../../../assets/icons';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateTaskStatus, createTask, fetchTasksByProject, updateTaskAssignee, updateTaskPriority, updateTaskDueDate, updateTaskTitle, deleteTask } from '../../../store/slices/taskSlice';
 import defaultAvatar from '../../../assets/avatar_def_man.png';
+import { MassChangeStatusModal } from '../../../components/workspace/MassChangeStatusModal';
+import { MassEditFieldsModal } from '../../../components/workspace/MassEditFieldsModal';
 
 interface ProjectListProps {
   projectId: string;
@@ -42,6 +44,37 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const [isItemsPerPageOpen, setIsItemsPerPageOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
 
+  // Checkbox selection state
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const [excludedTaskIds, setExcludedTaskIds] = useState<Set<string>>(new Set());
+
+  const handleMasterCheckboxToggle = () => {
+    if (isAllSelected) {
+      setIsAllSelected(false);
+      setSelectedTaskIds(new Set());
+      setExcludedTaskIds(new Set());
+    } else {
+      setIsAllSelected(true);
+      setSelectedTaskIds(new Set());
+      setExcludedTaskIds(new Set());
+    }
+  };
+
+  const handleTaskCheckboxToggle = (taskId: string) => {
+    if (isAllSelected) {
+      const newExcluded = new Set(excludedTaskIds);
+      if (newExcluded.has(taskId)) newExcluded.delete(taskId);
+      else newExcluded.add(taskId);
+      setExcludedTaskIds(newExcluded);
+    } else {
+      const newSelected = new Set(selectedTaskIds);
+      if (newSelected.has(taskId)) newSelected.delete(taskId);
+      else newSelected.add(taskId);
+      setSelectedTaskIds(newSelected);
+    }
+  };
+
   // Title inline edit state
   const [activeEditTitleId, setActiveEditTitleId] = useState<string | null>(null);
   const [editTitleValue, setEditTitleValue] = useState('');
@@ -53,6 +86,14 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const [deleteModalTask, setDeleteModalTask] = useState<any>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showMassDeleteModal, setShowMassDeleteModal] = useState(false);
+  
+  const [showMassChangeStatusModal, setShowMassChangeStatusModal] = useState(false);
+  const [isChangingStatus, setIsChangingStatus] = useState(false);
+  
+  const [showMassEditFieldsModal, setShowMassEditFieldsModal] = useState(false);
+  const [isEditingFields, setIsEditingFields] = useState(false);
+  
   const [activeFilterCategory, setActiveFilterCategory] = useState('Assignee');
   const [filterAssignees, setFilterAssignees] = useState<string[]>([]); // ids or 'unassigned'
   const [filterAssigneeSearch, setFilterAssigneeSearch] = useState('');
@@ -808,7 +849,12 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                     <div className="flex items-center h-full w-full">
                       {col.id === 'checkbox' ? (
                         <div className="w-full text-center">
-                          <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                          <input 
+                            type="checkbox" 
+                            checked={isAllSelected}
+                            onChange={handleMasterCheckboxToggle}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                          />
                         </div>
                       ) : col.id === 'actions' ? (
                         <div className="w-4 h-4 rounded hover:bg-slate-200 flex items-center justify-center cursor-pointer text-slate-500 mx-auto">
@@ -865,7 +911,12 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                               switch (col.id) {
                                 case 'checkbox': return (
                                   <td key={col.id} style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }} className="py-3.5 px-4 text-center">
-                                    <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                                    <input 
+                                      type="checkbox" 
+                                      checked={isAllSelected ? !excludedTaskIds.has(task.id) : selectedTaskIds.has(task.id)}
+                                      onChange={() => handleTaskCheckboxToggle(task.id)}
+                                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                                    />
                                   </td>
                                 );
                                 case 'work': return (
@@ -1010,7 +1061,12 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                         switch (col.id) {
                           case 'checkbox': return (
                             <td key={col.id} style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }} className="py-3.5 px-4 text-center">
-                              <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                              <input 
+                                type="checkbox" 
+                                checked={isAllSelected ? !excludedTaskIds.has(task.id) : selectedTaskIds.has(task.id)}
+                                onChange={() => handleTaskCheckboxToggle(task.id)}
+                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                              />
                             </td>
                           );
                           case 'work': return (
@@ -1869,8 +1925,204 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
             </div>,
             document.body
           )}
+
+          {/* Mass Change Status Modal */}
+          {showMassChangeStatusModal && (
+            <MassChangeStatusModal
+              isOpen={showMassChangeStatusModal}
+              onClose={() => setShowMassChangeStatusModal(false)}
+              onSubmit={async (statusId) => {
+                try {
+                  setIsChangingStatus(true);
+                  const tasksToUpdate = isAllSelected
+                    ? tasks.filter(t => !excludedTaskIds.has(t.id))
+                    : tasks.filter(t => selectedTaskIds.has(t.id));
+                  
+                  await Promise.all(tasksToUpdate.map(t => dispatch(updateTaskStatus({ taskId: t.dbId || t.id, statusId })).unwrap()));
+                } catch (e) {
+                  console.error(e);
+                } finally {
+                  setIsChangingStatus(false);
+                  setShowMassChangeStatusModal(false);
+                  setIsAllSelected(false);
+                  setSelectedTaskIds(new Set());
+                  setExcludedTaskIds(new Set());
+                  
+                  if (projectId) {
+                    dispatch(fetchTasksByProject({ projectId, params: { page: currentPage, size: itemsPerPage } }));
+                  }
+                }
+              }}
+              statuses={currentProject?.statuses || []}
+              isSubmitting={isChangingStatus}
+            />
+          )}
+
+          {/* Mass Edit Fields Modal */}
+          {showMassEditFieldsModal && (
+            <MassEditFieldsModal
+              isOpen={showMassEditFieldsModal}
+              onClose={() => setShowMassEditFieldsModal(false)}
+              members={currentProject?.members || []}
+              isSubmitting={isEditingFields}
+              onSubmit={async (data) => {
+                try {
+                  setIsEditingFields(true);
+                  const tasksToUpdate = isAllSelected
+                    ? tasks.filter(t => !excludedTaskIds.has(t.id))
+                    : tasks.filter(t => selectedTaskIds.has(t.id));
+
+                  const taskPromises = tasksToUpdate.map(async (t) => {
+                    const taskId = t.dbId || t.id;
+                    if (data.assigneeId !== undefined) {
+                      await dispatch(updateTaskAssignee({ taskId, assigneeId: data.assigneeId })).unwrap();
+                    }
+                    if (data.priority !== undefined) {
+                      await dispatch(updateTaskPriority({ taskId, priority: data.priority })).unwrap();
+                    }
+                    if (data.dueDate !== undefined) {
+                      await dispatch(updateTaskDueDate({ taskId, dueDate: data.dueDate })).unwrap();
+                    }
+                  });
+                  
+                  await Promise.all(taskPromises);
+                } catch (e) {
+                  console.error(e);
+                } finally {
+                  setIsEditingFields(false);
+                  setShowMassEditFieldsModal(false);
+                  setIsAllSelected(false);
+                  setSelectedTaskIds(new Set());
+                  setExcludedTaskIds(new Set());
+                  
+                  if (projectId) {
+                    dispatch(fetchTasksByProject({ projectId, params: { page: currentPage, size: itemsPerPage } }));
+                  }
+                }
+              }}
+            />
+          )}
+
+          {/* Mass Delete Confirmation Modal */}
+          {showMassDeleteModal && createPortal(
+            <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+              <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowMassDeleteModal(false)} />
+              <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-[440px] p-6 animate-in zoom-in-95 duration-200">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <Icons.alertCircle size={22} className="text-rose-600 fill-rose-100" />
+                    <h2 className="text-lg font-bold text-slate-800">Delete selected tasks?</h2>
+                  </div>
+                  <button onClick={() => setShowMassDeleteModal(false)} className="text-slate-400 hover:text-slate-600">
+                    <Icons.x size={20} />
+                  </button>
+                </div>
+                
+                <p className="text-slate-600 text-sm leading-relaxed mb-6 pl-8">
+                  You are about to delete {isAllSelected ? (totalElements - excludedTaskIds.size) : selectedTaskIds.size} task(s). 
+                  Deleting is irreversible. It permanently removes the work items, subtasks, 
+                  comments and attachments.
+                </p>
+                
+                <div className="mb-6 pl-8">
+                  <label className="block text-[13px] text-slate-600 mb-2">
+                    Type <strong className="text-slate-800 font-bold">delete</strong> to continue
+                  </label>
+                  <input
+                    type="text"
+                    autoFocus
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-end gap-3">
+                  <button 
+                    onClick={() => setShowMassDeleteModal(false)}
+                    className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    disabled={deleteConfirmText !== 'delete' || isDeleting}
+                    onClick={async () => {
+                      try {
+                        setIsDeleting(true);
+                        const tasksToDelete = isAllSelected
+                          ? tasks.filter(t => !excludedTaskIds.has(t.id))
+                          : tasks.filter(t => selectedTaskIds.has(t.id));
+                        
+                        await Promise.all(tasksToDelete.map(t => dispatch(deleteTask(t.dbId || t.id)).unwrap()));
+                        
+                        setShowMassDeleteModal(false);
+                        setDeleteConfirmText('');
+                        setIsAllSelected(false);
+                        setSelectedTaskIds(new Set());
+                        setExcludedTaskIds(new Set());
+                        
+                        if (projectId) {
+                          dispatch(fetchTasksByProject({ projectId, params: { page: currentPage, size: itemsPerPage } }));
+                        }
+                      } catch (e) {
+                        console.error(e);
+                      } finally {
+                        setIsDeleting(false);
+                      }
+                    }}
+                    className={`px-4 py-2 text-sm font-semibold text-white rounded transition-colors flex items-center gap-2 ${deleteConfirmText === 'delete' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-slate-100 text-slate-400'}`}
+                  >
+                    {isDeleting ? <Icons.refreshCw className="animate-spin" size={16} /> : null}
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
         </div>
       </div>
+
+      {/* Floating Action Bar */}
+      {(isAllSelected || selectedTaskIds.size > 0) && createPortal(
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[#28282b] text-white px-3 py-2 rounded-lg shadow-2xl z-[99999] text-[13px] font-medium border border-white/10 animate-slide-up">
+          <div className="flex items-center gap-2 pr-2">
+            <span className="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[12px]">
+              {isAllSelected ? totalElements - excludedTaskIds.size : selectedTaskIds.size}
+            </span>
+            <span className="text-[#d4d4d8]">selected</span>
+          </div>
+          
+          <button className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/10 rounded-md transition-colors text-[#d4d4d8]" onClick={() => { setIsAllSelected(true); setExcludedTaskIds(new Set()); setSelectedTaskIds(new Set()); }}>
+            <Icons.mousePointer2 size={14} />
+            <span>Select all</span>
+          </button>
+          
+          <div className="w-[1px] h-4 bg-white/20 mx-2"></div>
+
+          <button className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/10 rounded-md transition-colors text-[#d4d4d8]" onClick={() => setShowMassEditFieldsModal(true)}>
+            <Icons.edit3 size={14} />
+            <span>Edit fields</span>
+          </button>
+
+          <button className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/10 rounded-md transition-colors text-[#d4d4d8]" onClick={() => setShowMassChangeStatusModal(true)}>
+            <Icons.minusSquare size={14} />
+            <span>Change status</span>
+          </button>
+
+          <button className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/10 rounded-md transition-colors text-[#d4d4d8]" onClick={() => setShowMassDeleteModal(true)}>
+            <Icons.trash2 size={14} />
+            <span>Delete</span>
+          </button>
+          
+          <div className="w-[1px] h-4 bg-white/20 mx-2"></div>
+
+          <button className="p-1 hover:bg-white/10 rounded-md transition-colors ml-1 text-[#d4d4d8]" onClick={() => { setIsAllSelected(false); setSelectedTaskIds(new Set()); setExcludedTaskIds(new Set()); }}>
+            <Icons.x size={16} />
+          </button>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

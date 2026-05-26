@@ -12,7 +12,7 @@ interface CategoryState {
 const initialState: CategoryState = {
   categories: [],
   currentCategory: null,
-  loading: false,
+  loading: true,
   error: null,
 };
 

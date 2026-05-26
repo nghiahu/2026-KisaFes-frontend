@@ -13,7 +13,7 @@ const initialState: TaskState = {
   tasks: [],
   totalElements: 0,
   totalPages: 0,
-  loading: false,
+  loading: true,
   error: null,
 };
 
@@ -97,6 +97,54 @@ export const updateTaskTitle = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to update task title');
+    }
+  }
+);
+
+export const updateTaskDescription = createAsyncThunk(
+  'task/updateTaskDescription',
+  async ({ taskId, description }: { taskId: string; description: string }, { rejectWithValue }) => {
+    try {
+      const response = await taskService.updateTaskDescription(taskId, description);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update task description');
+    }
+  }
+);
+
+export const addSubTask = createAsyncThunk(
+  'task/addSubTask',
+  async ({ taskId, title }: { taskId: string; title: string }, { rejectWithValue }) => {
+    try {
+      const response = await taskService.addSubTask(taskId, title);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to add subtask');
+    }
+  }
+);
+
+export const toggleSubTask = createAsyncThunk(
+  'task/toggleSubTask',
+  async ({ taskId, subtaskId }: { taskId: string; subtaskId: string }, { rejectWithValue }) => {
+    try {
+      const response = await taskService.toggleSubTask(taskId, subtaskId);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to toggle subtask');
+    }
+  }
+);
+
+export const deleteSubTask = createAsyncThunk(
+  'task/deleteSubTask',
+  async ({ taskId, subtaskId }: { taskId: string; subtaskId: string }, { rejectWithValue }) => {
+    try {
+      const response = await taskService.deleteSubTask(taskId, subtaskId);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to delete subtask');
     }
   }
 );
@@ -240,6 +288,46 @@ const taskSlice = createSlice({
       })
       .addCase(updateTaskTitle.rejected, (state, action) => {
         state.error = action.payload as string;
+      })
+      // updateTaskDescription
+      .addCase(updateTaskDescription.fulfilled, (state, action) => {
+        const updatedTask = action.payload;
+        if (updatedTask && updatedTask.id) {
+          const index = state.tasks.findIndex((t) => t.id === updatedTask.id);
+          if (index !== -1) {
+            state.tasks[index] = updatedTask;
+          }
+        }
+      })
+      // addSubTask
+      .addCase(addSubTask.fulfilled, (state, action) => {
+        const updatedTask = action.payload;
+        if (updatedTask && updatedTask.id) {
+          const index = state.tasks.findIndex((t) => t.id === updatedTask.id);
+          if (index !== -1) {
+            state.tasks[index] = updatedTask;
+          }
+        }
+      })
+      // toggleSubTask
+      .addCase(toggleSubTask.fulfilled, (state, action) => {
+        const updatedTask = action.payload;
+        if (updatedTask && updatedTask.id) {
+          const index = state.tasks.findIndex((t) => t.id === updatedTask.id);
+          if (index !== -1) {
+            state.tasks[index] = updatedTask;
+          }
+        }
+      })
+      // deleteSubTask
+      .addCase(deleteSubTask.fulfilled, (state, action) => {
+        const updatedTask = action.payload;
+        if (updatedTask && updatedTask.id) {
+          const index = state.tasks.findIndex((t) => t.id === updatedTask.id);
+          if (index !== -1) {
+            state.tasks[index] = updatedTask;
+          }
+        }
       })
       // deleteTask
       .addCase(deleteTask.pending, (state) => {

@@ -11,7 +11,7 @@ interface ProjectState {
 const initialState: ProjectState = {
   projects: [],
   currentProject: null,
-  loading: false,
+  loading: true,
   error: null,
 };
 

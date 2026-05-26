@@ -5,7 +5,7 @@ import defaultMan from '../../assets/avatar_def_man.png';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProjectById } from '../../store/slices/projectSlice';
 import { fetchCategories } from '../../store/slices/categorySlice';
-import { fetchTasksByProject } from '../../store/slices/taskSlice';
+
 
 import ProjectOverview from './project-tabs/ProjectOverview';
 import ProjectList from './project-tabs/ProjectList';
@@ -18,6 +18,7 @@ import ProjectMembers from './project-tabs/ProjectMembers';
 import ProjectSettings from './project-tabs/ProjectSettings';
 import ProjectCalendar from './project-tabs/ProjectCalendar';
 import InviteMemberModal from '../../components/workspace/InviteMemberModal';
+import { Skeleton } from '../../components/ui/skeleton';
 
 type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
 
@@ -41,7 +42,6 @@ export default function ProjectDetail() {
     if (!projectId) return;
     dispatch(fetchCategories());
     dispatch(fetchProjectById(projectId));
-    dispatch(fetchTasksByProject({ projectId }));
     setActiveTab('list');
   }, [projectId, dispatch]);
 
@@ -140,9 +140,57 @@ export default function ProjectDetail() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[450px] gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin" />
-        <span className="text-sm font-semibold text-[#64748B] tracking-tight">Đang tải chi tiết dự án...</span>
+      <div className="flex flex-col h-[calc(100vh-88px)] bg-slate-50/30">
+        {/* Breadcrumbs skeleton */}
+        <div className="flex items-center gap-2 px-6 pt-5 shrink-0">
+          <Skeleton className="h-3 w-14 bg-slate-200" />
+          <Skeleton className="h-3 w-3 bg-slate-100 rounded-full" />
+          <Skeleton className="h-3 w-28 bg-slate-200" />
+        </div>
+
+        {/* Title row skeleton */}
+        <div className="flex items-center gap-3 px-6 pt-4 pb-2 shrink-0">
+          <Skeleton className="w-8 h-8 rounded-lg bg-blue-100" />
+          <Skeleton className="h-7 w-48 bg-slate-200" />
+          <Skeleton className="h-5 w-16 rounded-full bg-slate-100" />
+        </div>
+
+        {/* Tabs skeleton */}
+        <div className="flex items-center gap-1 px-6 pt-2 pb-0 border-b border-slate-200 shrink-0">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-8 w-16 rounded-t-md bg-slate-200 mx-0.5" />
+          ))}
+        </div>
+
+        {/* Toolbar skeleton */}
+        <div className="flex items-center gap-2 px-6 py-3 shrink-0">
+          <Skeleton className="h-8 w-24 rounded-md bg-slate-200" />
+          <Skeleton className="h-8 w-20 rounded-md bg-slate-100" />
+          <Skeleton className="h-8 w-20 rounded-md bg-slate-100" />
+          <div className="flex-1" />
+          <Skeleton className="h-8 w-16 rounded-md bg-slate-100" />
+        </div>
+
+        {/* Table header skeleton */}
+        <div className="px-6">
+          <div className="flex gap-0 border border-slate-200 rounded-t-lg bg-slate-50 overflow-hidden">
+            {[48, 280, 140, 120, 110, 120, 60].map((w, i) => (
+              <div key={i} style={{ width: w, minWidth: w }} className="py-2.5 px-4 border-r border-slate-200 last:border-r-0">
+                <Skeleton className="h-3 bg-slate-200" style={{ width: i === 0 ? 16 : '80%' }} />
+              </div>
+            ))}
+          </div>
+          {/* Table row skeletons */}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="flex gap-0 border-b border-x border-slate-200 last:rounded-b-lg">
+              {[48, 280, 140, 120, 110, 120, 60].map((w, j) => (
+                <div key={j} style={{ width: w, minWidth: w }} className="py-4 px-4 border-r border-slate-200 last:border-r-0">
+                  <Skeleton className="h-4 bg-slate-200" style={{ width: j === 0 ? 16 : `${60 + Math.random() * 30}%` }} />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
