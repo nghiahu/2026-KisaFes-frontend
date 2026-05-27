@@ -2,6 +2,7 @@ import axios from 'axios';
 import { store } from '../store';
 import { setToken } from '../store/slices/authSlice';
 import { sessionExpiredEvent } from '../utils/sessionExpiredEvent';
+import { permissionDeniedEvent } from '../utils/permissionDeniedEvent';
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',
@@ -116,6 +117,11 @@ axiosClient.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+    
+    if (error.response?.status === 403) {
+      const message = error.response?.data?.message || "Bạn không có quyền thực hiện hành động này hoặc thay đổi cài đặt này.";
+      permissionDeniedEvent.emit(message);
     }
     
     return Promise.reject(error.response?.data || error);

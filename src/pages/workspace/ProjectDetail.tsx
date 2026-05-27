@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
 import defaultMan from '../../assets/avatar_def_man.png';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProjectById } from '../../store/slices/projectSlice';
 import { fetchCategories } from '../../store/slices/categorySlice';
+import { socketService } from '../../services/socketService';
+import { wsUpdateTask, wsCreateTask, wsDeleteTask } from '../../store/slices/taskSlice';
+import { projectService } from '../../services/project.service';
 
 
 import ProjectOverview from './project-tabs/ProjectOverview';
@@ -37,12 +40,98 @@ export default function ProjectDetail() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [tasks, setTasks] = useState<any[]>([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingName, setEditingName] = useState('');
+  const [isSavingName, setIsSavingName] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const { user } = useAppSelector(state => state.auth);
+
+  const hasProjectUpdatePermission = () => {
+    if (!currentProject || !user) return false;
+    if (currentProject.ownerId === user.id) return true;
+    const memberObj = currentProject.members?.find((m: any) => m.id === user.id);
+    if (!memberObj) return false;
+    const roleObj = currentProject.customRoles?.find((r: any) => r.id === memberObj.roleId);
+    return roleObj?.permissions?.includes('PROJECT_UPDATE') ?? false;
+  };
+
+  const handleStartEditName = () => {
+    if (!hasProjectUpdatePermission()) {
+      import('../../utils/permissionDeniedEvent').then(({ permissionDeniedEvent }) => {
+        permissionDeniedEvent.emit('Bạn không có quyền chỉnh sửa tên dự án này.');
+      });
+      return;
+    }
+    setEditingName(currentProject.name);
+    setIsEditingName(true);
+    setTimeout(() => nameInputRef.current?.select(), 50);
+  };
+
+  const handleSaveName = async () => {
+    const trimmed = editingName.trim();
+    if (!trimmed || trimmed === currentProject.name) {
+      setIsEditingName(false);
+      return;
+    }
+    setIsSavingName(true);
+    try {
+      await projectService.updateProjectName(currentProject.id, trimmed);
+      // WebSocket will broadcast UPDATE_PROJECT – fetchProjectById will re-run
+    } catch {
+      // axiosClient interceptor shows permission-denied toast for 403
+    } finally {
+      setIsSavingName(false);
+      setIsEditingName(false);
+    }
+  };
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') { e.preventDefault(); handleSaveName(); }
+    if (e.key === 'Escape') { setIsEditingName(false); }
+  };
 
   useEffect(() => {
     if (!projectId) return;
     dispatch(fetchCategories());
     dispatch(fetchProjectById(projectId));
     setActiveTab('list');
+  }, [projectId, dispatch]);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    socketService.connect(() => {
+      const sub = socketService.subscribe(`/topic/project/${projectId}`, (event: any) => {
+        console.log("WebSocket event received:", event);
+        if (event && event.type) {
+          switch (event.type) {
+            case "CREATE_TASK":
+              dispatch(wsCreateTask(event.data));
+              break;
+            case "UPDATE_TASK":
+              dispatch(wsUpdateTask(event.data));
+              break;
+            case "UPDATE_PROJECT":
+              dispatch(fetchProjectById(projectId));
+              break;
+            case "DELETE_TASK":
+              dispatch(wsDeleteTask(event.data));
+              break;
+            default:
+              break;
+          }
+        }
+      });
+
+      return () => {
+        if (sub) sub.unsubscribe();
+      };
+    });
+
+    return () => {
+      socketService.disconnect();
+    };
   }, [projectId, dispatch]);
 
   useEffect(() => {
@@ -230,7 +319,28 @@ export default function ProjectDetail() {
           <div className="w-[30px] h-[30px] rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-md shadow-blue-500/10">
             {currentProject.code?.substring(0, 2).toUpperCase() || 'K'}
           </div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">{currentProject.name}</h1>
+          {isEditingName ? (
+            <input
+              ref={nameInputRef}
+              value={editingName}
+              onChange={e => setEditingName(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={handleNameKeyDown}
+              disabled={isSavingName}
+              autoFocus
+              className="text-2xl font-black text-slate-800 tracking-tight bg-transparent border-b-2 border-blue-500 outline-none px-0 min-w-[120px] max-w-[400px] w-auto"
+              style={{ width: `${Math.max(editingName.length, 10)}ch` }}
+            />
+          ) : (
+            <h1
+              className="text-2xl font-black text-slate-800 tracking-tight cursor-pointer hover:text-blue-600 transition-colors group flex items-center gap-1.5"
+              onClick={handleStartEditName}
+              title="Nhấn để đổi tên dự án"
+            >
+              {currentProject.name}
+              <Icons.pencil size={14} className="text-slate-300 group-hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100" />
+            </h1>
+          )}
           {/* Methodology badge */}
           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-widest border ${currentProject.methodology === 'SCRUM'
             ? 'bg-violet-50 text-violet-600 border-violet-200'

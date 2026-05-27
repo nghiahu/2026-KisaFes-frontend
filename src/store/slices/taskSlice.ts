@@ -168,6 +168,42 @@ const taskSlice = createSlice({
     clearTasks: (state) => {
       state.tasks = [];
     },
+    wsUpdateTask: (state, action) => {
+      const updatedTask = action.payload;
+      if (updatedTask) {
+        const targetId = updatedTask.dbId || updatedTask.id;
+        const index = state.tasks.findIndex((t) => {
+          const tId = t.dbId || t.id;
+          const keyMatch = t.taskKey && updatedTask.taskKey && t.taskKey === updatedTask.taskKey;
+          const idMatch = tId && targetId && tId === targetId;
+          return keyMatch || idMatch;
+        });
+        if (index !== -1) {
+          state.tasks[index] = { ...state.tasks[index], ...updatedTask };
+        }
+      }
+    },
+    wsCreateTask: (state, action) => {
+      const newTask = action.payload;
+      if (newTask) {
+        const targetId = newTask.dbId || newTask.id;
+        const exists = state.tasks.some((t) => {
+          const tId = t.dbId || t.id;
+          const keyMatch = t.taskKey && newTask.taskKey && t.taskKey === newTask.taskKey;
+          const idMatch = tId && targetId && tId === targetId;
+          return keyMatch || idMatch;
+        });
+        if (!exists) {
+          state.tasks.push(newTask);
+          state.totalElements += 1;
+        }
+      }
+    },
+    wsDeleteTask: (state, action) => {
+      const deletedTaskId = action.payload;
+      state.tasks = state.tasks.filter(t => t.id !== deletedTaskId && t.dbId !== deletedTaskId);
+      state.totalElements = Math.max(0, state.totalElements - 1);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -344,5 +380,5 @@ const taskSlice = createSlice({
   },
 });
 
-export const { clearTasks } = taskSlice.actions;
+export const { clearTasks, wsUpdateTask, wsCreateTask, wsDeleteTask } = taskSlice.actions;
 export default taskSlice.reducer;

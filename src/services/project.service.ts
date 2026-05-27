@@ -42,5 +42,14 @@ export const projectService = {
   addCustomRole: async (projectId: string, data: { name: string, permissions: string[] }): Promise<any> => {
     const response = await axiosClient.post(`/projects/${projectId}/roles`, data);
     return response.data;
-  }
+  },
+  updateCustomRole: async (projectId: string, roleId: string, data: { name?: string, permissions: string[] }): Promise<any> => {
+    const response = await axiosClient.put(`/projects/${projectId}/roles/${roleId}`, data);
+    return response.data;
+  },
+  updateProjectName: async (projectId: string, name: string): Promise<any> => {
+    const response = await axiosClient.patch(`/projects/${projectId}/name`, { name });
+    return response.data;
+  },
 };
+

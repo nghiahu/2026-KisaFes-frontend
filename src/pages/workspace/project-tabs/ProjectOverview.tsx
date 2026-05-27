@@ -23,7 +23,7 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
   });
 
   const uniqueStatuses = currentProject?.statuses?.map((s: any) => s.label) || ['To Do', 'In Progress', 'Done'];
-  const statusColors = ['#8EB83E', '#3B82F6', '#9B51E0', '#F2994A', '#EB5757', '#2F80ED'];
+  const statusColors = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
   const statusGroups = uniqueStatuses.map((label: string, index: number) => {
     return {
       label,
@@ -32,7 +32,7 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
     };
   });
 
-  // Render donut chart segments dynamically
+  // Render donut chart segments dynamically with premium entry animations
   const renderDonutSegments = () => {
     let accumulatedPercent = 0;
     return statusGroups.map((group: any, idx: number) => {
@@ -47,14 +47,19 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
           key={idx}
           cx="50"
           cy="50"
-          r="40"
+          r="38"
           fill="transparent"
           stroke={group.color}
-          strokeWidth="12"
+          strokeWidth="10"
           strokeDasharray={strokeDashArray}
           strokeDashoffset={strokeDashOffset}
-          className="transition-all duration-500 hover:stroke-[14px] cursor-pointer"
-          style={{ transformOrigin: 'center' }}
+          pathLength="100"
+          className="transition-all duration-700 hover:stroke-[12px] cursor-pointer"
+          style={{ 
+            transformOrigin: 'center',
+            transition: 'stroke-width 0.3s, stroke-dashoffset 0.8s ease-in-out',
+            filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.06))'
+          }}
         />
       );
     });
@@ -80,11 +85,11 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
   });
 
   const priorityStats = [
-    { label: 'Highest', count: priorityCounts.Highest, icon: <Icons.chevronsUp size={14} color="#E13C3C" />, color: '#E13C3C' },
-    { label: 'High', count: priorityCounts.High, icon: <Icons.chevronUp size={14} color="#E13C3C" />, color: '#E13C3C' },
-    { label: 'Medium', count: priorityCounts.Medium, icon: <Icons.minus size={14} color="#F79B2D" />, color: '#F79B2D' },
-    { label: 'Low', count: priorityCounts.Low, icon: <Icons.chevronDown size={14} color="#2D7DF7" />, color: '#2D7DF7' },
-    { label: 'Lowest', count: priorityCounts.Lowest, icon: <Icons.chevronsDown size={14} color="#2D7DF7" />, color: '#2D7DF7' }
+    { label: 'Highest', count: priorityCounts.Highest, icon: <Icons.chevronsUp size={14} className="text-red-500" />, color: 'linear-gradient(to top, #ef4444, #f87171)' },
+    { label: 'High', count: priorityCounts.High, icon: <Icons.chevronUp size={14} className="text-orange-500" />, color: 'linear-gradient(to top, #f97316, #fb923c)' },
+    { label: 'Medium', count: priorityCounts.Medium, icon: <Icons.equal size={14} strokeWidth={3} className="text-amber-500" />, color: 'linear-gradient(to top, #f59e0b, #fbbf24)' },
+    { label: 'Low', count: priorityCounts.Low, icon: <Icons.chevronDown size={14} className="text-blue-500" />, color: 'linear-gradient(to top, #3b82f6, #60a5fa)' },
+    { label: 'Lowest', count: priorityCounts.Lowest, icon: <Icons.chevronsDown size={14} className="text-slate-400" />, color: 'linear-gradient(to top, #94a3b8, #cbd5e1)' }
   ];
 
   // Types of work
@@ -334,8 +339,13 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
                       {item.count} items
                     </div>
                     <div 
-                      className="w-7 bg-[#858A99] hover:bg-blue-500 rounded-[1px] transition-all duration-300"
-                      style={{ height: `${percentHeight}%`, minHeight: item.count > 0 ? '12px' : '2px' }}
+                      className="w-7 rounded-t-lg transition-all duration-500 ease-out hover:scale-x-115 hover:shadow-md cursor-pointer"
+                      style={{ 
+                        height: `${percentHeight}%`, 
+                        minHeight: item.count > 0 ? '12px' : '2px',
+                        background: item.color,
+                        transition: 'height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                      }}
                     />
                   </div>
                 );

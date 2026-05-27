@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import SessionExpiredModal from '../components/common/SessionExpiredModal';
+import PermissionDeniedToast from '../components/common/PermissionDeniedToast';
 
 /**
  * Root layout bao toàn bộ app.
@@ -10,6 +11,7 @@ export default function RootLayout() {
     <>
       <Outlet />
       <SessionExpiredModal />
+      <PermissionDeniedToast />
     </>
   );
 }

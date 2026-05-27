@@ -4,6 +4,7 @@ import { projectService } from '../../../services/project.service';
 import defaultMan from '../../../assets/avatar_def_man.png';
 import CreateRoleModal from '../../../components/workspace/CreateRoleModal';
 import ConfirmModal from '../../../components/common/ConfirmModal';
+import { useAppSelector } from '../../../store/hooks';
 
 interface ProjectMembersProps {
   currentProject: any;
@@ -14,7 +15,73 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [showRoleMenu, setShowRoleMenu] = useState<string | null>(null);
   const [showCreateRole, setShowCreateRole] = useState(false);
+  const [roleToEdit, setRoleToEdit] = useState<any>(null);
   const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ACTIVE');
+
+  const { user } = useAppSelector(state => state.auth);
+
+  const hasRoleManagePermission = () => {
+    if (!user) return false;
+    if (currentProject.ownerId === user.id) return true;
+    
+    const memberObj = currentProject.members?.find((m: any) => m.id === user.id);
+    if (!memberObj) return false;
+    
+    const roleId = memberObj.roleId;
+    const roleObj = currentProject.customRoles?.find((r: any) => r.id === roleId);
+    if (!roleObj) return false;
+    
+    return roleObj.permissions?.includes('ROLE_MANAGE') || roleObj.permissions?.includes('PERMISSION_MANAGE');
+  };
+
+  const handleOpenCreateRole = () => {
+    if (!hasRoleManagePermission()) {
+      import('../../../utils/permissionDeniedEvent').then(({ permissionDeniedEvent }) => {
+        permissionDeniedEvent.emit("Bạn không có quyền quản lý vai trò trong dự án này.");
+      });
+      return;
+    }
+    setShowCreateRole(true);
+  };
+
+  const handleOpenEditRole = (role: any) => {
+    if (!hasRoleManagePermission()) {
+      import('../../../utils/permissionDeniedEvent').then(({ permissionDeniedEvent }) => {
+        permissionDeniedEvent.emit("Bạn không có quyền quản lý vai trò trong dự án này.");
+      });
+      return;
+    }
+    setRoleToEdit(role);
+  };
+
+  const getFriendlyPermissionName = (permId: string) => {
+    const allPerms = [
+      { id: 'PROJECT_VIEW', label: 'Xem dự án' },
+      { id: 'PROJECT_UPDATE', label: 'Cấu hình dự án' },
+      { id: 'PROJECT_CREATE', label: 'Tạo dự án' },
+      { id: 'PROJECT_DELETE', label: 'Xóa dự án' },
+      { id: 'PROJECT_ARCHIVE', label: 'Lưu trữ dự án' },
+      { id: 'TASK_VIEW', label: 'Xem công việc' },
+      { id: 'TASK_CREATE', label: 'Tạo công việc' },
+      { id: 'TASK_UPDATE', label: 'Sửa công việc' },
+      { id: 'TASK_DELETE', label: 'Xóa công việc' },
+      { id: 'TASK_ASSIGN', label: 'Giao việc' },
+      { id: 'TASK_CHANGE_STATUS', label: 'Đổi trạng thái' },
+      { id: 'BOARD_VIEW', label: 'Xem bảng' },
+      { id: 'BOARD_UPDATE', label: 'Cấu hình bảng' },
+      { id: 'MEMBER_INVITE', label: 'Mời thành viên' },
+      { id: 'MEMBER_REMOVE', label: 'Xóa thành viên' },
+      { id: 'MEMBER_UPDATE_ROLE', label: 'Đổi quyền thành viên' },
+      { id: 'COMMENT_CREATE', label: 'Tạo bình luận' },
+      { id: 'COMMENT_UPDATE', label: 'Sửa bình luận' },
+      { id: 'COMMENT_DELETE', label: 'Xóa bình luận' },
+      { id: 'ATTACHMENT_UPLOAD', label: 'Tải file' },
+      { id: 'ATTACHMENT_DELETE', label: 'Xóa file' },
+      { id: 'ROLE_MANAGE', label: 'Quản lý Role' },
+      { id: 'PERMISSION_MANAGE', label: 'Quản lý Phân quyền' }
+    ];
+    return allPerms.find(p => p.id === permId)?.label || permId;
+  };
 
   // Modal states
   const [memberToRemove, setMemberToRemove] = useState<any>(null);
@@ -120,7 +187,7 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
             </button>
           </div>
           <button 
-            onClick={() => setShowCreateRole(true)}
+            onClick={handleOpenCreateRole}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors"
           >
             <Icons.settings size={16} />
@@ -224,12 +291,85 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
         ))}
       </div>
 
-      {showCreateRole && (
+      {/* Danh sách vai trò custom */}
+      <div className="border-t border-slate-200 pt-6 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <Icons.shield size={20} className="text-blue-600" />
+              Danh sách Vai trò & Quyền hạn (Custom Roles)
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">Tùy chỉnh chi tiết quyền hạn cho từng vai trò trong dự án</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {currentProject.customRoles?.map((role: any) => (
+            <div key={role.id} className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-bold text-sm text-slate-800 flex items-center gap-1.5">
+                    <Icons.shield size={16} className="text-blue-500" />
+                    {role.name}
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                    {role.permissions?.length || 0} quyền
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {role.permissions?.slice(0, 3).map((p: string) => (
+                    <span key={p} className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">
+                      {getFriendlyPermissionName(p)}
+                    </span>
+                  ))}
+                  {role.permissions?.length > 3 && (
+                    <span className="text-[10px] px-1.5 py-0.5 bg-slate-50 text-slate-400 font-bold">
+                      +{role.permissions.length - 3} quyền khác
+                    </span>
+                  )}
+                  {(!role.permissions || role.permissions.length === 0) && (
+                    <span className="text-[10px] text-slate-400 italic">Không có quyền hạn</span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+                {role.name?.toLowerCase().includes("owner") ? (
+                  <span className="text-[10px] text-slate-400 font-bold italic flex items-center gap-1">
+                    <Icons.shield size={10} className="text-slate-450" />
+                    Hệ thống mặc định (Không thể sửa)
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => handleOpenEditRole(role)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    <Icons.pencil size={12} />
+                    Chỉnh sửa quyền
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+          {!currentProject.customRoles?.length && (
+            <div className="col-span-full py-8 text-center text-slate-400 text-sm italic">
+              Chưa có vai trò tùy chỉnh nào được tạo
+            </div>
+          )}
+        </div>
+      </div>
+
+      {(showCreateRole || roleToEdit) && (
         <CreateRoleModal
           projectId={currentProject.id}
-          onClose={() => setShowCreateRole(false)}
+          roleToEdit={roleToEdit}
+          onClose={() => {
+            setShowCreateRole(false);
+            setRoleToEdit(null);
+          }}
           onSuccess={() => {
             setShowCreateRole(false);
+            setRoleToEdit(null);
             onUpdate();
           }}
         />

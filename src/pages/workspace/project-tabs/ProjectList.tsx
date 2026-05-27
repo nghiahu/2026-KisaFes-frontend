@@ -6,6 +6,8 @@ import { updateTaskStatus, createTask, fetchTasksByProject, updateTaskAssignee, 
 import defaultAvatar from '../../../assets/avatar_def_man.png';
 import { MassChangeStatusModal } from '../../../components/workspace/MassChangeStatusModal';
 import { MassEditFieldsModal } from '../../../components/workspace/MassEditFieldsModal';
+import TaskDetailView from '../../../components/workspace/TaskDetailView';
+
 
 interface ProjectListProps {
   projectId: string;
@@ -93,6 +95,8 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   
   const [showMassEditFieldsModal, setShowMassEditFieldsModal] = useState(false);
   const [isEditingFields, setIsEditingFields] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any | null>(null);
+
   
   const [activeFilterCategory, setActiveFilterCategory] = useState('Assignee');
   const [filterAssignees, setFilterAssignees] = useState<string[]>([]); // ids or 'unassigned'
@@ -923,7 +927,15 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                                   <td key={col.id} style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }} className="py-3.5 px-4 font-semibold text-slate-800 text-xs">
                                     <div className="flex items-center gap-2.5 min-w-0 w-full overflow-hidden">
                                       <span className={`w-4 h-4 rounded ${typeInfo.bg} flex items-center justify-center ${typeInfo.color} shrink-0 font-black shadow-sm`} title={typeInfo.label}>{typeInfo.icon}</span>
-                                      <span className="text-blue-600 hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap">{task.taskKey || `ISSUE-${String(startIndex + index + 1).padStart(2, '0')}`}</span>
+                                      <span 
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedTask(task);
+                                        }}
+                                        className="text-blue-600 hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap"
+                                      >
+                                        {task.taskKey || `ISSUE-${String(startIndex + index + 1).padStart(2, '0')}`}
+                                      </span>
                                       {activeEditTitleId === task.id ? (
                                         <div className="flex items-center flex-1 min-w-0 gap-1" onClick={e => e.stopPropagation()}>
                                           <input 
@@ -1075,7 +1087,13 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                               <span className={`w-4 h-4 rounded ${typeInfo.bg} flex items-center justify-center ${typeInfo.color} shrink-0 font-black shadow-sm`} title={typeInfo.label}>
                                 {typeInfo.icon}
                               </span>
-                              <span className="text-blue-600 hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap">
+                              <span 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedTask(task);
+                                }}
+                                className="text-blue-600 hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap"
+                              >
                                 {task.taskKey || `ISSUE-${String(startIndex + index + 1).padStart(2, '0')}`}
                               </span>
                               {activeEditTitleId === task.id ? (
@@ -1109,7 +1127,14 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                               )}
                               
                               <span className="opacity-0 group-hover:opacity-100 flex items-center gap-1.5 ml-2 transition-all shrink-0">
-                                <Icons.arrowUpRight size={12} className="text-slate-400 hover:text-slate-600 cursor-pointer" />
+                                <Icons.arrowUpRight 
+                                  size={12} 
+                                  className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedTask(task);
+                                  }}
+                                />
                                 <Icons.plus size={12} className="text-slate-400 hover:text-slate-600 cursor-pointer" />
                               </span>
                             </div>
@@ -2120,6 +2145,30 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
           <button className="p-1 hover:bg-white/10 rounded-md transition-colors ml-1 text-[#d4d4d8]" onClick={() => { setIsAllSelected(false); setSelectedTaskIds(new Set()); setExcludedTaskIds(new Set()); }}>
             <Icons.x size={16} />
           </button>
+        </div>,
+        document.body
+      )}
+
+      {/* Task Detail Modal */}
+      {selectedTask && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-end bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
+          <div 
+            className="absolute inset-0" 
+            onClick={() => setSelectedTask(null)} 
+          />
+          <div className="relative bg-white w-full max-w-[1000px] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="flex-1 flex overflow-hidden">
+              <TaskDetailView 
+                task={selectedTask}
+                currentProject={currentProject}
+                onClose={() => setSelectedTask(null)}
+                onUpdateTaskLocally={(taskId, updates) => {
+                  setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
+                  setSelectedTask(prev => prev && prev.id === taskId ? { ...prev, ...updates } : prev);
+                }}
+              />
+            </div>
+          </div>
         </div>,
         document.body
       )}

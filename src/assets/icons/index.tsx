@@ -80,7 +80,8 @@ import {
   CornerDownLeft,
   MousePointer2,
   Edit3,
-  MinusSquare
+  MinusSquare,
+  Paperclip
 } from 'lucide-react';
 
 export const Icons = {
@@ -166,4 +167,5 @@ export const Icons = {
   mousePointer2: MousePointer2,
   edit3: Edit3,
   minusSquare: MinusSquare,
+  paperclip: Paperclip,
 };

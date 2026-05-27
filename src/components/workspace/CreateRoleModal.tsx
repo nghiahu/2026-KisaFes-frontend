@@ -6,6 +6,7 @@ interface CreateRoleModalProps {
   projectId: string;
   onClose: () => void;
   onSuccess: () => void;
+  roleToEdit?: any;
 }
 
 const PERMISSION_GROUPS = [
@@ -98,10 +99,10 @@ const PRESET_TEMPLATES = [
   }
 ];
 
-export default function CreateRoleModal({ projectId, onClose, onSuccess }: CreateRoleModalProps) {
-  const [name, setName] = useState('');
+export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToEdit }: CreateRoleModalProps) {
+  const [name, setName] = useState(roleToEdit ? roleToEdit.name : '');
   const [selectedPreset, setSelectedPreset] = useState('CUSTOM');
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(roleToEdit ? roleToEdit.permissions || [] : []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -147,13 +148,20 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess }: Creat
     setIsSubmitting(true);
     setError(null);
     try {
-      await projectService.addCustomRole(projectId, {
-        name: name.trim(),
-        permissions: selectedPermissions
-      });
+      if (roleToEdit) {
+        await projectService.updateCustomRole(projectId, roleToEdit.id, {
+          name: name.trim(),
+          permissions: selectedPermissions
+        });
+      } else {
+        await projectService.addCustomRole(projectId, {
+          name: name.trim(),
+          permissions: selectedPermissions
+        });
+      }
       onSuccess();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Có lỗi xảy ra khi tạo Role');
+      setError(err.response?.data?.message || 'Có lỗi xảy ra khi xử lý Role');
     } finally {
       setIsSubmitting(false);
     }
@@ -168,8 +176,12 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess }: Creat
               <Icons.shield size={20} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-800 text-lg">Tạo quyền mới (Custom Role)</h3>
-              <p className="text-sm text-slate-500 mt-0.5">Xây dựng nhóm quyền riêng biệt cho dự án</p>
+              <h3 className="font-bold text-slate-800 text-lg">
+                {roleToEdit ? 'Chỉnh sửa vai trò & quyền hạn' : 'Tạo quyền mới (Custom Role)'}
+              </h3>
+              <p className="text-sm text-slate-500 mt-0.5">
+                {roleToEdit ? `Đang chỉnh sửa cấu hình vai trò ${roleToEdit.name}` : 'Xây dựng nhóm quyền riêng biệt cho dự án'}
+              </p>
             </div>
           </div>
           <button 
@@ -261,7 +273,11 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess }: Creat
                         {group.permissions.map((perm) => {
                           const isChecked = selectedPermissions.includes(perm.id);
                           return (
-                            <label key={perm.id} className="flex items-center gap-3 cursor-pointer group">
+                            <label 
+                              key={perm.id} 
+                              onClick={() => handleTogglePermission(perm.id)}
+                              className="flex items-center gap-3 cursor-pointer group"
+                            >
                               <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                                 isChecked ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300 group-hover:border-blue-400'
                               }`}>
@@ -306,10 +322,10 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess }: Creat
             {isSubmitting ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Đang tạo...
+                {roleToEdit ? 'Đang cập nhật...' : 'Đang tạo...'}
               </>
             ) : (
-              'Tạo Role Mới'
+              roleToEdit ? 'Cập nhật Role' : 'Tạo Role Mới'
             )}
           </button>
         </div>
