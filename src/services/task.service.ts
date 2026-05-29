@@ -35,6 +35,11 @@ export const taskService = {
     const response = await axiosClient.patch(`/tasks/${taskId}/priority?priority=${encodeURIComponent(priority)}`);
     return response.data;
   },
+  updateTaskStoryPoints: async (taskId: string, points: number | null): Promise<any> => {
+    const params = points !== null ? `?storyPoints=${points}` : '';
+    const response = await axiosClient.patch(`/tasks/${taskId}/story-points${params}`);
+    return response.data;
+  },
   updateTaskDueDate: async (taskId: string, dueDate: string | null): Promise<any> => {
     const params = dueDate ? `?dueDate=${encodeURIComponent(dueDate)}` : '';
     const response = await axiosClient.patch(`/tasks/${taskId}/due-date${params}`);

@@ -334,12 +334,7 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
               </div>
               
               <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end">
-                {role.name?.toLowerCase().includes("owner") ? (
-                  <span className="text-[10px] text-slate-400 font-bold italic flex items-center gap-1">
-                    <Icons.shield size={10} className="text-slate-450" />
-                    Hệ thống mặc định (Không thể sửa)
-                  </span>
-                ) : (
+                {role.name?.toLowerCase().includes("owner") ? null : (
                   <button
                     onClick={() => handleOpenEditRole(role)}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

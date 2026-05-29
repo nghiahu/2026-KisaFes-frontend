@@ -1,348 +1,316 @@
-import { useState, useEffect } from 'react';
-import { Icons } from '../../../assets/icons';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
+  closestCorners, type DragStartEvent, type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext, verticalListSortingStrategy, useSortable,
+} from '@dnd-kit/sortable';
+import { useDroppable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
+import {
+  Zap, Target, Clock, CheckCircle2, GripVertical, BookOpen,
+  Bug, SquareCheck, CircleDot, Play, AlertCircle,
+} from 'lucide-react';
 import { sprintService, type Sprint } from '../../../services/sprint.service';
-import { Plus, Target, Zap, CheckCircle2, Clock } from 'lucide-react';
+import { useAppDispatch } from '../../../store/hooks';
+import { updateTaskStatus } from '../../../store/slices/taskSlice';
+import defaultMan from '../../../assets/avatar_def_man.png';
 
 interface ProjectSprintProps {
   projectId: string;
-  tasks: any[];
+  currentProject: any;
 }
 
-export default function ProjectSprint({ projectId, tasks }: ProjectSprintProps) {
-  const [sprints, setSprints] = useState<Sprint[]>([]);
-  const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newSprintName, setNewSprintName] = useState('');
-  const [newSprintGoal, setNewSprintGoal] = useState('');
+import { SortableTaskCard } from './components/SortableTaskCard';
+import { Skeleton } from '../../../components/ui/skeleton';
+import { Progress } from '../../../components/ui/progress';
 
-  useEffect(() => {
-    if (!projectId) return;
-    loadSprints();
+import { DroppableColumn } from './components/DroppableColumn';
+import { Icons } from '../../../assets/icons';
+import { createTask } from '../../../store/slices/taskSlice';
+import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
+
+
+// ─── Main Component ────────────────────────────────────────────────────────
+export default function ProjectSprint({ projectId, currentProject }: ProjectSprintProps) {
+  const dispatch = useAppDispatch();
+  const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [activeTask, setActiveTask] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const [showAddTask, setShowAddTask] = useState<string | null>(null);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const boardColumns = currentProject?.boardColumns || [];
+
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setIsLoading(true);
+    setError('');
+    try {
+      const sprint = await sprintService.getActiveSprint(projectId).catch(() => null);
+      setActiveSprint(sprint);
+      if (sprint) {
+        const sprintTaskData = await sprintService.getSprintTasks(projectId, sprint.id);
+        setTasks(sprintTaskData);
+      }
+    } catch (e) {
+      setError('Không thể tải dữ liệu sprint');
+    } finally {
+      if (!silent) setIsLoading(false);
+    }
   }, [projectId]);
 
-  const loadSprints = async () => {
-    setIsLoading(true);
-    try {
-      const data = await sprintService.getSprintsByProject(projectId);
-      setSprints(data);
-      const active = data.find(s => s.status === 'ACTIVE') ?? null;
-      setActiveSprint(active);
-    } catch (e) {
-      console.error('Failed to load sprints', e);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => { load(); }, [load]);
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const task = tasks.find(t => t.id === event.active.id);
+    setActiveTask(task || null);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveTask(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeTaskId = String(active.id);
+    let overColumnId = String(over.id);
+
+    // Check if dropped over a task → use that task's column
+    const isOverTask = tasks.some(t => t.id === overColumnId);
+    if (isOverTask) {
+      const overTask = tasks.find(t => t.id === overColumnId);
+      const col = boardColumns.find((c: any) => c.mappedStatusIds?.includes(overTask?.statusId));
+      if (col) overColumnId = col.id || col.name;
+    }
+
+    const draggedTask = tasks.find(t => t.id === activeTaskId);
+    if (!draggedTask) return;
+
+    const sourceCol = boardColumns.find((c: any) => c.mappedStatusIds?.includes(draggedTask.statusId));
+    const sourceColId = sourceCol?.id || sourceCol?.name;
+
+    if (sourceColId !== overColumnId) {
+      const targetCol = boardColumns.find((c: any) => (c.id || c.name) === overColumnId);
+      const targetStatusId = targetCol?.mappedStatusIds?.[0];
+
+      if (targetStatusId && targetStatusId !== draggedTask.statusId) {
+        // Optimistic update
+        setTasks(prev => prev.map(t => t.id === activeTaskId ? { ...t, statusId: targetStatusId } : t));
+        try {
+          await dispatch(updateTaskStatus({ taskId: draggedTask.id, statusId: targetStatusId })).unwrap();
+          await load(true); // refresh metrics silently
+        } catch (e) {
+          console.error('Failed to update status', e);
+          setTasks(prev => prev.map(t => t.id === activeTaskId ? { ...t, statusId: draggedTask.statusId } : t));
+        }
+      }
     }
   };
 
-  const handleCreateSprint = async () => {
-    if (!newSprintName.trim()) return;
-    setIsCreating(true);
-    try {
-      const sprint = await sprintService.createSprint(projectId, {
-        name: newSprintName.trim(),
-        goal: newSprintGoal.trim() || undefined,
-      });
-      setSprints(prev => [...prev, sprint]);
-      setNewSprintName('');
-      setNewSprintGoal('');
-      setShowCreateForm(false);
-    } catch (e) {
-      console.error('Failed to create sprint', e);
-    } finally {
-      setIsCreating(false);
-    }
+  const handleTaskUpdate = (taskId: string, updates: any) => {
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
   };
 
-  const handleStartSprint = async (sprintId: string) => {
-    try {
-      const updated = await sprintService.startSprint(projectId, sprintId);
-      setSprints(prev => prev.map(s => s.id === sprintId ? updated : s));
-      setActiveSprint(updated);
-    } catch (e: any) {
-      alert(e?.response?.data?.message || 'Không thể bắt đầu sprint.');
-    }
-  };
+  const handleAddTask = async (columnId: string, title: string, type: string, assignee: any, dueDate: string) => {
+    if (!title.trim() || !currentProject || !activeSprint) return;
+    const columns = currentProject.boardColumns || [];
+    const column = columns.find((c: any) => (c.id || c.name) === columnId) || columns[0];
+    
+    const statusId = column?.defaultStatusId || column?.mappedStatusIds?.[0] || '';
 
-  const handleCompleteSprint = async (sprintId: string) => {
-    if (!confirm('Bạn có chắc muốn hoàn thành sprint này?')) return;
     try {
-      const updated = await sprintService.completeSprint(projectId, sprintId);
-      setSprints(prev => prev.map(s => s.id === sprintId ? updated : s));
-      setActiveSprint(null);
-    } catch (e: any) {
-      alert(e?.response?.data?.message || 'Không thể hoàn thành sprint.');
+      const res = await dispatch(createTask({
+        projectId: currentProject.id,
+        title: title.trim(),
+        statusId: statusId,
+        type: type,
+        assigneeId: assignee && assignee !== 'automatic' ? assignee.id : null,
+        dueDate: dueDate ? `${dueDate}T00:00:00` : null
+      })).unwrap();
+      
+      if (res?.id) {
+        await sprintService.moveTaskToSprint(res.id, activeSprint.id);
+      }
+      
+      setShowAddTask(null);
+      
+      load(true); // Reload sprint tasks silently
+    } catch (err) {
+      console.error("Failed to add task via UI:", err);
     }
   };
 
   const getRemainingDays = (endDate?: string) => {
     if (!endDate) return null;
     const diff = Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000);
-    if (diff < 0) return 'Đã kết thúc';
-    if (diff === 0) return 'Hôm nay';
-    return `${diff} ngày còn lại`;
+    if (diff < 0) return { text: 'Quá hạn', color: 'text-rose-600' };
+    if (diff === 0) return { text: 'Hôm nay', color: 'text-orange-600' };
+    return { text: `${diff} ngày còn lại`, color: 'text-slate-500' };
   };
 
-  const getStatusBadge = (status: Sprint['status']) => {
-    switch (status) {
-      case 'ACTIVE': return 'bg-emerald-500 text-white';
-      case 'PLANNING': return 'bg-blue-500 text-white';
-      case 'COMPLETED': return 'bg-slate-400 text-white';
-    }
-  };
-
+  // ─── Loading ─────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20 m-6">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-bold text-slate-400">Đang tải Sprint...</span>
+      <div className="flex flex-col h-full">
+        {/* Header Skeleton */}
+        <div className="px-6 pt-5 pb-4 border-b border-slate-100 bg-gradient-to-r from-violet-50/60 to-white">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap">
+                <Skeleton className="h-4 w-12 rounded-full" />
+                <Skeleton className="h-6 w-48 rounded-md" />
+                <Skeleton className="h-4 w-24 rounded-md" />
+                <Skeleton className="h-4 w-32 rounded-md ml-2" />
+                <Skeleton className="h-4 w-20 rounded-md" />
+              </div>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="flex justify-between mb-1.5">
+              <Skeleton className="h-3 w-20 rounded-sm" />
+              <Skeleton className="h-3 w-32 rounded-sm" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full" />
+          </div>
+        </div>
+
+        {/* Board Columns Skeleton */}
+        <div className="flex gap-5 overflow-x-auto p-6 items-start flex-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-slate-50 p-4 rounded-3xl border border-slate-200/60 w-[320px] shrink-0 flex flex-col gap-3">
+              <div className="flex items-center justify-between px-2 mb-1">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-24 rounded-md" />
+                  <Skeleton className="h-4 w-6 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-4 rounded-full" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-24 w-full rounded-2xl" />
+                <Skeleton className="h-24 w-full rounded-2xl" />
+                {i % 2 === 0 && <Skeleton className="h-24 w-full rounded-2xl" />}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
-  const sprintTasks = activeSprint
-    ? tasks.filter(t => t.sprintId === activeSprint.id || t.dbId)
-    : tasks.slice(0, 5);
+  // ─── No active sprint ─────────────────────────────────────────────────────
+  if (!activeSprint) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <div className="w-20 h-20 bg-violet-50 rounded-3xl flex items-center justify-center">
+          <Zap size={36} className="text-violet-400" />
+        </div>
+        <div className="text-center">
+          <h3 className="text-lg font-black text-slate-700">Không có Sprint đang chạy</h3>
+          <p className="text-sm text-slate-400 font-semibold mt-1">
+            Vào tab Backlog để tạo và bắt đầu một sprint.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const remaining = getRemainingDays(activeSprint.endDate);
+  const progressPct = activeSprint.totalTasks > 0
+    ? Math.round((activeSprint.completedTasks / activeSprint.totalTasks) * 100)
+    : 0;
 
   return (
-    <div className="flex flex-col gap-6 m-6">
-
-      {/* Active Sprint Card */}
-      {activeSprint ? (
-        <div className="bg-white rounded-3xl p-6 border border-violet-100 shadow-lg shadow-violet-500/5">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5 mb-5">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <span className={`text-xs font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${getStatusBadge('ACTIVE')}`}>
-                  Active
-                </span>
-                <h3 className="font-extrabold text-slate-800 text-xl">{activeSprint.name}</h3>
-              </div>
+    <div className="flex flex-col h-full">
+      {/* Sprint Header */}
+      <div className="px-6 pt-5 pb-4 border-b border-slate-100 bg-gradient-to-r from-violet-50/60 to-white">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-[10px] font-extrabold bg-emerald-500 text-white px-2 py-0.5 rounded-full uppercase">Active</span>
+              <h2 className="text-xl font-black text-slate-800">{activeSprint.name}</h2>
               {activeSprint.goal && (
-                <p className="text-slate-400 text-xs font-semibold mt-1 flex items-center gap-1.5">
+                <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
                   <Target size={12} /> {activeSprint.goal}
-                </p>
+                </span>
               )}
-              <p className="text-slate-400 text-xs font-semibold mt-1">
+              <span className="text-xs text-slate-400 font-semibold ml-2">
                 {activeSprint.startDate ? new Date(activeSprint.startDate).toLocaleDateString('vi-VN') : '—'}
                 {' → '}
                 {activeSprint.endDate ? new Date(activeSprint.endDate).toLocaleDateString('vi-VN') : '—'}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {activeSprint.endDate && (
-                <span className="flex items-center gap-1 text-slate-500 text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200/50">
-                  <Clock size={14} />
-                  <span>{getRemainingDays(activeSprint.endDate)}</span>
+              </span>
+              {remaining && (
+                <span className={`text-xs font-bold flex items-center gap-1 ${remaining.color}`}>
+                  <Clock size={12} /> {remaining.text}
                 </span>
               )}
-              <button
-                onClick={() => handleCompleteSprint(activeSprint.id)}
-                className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-1.5 rounded-xl text-xs font-black transition-colors shadow-md shadow-violet-200"
-              >
-                Complete Sprint
-              </button>
             </div>
           </div>
 
-          {/* Story Point Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <MetricCard label="Total Points" value={activeSprint.totalStoryPoints} color="slate" />
-            <MetricCard label="Completed" value={activeSprint.completedStoryPoints} color="emerald" />
-            <MetricCard label="In Progress" value={activeSprint.inProgressStoryPoints} color="blue" />
-            <MetricCard label="Unstarted" value={activeSprint.unstartedStoryPoints} color="amber" />
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="flex justify-between text-xs font-bold text-slate-400 mb-2">
-              <span>Sprint Progress</span>
-              <span>
-                {activeSprint.completedTasks}/{activeSprint.totalTasks} tasks
-                {activeSprint.totalStoryPoints > 0 && (
-                  <span className="text-violet-500 ml-2">
-                    ({Math.round((activeSprint.completedStoryPoints / activeSprint.totalStoryPoints) * 100)}% pts)
-                  </span>
-                )}
-              </span>
-            </div>
-            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-violet-400 transition-all duration-700"
-                style={{
-                  width: activeSprint.totalStoryPoints > 0
-                    ? `${Math.round((activeSprint.completedStoryPoints / activeSprint.totalStoryPoints) * 100)}%`
-                    : '0%'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Task List */}
-          <div>
-            <h4 className="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
-              <Zap size={14} className="text-violet-500" />
-              Sprint Tasks ({activeSprint.totalTasks})
-            </h4>
-            <div className="flex flex-col gap-2">
-              {sprintTasks.length === 0 ? (
-                <p className="text-sm text-slate-400 italic px-2">Chưa có task nào trong sprint này.</p>
-              ) : (
-                sprintTasks.slice(0, 8).map((task) => (
-                  <div key={task.id || task.taskKey} className="flex items-center justify-between p-3 border border-slate-100 hover:bg-slate-50 rounded-2xl transition-colors">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <CheckCircle2
-                        size={16}
-                        className={task.status === 'Done' || task.statusLabel === 'Done' ? 'text-emerald-500 shrink-0' : 'text-slate-300 shrink-0'}
-                      />
-                      <span className="text-xs font-bold text-slate-400 shrink-0">{task.id || task.taskKey}</span>
-                      <span className="text-sm font-bold text-slate-700 truncate">{task.title}</span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {task.storyPoints && (
-                        <span className="text-[10px] bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded-md font-black">
-                          {task.storyPoints}sp
-                        </span>
-                      )}
-                      <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-bold">
-                        {task.status || task.statusLabel}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-violet-50/50 border-2 border-dashed border-violet-200 rounded-3xl p-10 flex flex-col items-center gap-4 text-center">
-          <div className="w-16 h-16 bg-violet-100 rounded-2xl flex items-center justify-center text-violet-500">
-            <Zap size={28} />
-          </div>
-          <div>
-            <h3 className="font-black text-slate-700 text-lg">Không có Sprint đang chạy</h3>
-            <p className="text-sm text-slate-400 font-semibold mt-1">Tạo và bắt đầu một sprint để theo dõi tiến độ theo chu kỳ.</p>
-          </div>
-        </div>
-      )}
-
-      {/* All Sprints List */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h3 className="font-extrabold text-slate-800">Tất cả Sprint</h3>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-black transition-colors shadow-md shadow-violet-200"
-          >
-            <Plus size={14} />
-            New Sprint
-          </button>
         </div>
 
-        {/* Create Sprint Form */}
-        {showCreateForm && (
-          <div className="px-6 py-4 border-b border-slate-100 bg-violet-50/40 animate-in fade-in duration-200">
-            <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                placeholder="Sprint name (e.g. Sprint 2)"
-                className="w-full bg-white border border-violet-200 px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-violet-400/20 font-semibold text-sm"
-                value={newSprintName}
-                onChange={e => setNewSprintName(e.target.value)}
-                autoFocus
-              />
-              <input
-                type="text"
-                placeholder="Sprint goal (optional)"
-                className="w-full bg-white border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-violet-400/20 font-semibold text-sm"
-                value={newSprintGoal}
-                onChange={e => setNewSprintGoal(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleCreateSprint}
-                  disabled={isCreating || !newSprintName.trim()}
-                  className="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-xl text-xs font-black transition-all disabled:bg-slate-200 disabled:text-slate-400"
-                >
-                  {isCreating ? 'Đang tạo...' : 'Tạo Sprint'}
-                </button>
-                <button
-                  onClick={() => { setShowCreateForm(false); setNewSprintName(''); setNewSprintGoal(''); }}
-                  className="text-slate-400 hover:text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-colors"
-                >
-                  Hủy
-                </button>
-              </div>
-            </div>
+        {/* Progress bar */}
+        <div className="mt-3">
+          <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1.5">
+            <span>Sprint Progress</span>
+            <span>
+              {activeSprint.completedTasks}/{activeSprint.totalTasks} tasks · {progressPct}%
+            </span>
           </div>
-        )}
-
-        {/* Sprint List */}
-        <div className="flex flex-col divide-y divide-slate-100">
-          {sprints.length === 0 ? (
-            <div className="px-6 py-10 text-center text-sm text-slate-400 font-semibold">
-              Chưa có sprint nào. Hãy tạo sprint đầu tiên!
-            </div>
-          ) : (
-            sprints.map(sprint => (
-              <div key={sprint.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/50 transition-colors">
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${getStatusBadge(sprint.status)}`}>
-                    {sprint.status}
-                  </span>
-                  <div className="min-w-0">
-                    <h4 className="font-bold text-slate-800 text-sm truncate">{sprint.name}</h4>
-                    {sprint.goal && (
-                      <p className="text-xs text-slate-400 font-semibold truncate">{sprint.goal}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] font-bold text-slate-400">
-                    {sprint.completedTasks}/{sprint.totalTasks} tasks
-                  </span>
-                  {sprint.status === 'PLANNING' && (
-                    <button
-                      onClick={() => handleStartSprint(sprint.id)}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg text-[11px] font-black transition-colors"
-                    >
-                      Start
-                    </button>
-                  )}
-                  {sprint.status === 'ACTIVE' && (
-                    <button
-                      onClick={() => handleCompleteSprint(sprint.id)}
-                      className="bg-violet-500 hover:bg-violet-600 text-white px-3 py-1 rounded-lg text-[11px] font-black transition-colors"
-                    >
-                      Complete
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
+          <Progress value={progressPct} className="mt-1" />
         </div>
       </div>
-    </div>
-  );
-}
 
-function MetricCard({ label, value, color }: { label: string; value: number; color: string }) {
-  const colorMap: Record<string, string> = {
-    slate: 'bg-slate-50/50 border-slate-100 text-slate-800',
-    emerald: 'bg-emerald-50/30 border-emerald-100/30 text-emerald-600',
-    blue: 'bg-blue-50/20 border-blue-100/30 text-blue-600',
-    amber: 'bg-amber-50/20 border-amber-100/30 text-amber-600',
-  };
-  return (
-    <div className={`rounded-2xl p-4 border text-center ${colorMap[color] ?? colorMap.slate}`}>
-      <span className="text-xs font-bold uppercase tracking-wider block text-slate-400">{label}</span>
-      <h4 className={`text-2xl font-black mt-1 ${colorMap[color]?.split(' ')[2]}`}>{value}</h4>
+      {/* Board */}
+      {boardColumns.length === 0 ? (
+        <div className="flex items-center justify-center py-12 text-sm text-slate-400 font-semibold">
+          Cấu hình board columns trong Project Settings trước.
+        </div>
+      ) : (
+        <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <div className="flex gap-5 overflow-x-auto p-6 items-start flex-1">
+            {boardColumns.map((column: any) => {
+              const colTasks = tasks.filter((t: any) => column.mappedStatusIds?.includes(t.statusId));
+              const columnId = column.id || column.name;
+              return (
+                <DroppableColumn 
+                  key={columnId} 
+                  column={column} 
+                  tasks={colTasks}
+                  projectMembers={currentProject?.members || []}
+                  onTaskUpdate={handleTaskUpdate}
+                >
+                  {/* Add task option */}
+                  <div className="shrink-0 mt-2">
+                    {showAddTask === columnId ? (
+                      <InlineTaskCreator
+                        onAdd={(title, type, assignee, dueDate) => handleAddTask(columnId, title, type, assignee, dueDate)}
+                        onCancel={() => setShowAddTask(null)}
+                        projectMembers={currentProject?.members || []}
+                      />
+                  ) : (
+                    <button
+                      onClick={() => setShowAddTask(columnId)}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/20 rounded-2xl text-slate-400 hover:text-blue-600 text-xs font-bold transition-all mt-2"
+                    >
+                      <Icons.plus size={14} />
+                      <span>Add Issue</span>
+                      </button>
+                    )}
+                  </div>
+                </DroppableColumn>
+              );
+            })}
+          </div>
+
+          <DragOverlay>
+            {activeTask && <SortableTaskCard task={activeTask} isOverlay projectMembers={currentProject?.members || []} />}
+          </DragOverlay>
+        </DndContext>
+      )}
     </div>
   );
 }

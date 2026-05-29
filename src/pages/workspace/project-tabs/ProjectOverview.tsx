@@ -1,5 +1,9 @@
 import { Icons } from '../../../assets/icons';
 import defaultMan from '../../../assets/avatar_def_man.png';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface ProjectOverviewProps {
   currentProject: any;
@@ -32,37 +36,33 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
     };
   });
 
-  // Render donut chart segments dynamically with premium entry animations
-  const renderDonutSegments = () => {
-    let accumulatedPercent = 0;
-    return statusGroups.map((group: any, idx: number) => {
-      if (totalCount === 0 || group.count === 0) return null;
-      const percentage = (group.count / totalCount) * 100;
-      const strokeDashArray = `${percentage} ${100 - percentage}`;
-      const strokeDashOffset = -accumulatedPercent;
-      accumulatedPercent += percentage;
+  const chartData = {
+    labels: statusGroups.map((g: any) => g.label),
+    datasets: [
+      {
+        data: statusGroups.map((g: any) => g.count),
+        backgroundColor: statusGroups.map((g: any) => g.color),
+        borderWidth: 0,
+        hoverOffset: 4,
+      },
+    ],
+  };
 
-      return (
-        <circle
-          key={idx}
-          cx="50"
-          cy="50"
-          r="38"
-          fill="transparent"
-          stroke={group.color}
-          strokeWidth="10"
-          strokeDasharray={strokeDashArray}
-          strokeDashoffset={strokeDashOffset}
-          pathLength="100"
-          className="transition-all duration-700 hover:stroke-[12px] cursor-pointer"
-          style={{ 
-            transformOrigin: 'center',
-            transition: 'stroke-width 0.3s, stroke-dashoffset 0.8s ease-in-out',
-            filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.06))'
-          }}
-        />
-      );
-    });
+  const chartOptions = {
+    cutout: '75%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1e293b',
+        titleFont: { size: 11 },
+        bodyFont: { size: 11 },
+        cornerRadius: 8,
+        callbacks: {
+          label: (ctx: any) => ` ${ctx.label}: ${ctx.raw} task${ctx.raw !== 1 ? 's' : ''}`,
+        },
+      },
+    },
+    animation: { animateScale: true, animateRotate: true, duration: 1000 },
   };
 
   // Priority breakdown
@@ -233,15 +233,15 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-10 py-4 flex-1">
-            {/* SVG Donut Chart */}
+            {/* Chart.js Donut Chart */}
             <div className="relative w-40 h-40 flex items-center justify-center">
               {totalCount > 0 ? (
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  {renderDonutSegments()}
-                </svg>
+                <div className="w-full h-full">
+                  <Doughnut data={chartData} options={chartOptions} />
+                </div>
               ) : (
                 <div className="w-full h-full rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300 font-bold text-xs">
-                  No work items
+                  No tasks
                 </div>
               )}
               <div className="absolute inset-0 flex flex-col items-center justify-center">

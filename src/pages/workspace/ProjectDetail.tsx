@@ -16,6 +16,7 @@ import ProjectBoard from './project-tabs/ProjectBoard';
 import ProjectBacklog from './project-tabs/ProjectBacklog';
 import ProjectSprint from './project-tabs/ProjectSprint';
 import ProjectRoadmap from './project-tabs/ProjectRoadmap';
+
 import ProjectIssues from './project-tabs/ProjectIssues';
 import ProjectMembers from './project-tabs/ProjectMembers';
 import ProjectSettings from './project-tabs/ProjectSettings';
@@ -95,8 +96,22 @@ export default function ProjectDetail() {
     if (!projectId) return;
     dispatch(fetchCategories());
     dispatch(fetchProjectById(projectId));
-    setActiveTab('list');
+    
+    const savedTab = localStorage.getItem(`project_tab_${projectId}`);
+    setActiveTab((savedTab as TabType) || 'list');
   }, [projectId, dispatch]);
+
+  useEffect(() => {
+    if (!currentProject) return;
+
+    if (currentProject.methodology === 'SCRUM' && activeTab === 'board') {
+      setActiveTab('sprint');
+      if (projectId) localStorage.setItem(`project_tab_${projectId}`, 'sprint');
+    } else if (currentProject.methodology === 'KANBAN' && (activeTab === 'sprint' || activeTab === 'backlog')) {
+      setActiveTab('board');
+      if (projectId) localStorage.setItem(`project_tab_${projectId}`, 'board');
+    }
+  }, [currentProject?.methodology, activeTab, projectId, currentProject]);
 
   useEffect(() => {
     if (!projectId) return;
@@ -112,11 +127,24 @@ export default function ProjectDetail() {
             case "UPDATE_TASK":
               dispatch(wsUpdateTask(event.data));
               break;
+            case "TASK_MOVED":
+              dispatch(wsUpdateTask(event.data));
+              break;
+            case "TASK_REORDERED":
+              dispatch(wsUpdateTask(event.data));
+              break;
             case "UPDATE_PROJECT":
               dispatch(fetchProjectById(projectId));
               break;
             case "DELETE_TASK":
               dispatch(wsDeleteTask(event.data));
+              break;
+            case "SPRINT_CREATED":
+            case "SPRINT_UPDATED":
+            case "SPRINT_STARTED":
+            case "SPRINT_COMPLETED":
+            case "SPRINT_DELETED":
+              // Sprint changes are handled by the individual tab components via their own reload
               break;
             default:
               break;
@@ -203,26 +231,20 @@ export default function ProjectDetail() {
     { id: 'settings' as TabType, label: 'Settings', icon: Icons.settings },
   ];
 
-  // Scrum-specific tabs inserted after Board
-  const scrumTabs = [
-    { id: 'backlog' as TabType, label: 'Backlog', icon: Icons.listTodo },
-    { id: 'sprint' as TabType, label: 'Sprint', icon: Icons.zap },
-    { id: 'roadmap' as TabType, label: 'Roadmap', icon: Icons.gitBranch },
-    { id: 'issues' as TabType, label: 'Issues', icon: Icons.alertCircle },
+  // Scrum-specific tabs
+  const scrumOnlyTabs: { id: TabType; label: string; icon: any }[] = [
+    { id: 'backlog', label: 'Backlog', icon: Icons.listTodo },
+    { id: 'sprint', label: 'Sprint Board', icon: Icons.zap },
   ];
 
   const tabs = isScrum
     ? [
       baseTabs[0], // Summary
       baseTabs[1], // List
-      baseTabs[2], // Board (Kanban-style)
-      scrumTabs[0], // Backlog
-      scrumTabs[1], // Sprint Board
-      scrumTabs[2], // Roadmap
-      scrumTabs[3], // Issues
+      scrumOnlyTabs[0], // Backlog
+      scrumOnlyTabs[1], // Sprint Board
       baseTabs[3], // Calendar
       baseTabs[4], // Members
-      baseTabs[5], // Forms
       baseTabs[6], // Settings
     ]
     : baseTabs;
@@ -251,35 +273,8 @@ export default function ProjectDetail() {
           ))}
         </div>
 
-        {/* Toolbar skeleton */}
-        <div className="flex items-center gap-2 px-6 py-3 shrink-0">
-          <Skeleton className="h-8 w-24 rounded-md bg-slate-200" />
-          <Skeleton className="h-8 w-20 rounded-md bg-slate-100" />
-          <Skeleton className="h-8 w-20 rounded-md bg-slate-100" />
-          <div className="flex-1" />
-          <Skeleton className="h-8 w-16 rounded-md bg-slate-100" />
-        </div>
-
-        {/* Table header skeleton */}
-        <div className="px-6">
-          <div className="flex gap-0 border border-slate-200 rounded-t-lg bg-slate-50 overflow-hidden">
-            {[48, 280, 140, 120, 110, 120, 60].map((w, i) => (
-              <div key={i} style={{ width: w, minWidth: w }} className="py-2.5 px-4 border-r border-slate-200 last:border-r-0">
-                <Skeleton className="h-3 bg-slate-200" style={{ width: i === 0 ? 16 : '80%' }} />
-              </div>
-            ))}
-          </div>
-          {/* Table row skeletons */}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="flex gap-0 border-b border-x border-slate-200 last:rounded-b-lg">
-              {[48, 280, 140, 120, 110, 120, 60].map((w, j) => (
-                <div key={j} style={{ width: w, minWidth: w }} className="py-4 px-4 border-r border-slate-200 last:border-r-0">
-                  <Skeleton className="h-4 bg-slate-200" style={{ width: j === 0 ? 16 : `${60 + Math.random() * 30}%` }} />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        {/* Content area is left empty so individual tabs can show their own specific skeletons */}
+        <div className="flex-1" />
       </div>
     );
   }
@@ -389,7 +384,10 @@ export default function ProjectDetail() {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                if (projectId) localStorage.setItem(`project_tab_${projectId}`, tab.id);
+              }}
               className={`flex items-center gap-1.5 px-1 py-2.5 border-b-2 font-bold text-xs transition-all duration-200 whitespace-nowrap -mb-[2px] ${isActiveTab
                 ? 'border-slate-800 text-slate-800'
                 : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
@@ -404,12 +402,16 @@ export default function ProjectDetail() {
 
       {/* Dynamic Tabs Content Viewport */}
       <div className="flex-1 flex flex-col min-h-0 bg-white">
-        {activeTab === 'overview' && <ProjectOverview currentProject={currentProject} tasks={tasks} setActiveTab={setActiveTab} />}
+        {activeTab === 'overview' && <ProjectOverview currentProject={currentProject} tasks={tasks} setActiveTab={(t) => {
+          setActiveTab(t);
+          if (projectId) localStorage.setItem(`project_tab_${projectId}`, t);
+        }} />}
         {activeTab === 'list' && <ProjectList projectId={projectId!} currentProject={currentProject} tasks={tasks} setTasks={setTasks} />}
         {activeTab === 'board' && <ProjectBoard currentProject={currentProject} tasks={tasks} />}
         {activeTab === 'calendar' && <ProjectCalendar currentProject={currentProject} tasks={tasks} />}
-        {activeTab === 'backlog' && <ProjectBacklog tasks={tasks} setActiveTab={setActiveTab} />}
-        {activeTab === 'sprint' && <ProjectSprint projectId={projectId!} tasks={tasks} />}
+        {activeTab === 'backlog' && <ProjectBacklog projectId={projectId!} currentProject={currentProject} />}
+        {activeTab === 'sprint' && <ProjectSprint projectId={projectId!} currentProject={currentProject} />}
+
         {activeTab === 'roadmap' && <ProjectRoadmap />}
         {activeTab === 'issues' && <ProjectIssues tasks={tasks} />}
         {activeTab === 'members' && (
