@@ -18,6 +18,10 @@ export const taskService = {
     const response = await axiosClient.get(`/tasks/project/${projectId}`, { params });
     return response.data;
   },
+  getMyTasks: async (params?: any): Promise<any> => {
+    const response = await axiosClient.get(`/tasks/my-tasks`, { params });
+    return response.data;
+  },
   createTask: async (data: TaskCreateRequest): Promise<any> => {
     const response = await axiosClient.post('/tasks', data);
     return response.data;

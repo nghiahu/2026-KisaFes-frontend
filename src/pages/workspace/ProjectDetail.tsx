@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
 import defaultMan from '../../assets/avatar_def_man.png';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchProjectById } from '../../store/slices/projectSlice';
-import { fetchCategories } from '../../store/slices/categorySlice';
 import { socketService } from '../../services/socketService';
 import { wsUpdateTask, wsCreateTask, wsDeleteTask } from '../../store/slices/taskSlice';
 import { projectService } from '../../services/project.service';
+import categoryService from '../../services/category.service';
 
 
 import ProjectOverview from './project-tabs/ProjectOverview';
@@ -29,14 +29,25 @@ type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' 
 export default function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-
   const dispatch = useAppDispatch();
-  const { currentProject: backendProject, loading: isProjectLoading } = useAppSelector(state => state.project);
-  const { categories, loading: isCategoriesLoading } = useAppSelector(state => state.category);
-  const { tasks: backendTasks, loading: isTasksLoading } = useAppSelector(state => state.task);
+  const queryClient = useQueryClient();
+
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.getAllCategories(),
+    staleTime: 60 * 60 * 1000, // Cache for 1 hour
+  });
+
+  const { data: backendProject, isLoading: isProjectLoading } = useQuery({
+    queryKey: ['project', projectId],
+    queryFn: () => projectService.getProjectById(projectId!),
+    enabled: !!projectId,
+  });
+
+  const { tasks: backendTasks } = useAppSelector(state => state.task);
 
   const [currentProject, setCurrentProject] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const loading = isProjectLoading || isCategoriesLoading;
   const [activeTab, setActiveTab] = useState<TabType>('list');
   const [isFavorite, setIsFavorite] = useState(false);
   const [tasks, setTasks] = useState<any[]>([]);
@@ -45,6 +56,13 @@ export default function ProjectDetail() {
   const [editingName, setEditingName] = useState('');
   const [isSavingName, setIsSavingName] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [editFormData, setEditFormData] = useState({ name: '', description: '', categoryId: '' });
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteInput, setDeleteInput] = useState('');
 
   const { user } = useAppSelector(state => state.auth);
 
@@ -78,7 +96,7 @@ export default function ProjectDetail() {
     setIsSavingName(true);
     try {
       await projectService.updateProjectName(currentProject.id, trimmed);
-      // WebSocket will broadcast UPDATE_PROJECT – fetchProjectById will re-run
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
     } catch {
       // axiosClient interceptor shows permission-denied toast for 403
     } finally {
@@ -93,13 +111,44 @@ export default function ProjectDetail() {
   };
 
   useEffect(() => {
+    const handleClickOutside = () => setShowDropdown(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsUpdating(true);
+      await projectService.updateProjectInfo(currentProject.id, editFormData as any);
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      setIsEditingInfo(false);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update project info');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentProject) return;
+    if (deleteInput !== `delete ${currentProject.code}`) {
+      alert(`Vui lòng nhập đúng "delete ${currentProject.code}" để xác nhận.`);
+      return;
+    }
+    // Perform deletion
+    // TODO: Call API to delete project here
+    navigate('/workspace/projects');
+  };
+
+  useEffect(() => {
     if (!projectId) return;
-    dispatch(fetchCategories());
-    dispatch(fetchProjectById(projectId));
-    
+
     const savedTab = localStorage.getItem(`project_tab_${projectId}`);
     setActiveTab((savedTab as TabType) || 'list');
-  }, [projectId, dispatch]);
+  }, [projectId]);
 
   useEffect(() => {
     if (!currentProject) return;
@@ -134,7 +183,7 @@ export default function ProjectDetail() {
               dispatch(wsUpdateTask(event.data));
               break;
             case "UPDATE_PROJECT":
-              dispatch(fetchProjectById(projectId));
+              queryClient.invalidateQueries({ queryKey: ['project', projectId] });
               break;
             case "DELETE_TASK":
               dispatch(wsDeleteTask(event.data));
@@ -162,12 +211,10 @@ export default function ProjectDetail() {
     };
   }, [projectId, dispatch]);
 
-  useEffect(() => {
-    setLoading(isProjectLoading || isCategoriesLoading);
-  }, [isProjectLoading, isCategoriesLoading]);
+
 
   useEffect(() => {
-    if (backendProject) {
+    if (backendProject && backendProject.id === projectId) {
       const catName = categories.find((c: any) => c.id === backendProject.categoryId)?.name || 'General';
       const completedCount = backendProject.completedTasksCount ?? 0;
       const totalCount = backendProject.totalTasksCount ?? 0;
@@ -196,11 +243,11 @@ export default function ProjectDetail() {
         customRoles: backendProject.customRoles || [],
         ownerId: backendProject.ownerId
       });
-    } else {
+    } else if (!isProjectLoading && !backendProject) {
       setCurrentProject(null);
     }
 
-    if (backendTasks && backendTasks.length > 0) {
+    if (backendTasks && backendTasks.length > 0 && backendProject && backendProject.id === projectId) {
       setTasks(backendTasks.map((t: any) => ({
         ...t,
         id: t.taskKey,
@@ -216,7 +263,7 @@ export default function ProjectDetail() {
     } else {
       setTasks([]);
     }
-  }, [backendProject, backendTasks, categories]);
+  }, [backendProject, backendTasks, categories, projectId, isProjectLoading]);
 
   const isScrum = currentProject?.methodology === 'SCRUM';
 
@@ -352,9 +399,38 @@ export default function ProjectDetail() {
           >
             <Icons.userPlus size={15} />
           </button>
-          <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors shrink-0">
-            <Icons.moreHorizontal size={15} />
-          </button>
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors shrink-0"
+            >
+              <Icons.moreHorizontal size={15} />
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 top-full mt-1.5 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <button onClick={() => { setIsFavorite(!isFavorite); setShowDropdown(false); }}
+                  className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
+                  <Icons.star size={13} className={isFavorite ? 'text-amber-400' : 'text-slate-400'} fill={isFavorite ? 'currentColor' : 'none'} />
+                  <span>{isFavorite ? 'Remove from starred' : 'Add to starred'}</span>
+                </button>
+                <button onClick={() => { 
+                    setShowDropdown(false); 
+                    setEditFormData({ name: currentProject.name, description: currentProject.description, categoryId: categories.find((c: any) => c.name === currentProject.category)?.id || '' }); 
+                    setIsEditingInfo(true); 
+                  }}
+                  className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
+                  <Icons.settings size={13} className="text-slate-400" />
+                  <span>Edit project</span>
+                </button>
+                <div className="h-px bg-slate-100 my-1" />
+                <button onClick={() => { setShowDropdown(false); setIsDeleting(true); setDeleteInput(''); }}
+                  className="w-full px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors">
+                  <Icons.alertCircle size={13} className="text-rose-500" />
+                  <span>Delete project</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -435,6 +511,66 @@ export default function ProjectDetail() {
           projectName={currentProject.name}
           projectId={currentProject.id}
         />
+      )}
+
+      {/* Edit Project Modal */}
+      {isEditingInfo && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-4">Edit Project</h3>
+            <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-slate-700">Project Name</label>
+                <input required type="text" className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  value={editFormData.name} onChange={e => setEditFormData({ ...editFormData, name: e.target.value })} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-slate-700">Category</label>
+                <select required className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  value={editFormData.categoryId} onChange={e => setEditFormData({ ...editFormData, categoryId: e.target.value })}>
+                  <option value="" disabled>Select category</option>
+                  {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-slate-700">Description</label>
+                <textarea className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" rows={3}
+                  value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />
+              </div>
+              <div className="flex items-center justify-end gap-3 mt-4">
+                <button type="button" onClick={() => setIsEditingInfo(false)} className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" disabled={isUpdating} className="px-4 py-2 text-sm font-bold bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                  {isUpdating ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Project Modal */}
+      {isDeleting && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 mb-4 text-rose-600">
+              <Icons.alertCircle size={24} />
+              <h3 className="text-xl font-bold text-slate-900">Delete Project</h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-6">
+              Bạn sắp xóa dự án <strong>{currentProject.name}</strong>. Hành động này không thể hoàn tác. Để xác nhận, vui lòng nhập <code className="bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded border border-rose-100 font-bold">delete {currentProject.code}</code> vào ô bên dưới.
+            </p>
+            <form onSubmit={handleDeleteSubmit} className="flex flex-col gap-4">
+              <input required type="text" className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                placeholder={`delete ${currentProject.code}`} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} />
+              <div className="flex items-center justify-end gap-3 mt-2">
+                <button type="button" onClick={() => { setIsDeleting(false); setDeleteInput(''); }} className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" disabled={deleteInput !== `delete ${currentProject.code}`} className="px-4 py-2 text-sm font-bold bg-rose-600 text-white rounded-xl hover:bg-rose-700 disabled:opacity-50 transition-colors">
+                  Confirm Delete
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

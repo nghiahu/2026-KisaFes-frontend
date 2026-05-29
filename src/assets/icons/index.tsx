@@ -81,7 +81,12 @@ import {
   MousePointer2,
   Edit3,
   MinusSquare,
-  Paperclip
+  Paperclip,
+  Briefcase,
+  PartyPopper,
+  AlertTriangle,
+  Sun,
+  PieChart
 } from 'lucide-react';
 
 export const Icons = {
@@ -168,4 +173,9 @@ export const Icons = {
   edit3: Edit3,
   minusSquare: MinusSquare,
   paperclip: Paperclip,
+  briefcase: Briefcase,
+  partyPopper: PartyPopper,
+  alertTriangle: AlertTriangle,
+  sun: Sun,
+  pieChart: PieChart,
 };

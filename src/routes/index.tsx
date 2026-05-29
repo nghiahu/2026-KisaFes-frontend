@@ -10,6 +10,8 @@ import Dashboard from '../pages/workspace/Dashboard'
 import Projects from '../pages/workspace/Projects'
 import CreateProject from '../pages/workspace/CreateProject'
 import ProjectDetail from '../pages/workspace/ProjectDetail'
+import Inbox from '../pages/workspace/Inbox'
+import MyTasks from '../pages/workspace/MyTasks'
 import ProtectedRoute from './ProtectedRoute'
 
 export const router = createBrowserRouter([
@@ -89,6 +91,14 @@ export const router = createBrowserRouter([
           {
             path: 'projects/:projectId',
             element: <ProjectDetail />,
+          },
+          {
+            path: 'inbox',
+            element: <Inbox />,
+          },
+          {
+            path: 'my-tasks',
+            element: <MyTasks />,
           },
         ],
       },

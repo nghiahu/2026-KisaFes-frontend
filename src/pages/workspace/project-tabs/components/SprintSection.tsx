@@ -8,13 +8,26 @@ import { DraggableTaskRow } from './DraggableTaskRow';
 import { InlineTaskCreator } from '../../../../components/workspace/InlineTaskCreator';
 
 // ─── Sprint Section ────────────────────────────────────────────────────────
-export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, onEdit, onDelete, onStart, onComplete, onMoveToSprint, onDeleteTask, allSprints, selectedTaskIds, onToggleTask, onTaskUpdated, onCreateTask }: any) {
+export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, onEdit, onDelete, onStart, onComplete, onMoveToSprint, onDeleteTask, allSprints, selectedTaskIds, onToggleTask, onTaskUpdated, onCreateTask, onTaskClick }: any) {
   const { setNodeRef: setSprintNodeRef, isOver } = useDroppable({
     id: sprint.id,
     data: { type: 'sprint', sprintId: sprint.id }
   });
 
   const [isCreating, setIsCreating] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const sprintTasks = tasks.filter((t: any) => t.sprintId === sprint.id);
   const isAllSelected = sprintTasks.length > 0 && sprintTasks.every((t: any) => selectedTaskIds?.has(t.id));
 
@@ -89,15 +102,32 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
                 Complete sprint
               </button>
             )}
-            {sprint.status !== 'ACTIVE' && sprint.status !== 'COMPLETED' && (
-              <button onClick={onDelete}
-                className="p-1 text-slate-500 hover:bg-slate-200 rounded transition-colors ml-1">
-                <Trash2 size={14} />
+            <div className="relative" ref={menuRef}>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+                className="p-1 text-slate-500 hover:bg-slate-200 rounded transition-colors"
+              >
+                <MoreHorizontal size={16} />
               </button>
-            )}
-            <button className="p-1 text-slate-500 hover:bg-slate-200 rounded transition-colors">
-              <MoreHorizontal size={16} />
-            </button>
+              {showMenu && (
+                <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-50">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setShowMenu(false); onEdit?.(); }}
+                    className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                  >
+                    <Pencil size={14} />
+                    Edit sprint
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setShowMenu(false); onDelete?.(); }}
+                    className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                  >
+                    <Trash2 size={14} />
+                    Delete sprint
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -108,7 +138,7 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
           <SortableContext items={sprintTasks.map((t: any) => t.id)} strategy={verticalListSortingStrategy}>
             {sprintTasks.length === 0 && (
               <div className="border border-dashed border-slate-300 bg-slate-50/50 text-slate-500 text-[13px] text-center py-6 mx-2 my-2 rounded-sm select-none">
-                Kéo thả task vào đây để thêm vào Sprint
+                There's nothing in sprint
               </div>
             )}
             {sprintTasks.map((task: any) => (
@@ -122,6 +152,7 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
                 isSelected={selectedTaskIds?.has(task.id)}
                 onToggle={onToggleTask}
                 onTaskUpdated={onTaskUpdated}
+                onTaskClick={onTaskClick}
               />
             ))}
           </SortableContext>

@@ -20,8 +20,8 @@ const getTypeInfo = (type?: string) => {
 };
 
 // ─── Draggable Task Row ────────────────────────────────────────────────────
-export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, sprints, isSelected, onToggle, onTaskUpdated, isOverlay = false }: {
-  task: any; project: any; onMoveToSprint?: (taskId: string, sprintId: string | null) => void; onDeleteTask?: (taskId: string) => void; sprints?: any[]; isSelected?: boolean; onToggle?: (id: string) => void; onTaskUpdated?: () => void; isOverlay?: boolean;
+export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, sprints, isSelected, onToggle, onTaskUpdated, isOverlay = false, onTaskClick }: {
+  task: any; project: any; onMoveToSprint?: (taskId: string, sprintId: string | null) => void; onDeleteTask?: (taskId: string) => void; sprints?: any[]; isSelected?: boolean; onToggle?: (id: string) => void; onTaskUpdated?: () => void; isOverlay?: boolean; onTaskClick?: (task: any) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id, data: { type: 'task', task, sprintId: task.sprintId || null },
@@ -114,7 +114,15 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
         })()}
       </span>
 
-      <span className="text-xs font-semibold text-slate-500 hover:underline cursor-pointer shrink-0">{task.taskKey}</span>
+      <span 
+        className="text-xs font-semibold text-slate-500 hover:underline cursor-pointer shrink-0"
+        onClick={(e) => {
+          e.stopPropagation();
+          onTaskClick?.(task);
+        }}
+      >
+        {task.taskKey}
+      </span>
 
       {isEditingTitle ? (
         <div className="flex-1 flex items-center gap-1 min-w-0" ref={titleInputRef}>

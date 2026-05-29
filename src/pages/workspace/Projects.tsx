@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProjects } from '../../store/slices/projectSlice';
 import { fetchCategories } from '../../store/slices/categorySlice';
 import { Skeleton } from '../../components/ui/skeleton';
+import { projectService } from '../../services/project.service';
 
 export default function Projects() {
   const navigate = useNavigate();
@@ -16,6 +17,11 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeDropdownProjectId, setActiveDropdownProjectId] = useState<string | null>(null);
+  const [editingProject, setEditingProject] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState({ name: '', description: '', categoryId: '' });
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [deletingProject, setDeletingProject] = useState<any>(null);
+  const [deleteInput, setDeleteInput] = useState('');
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +40,15 @@ export default function Projects() {
     dispatch(fetchCategories());
   }, [dispatch]);
 
+  // Global click listener to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setActiveDropdownProjectId(null);
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     setCategories(backendCategories);
     if (backendProjects) {
@@ -43,6 +58,7 @@ export default function Projects() {
         name: p.name,
         code: p.code,
         description: p.description,
+        categoryId: p.categoryId,
         category: backendCategories.find(c => c.id === p.categoryId)?.name || 'General',
         status: 'ACTIVE', // Default status as backend doesn't have it yet in root
         methodology: (p.methodology as 'SCRUM' | 'KANBAN') || 'KANBAN',
@@ -146,6 +162,36 @@ export default function Projects() {
       case 'PLANNING': return 'bg-blue-500';
       default: return 'bg-blue-500';
     }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+    try {
+      setIsUpdating(true);
+      await projectService.updateProjectInfo(editingProject.id, editFormData);
+      dispatch(fetchProjects()); // reload
+      setEditingProject(null);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update project info');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!deletingProject) return;
+    if (deleteInput !== `delete ${deletingProject.code}`) {
+      alert(`Vui lòng nhập đúng "delete ${deletingProject.code}" để xác nhận.`);
+      return;
+    }
+    // Perform deletion
+    setProjects(prev => prev.filter(p => p.id !== deletingProject.id));
+    // TODO: Call API to delete project here
+    setDeletingProject(null);
+    setDeleteInput('');
   };
 
   return (
@@ -315,8 +361,8 @@ export default function Projects() {
                 <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
                   {favoriteProjects.map(project => (
                     viewType === 'grid'
-                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} />
-                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} />
+                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); setEditFormData({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
+                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); setEditFormData({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
                   ))}
                 </div>
               </section>
@@ -352,8 +398,8 @@ export default function Projects() {
                 <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
                   {otherProjects.map(project => (
                     viewType === 'grid'
-                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} />
-                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} />
+                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); setEditFormData({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
+                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); setEditFormData({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
                   ))}
 
                   {/* New Project Card (Only in Grid View) */}
@@ -374,6 +420,66 @@ export default function Projects() {
           </>
         )}
       </div>
+
+      {/* Edit Project Modal */}
+      {editingProject && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-4">Edit Project</h3>
+            <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-slate-700">Project Name</label>
+                <input required type="text" className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  value={editFormData.name} onChange={e => setEditFormData({ ...editFormData, name: e.target.value })} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-slate-700">Category</label>
+                <select required className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  value={editFormData.categoryId} onChange={e => setEditFormData({ ...editFormData, categoryId: e.target.value })}>
+                  <option value="" disabled>Select category</option>
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-slate-700">Description</label>
+                <textarea className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" rows={3}
+                  value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />
+              </div>
+              <div className="flex items-center justify-end gap-3 mt-4">
+                <button type="button" onClick={() => setEditingProject(null)} className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" disabled={isUpdating} className="px-4 py-2 text-sm font-bold bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                  {isUpdating ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Project Modal */}
+      {deletingProject && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 mb-4 text-rose-600">
+              <Icons.alertCircle size={24} />
+              <h3 className="text-xl font-bold text-slate-900">Delete Project</h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-6">
+              Bạn sắp xóa dự án <strong>{deletingProject.name}</strong>. Hành động này không thể hoàn tác. Để xác nhận, vui lòng nhập <code className="bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded border border-rose-100 font-bold">delete {deletingProject.code}</code> vào ô bên dưới.
+            </p>
+            <form onSubmit={handleDeleteSubmit} className="flex flex-col gap-4">
+              <input required type="text" className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                placeholder={`delete ${deletingProject.code}`} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} />
+              <div className="flex items-center justify-end gap-3 mt-2">
+                <button type="button" onClick={() => { setDeletingProject(null); setDeleteInput(''); }} className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                <button type="submit" disabled={deleteInput !== `delete ${deletingProject.code}`} className="px-4 py-2 text-sm font-bold bg-rose-600 text-white rounded-xl hover:bg-rose-700 disabled:opacity-50 transition-colors">
+                  Confirm Delete
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -386,6 +492,8 @@ interface ProjectViewProps {
   activeDropdownProjectId: string | null;
   setActiveDropdownProjectId: (id: string | null) => void;
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
+  setEditingProject: (project: Project) => void;
+  setDeletingProject: (project: Project) => void;
 }
 
 function ProjectCard({
@@ -395,11 +503,14 @@ function ProjectCard({
   getProgressColor,
   activeDropdownProjectId,
   setActiveDropdownProjectId,
-  setProjects
+  setProjects,
+  setEditingProject,
+  setDeletingProject
 }: ProjectViewProps) {
   const navigate = useNavigate();
 
   const totalTasks = project.totalTasksCount ?? 0;
+  const completedTasks = project.completedTasksCount ?? 0;
   const percentage = project.progress ?? 0;
   const sprintName = project.activeSprintName && project.activeSprintName !== 'No active sprint'
     ? project.activeSprintName : 'Sprint';
@@ -433,22 +544,21 @@ function ProjectCard({
           </button>
           {activeDropdownProjectId === project.id && (
             <>
-              <div className="fixed inset-0 z-40 cursor-default" onClick={(e) => { e.stopPropagation(); setActiveDropdownProjectId(null); }} />
               <div className="absolute right-0 top-full mt-1.5 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <button onClick={() => { onToggleFavorite(project.id); setActiveDropdownProjectId(null); }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
                   <Icons.star size={13} className={project.isFavorite ? 'text-amber-400' : 'text-slate-400'} fill={project.isFavorite ? 'currentColor' : 'none'} />
                   <span>{project.isFavorite ? 'Remove from starred' : 'Add to starred'}</span>
                 </button>
-                <button onClick={() => { setActiveDropdownProjectId(null); navigate(`/workspace/projects/${project.id}`); }}
+                <button onClick={() => { setActiveDropdownProjectId(null); setEditingProject(project); }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
                   <Icons.settings size={13} className="text-slate-400" />
-                  <span>Project settings</span>
+                  <span>Edit project</span>
                 </button>
                 <div className="h-px bg-slate-100 my-1" />
                 <button onClick={() => {
                   setActiveDropdownProjectId(null);
-                  if (confirm(`Xóa dự án "${project.name}"?`)) setProjects(prev => prev.filter(p => p.id !== project.id));
+                  setDeletingProject(project);
                 }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors">
                   <Icons.alertCircle size={13} className="text-rose-500" />
@@ -485,41 +595,20 @@ function ProjectCard({
 
       {/* Row 4 — Stat chips */}
       <div className="grid grid-cols-2 gap-2">
-        {isScrum ? (
-          <>
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/70 rounded-xl px-3 py-2">
-              <Icons.clock size={13} className="text-slate-400 shrink-0" />
-              <div>
-                <p className="text-[11px] font-bold text-slate-700 leading-none">{issuesCount} Open</p>
-                <p className="text-[10px] text-slate-400 leading-none mt-0.5">Issues</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 bg-rose-50 border border-rose-100 rounded-xl px-3 py-2">
-              <Icons.ban size={13} className="text-rose-400 shrink-0" />
-              <div>
-                <p className="text-[11px] font-bold text-rose-600 leading-none">{blockedCount} Blocked</p>
-                <p className="text-[10px] text-rose-400 leading-none mt-0.5">Items</p>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/70 rounded-xl px-3 py-2">
-              <Icons.listChecks size={13} className="text-slate-400 shrink-0" />
-              <div>
-                <p className="text-[11px] font-bold text-slate-700 leading-none">{totalTasks} Total</p>
-                <p className="text-[10px] text-slate-400 leading-none mt-0.5">Tasks</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 bg-teal-50 border border-teal-100 rounded-xl px-3 py-2">
-              <Icons.refreshCw size={13} className="text-teal-500 shrink-0" />
-              <div>
-                <p className="text-[11px] font-bold text-teal-600 leading-none">{issuesCount} WIP</p>
-                <p className="text-[10px] text-teal-400 leading-none mt-0.5">Tasks</p>
-              </div>
-            </div>
-          </>
-        )}
+        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/70 rounded-xl px-3 py-2">
+          <Icons.listChecks size={13} className="text-slate-400 shrink-0" />
+          <div>
+            <p className="text-[11px] font-bold text-slate-700 leading-none">{totalTasks} Total</p>
+            <p className="text-[10px] text-slate-400 leading-none mt-0.5">Tasks</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2">
+          <Icons.checkCircle2 size={13} className="text-emerald-500 shrink-0" />
+          <div>
+            <p className="text-[11px] font-bold text-emerald-600 leading-none">{completedTasks} Done</p>
+            <p className="text-[10px] text-emerald-400 leading-none mt-0.5">Tasks</p>
+          </div>
+        </div>
       </div>
 
       {/* Row 5 — Footer: avatars + deadline / CONTINUOUS DELIVERY */}
@@ -553,7 +642,9 @@ function ProjectListItem({
   getProgressColor,
   activeDropdownProjectId,
   setActiveDropdownProjectId,
-  setProjects
+  setProjects,
+  setEditingProject,
+  setDeletingProject
 }: ProjectViewProps) {
   const navigate = useNavigate();
   if (typeof getProgressColor === 'function') { }
@@ -618,27 +709,14 @@ function ProjectListItem({
 
       {/* 3. Task Stats (Vertical text) */}
       <div className="flex flex-col justify-center items-start shrink-0 w-[80px] border-l border-slate-100 pl-6 h-10">
-        {isScrum ? (
-          <>
-            <span className="text-[13px] font-bold text-slate-700 leading-tight">{completedTasks}/{totalTasks}</span>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Tasks</span>
-          </>
-        ) : (
-          <>
-            <span className="text-[13px] font-bold text-slate-700 leading-tight">{totalTasks} Total</span>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Tasks</span>
-          </>
-        )}
+        <span className="text-[13px] font-bold text-slate-700 leading-tight">{totalTasks} Total</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Tasks</span>
       </div>
 
       {/* 4. Progress / Blocked */}
       <div className="flex flex-col shrink-0 w-[140px] pl-4">
         <div className="flex items-center justify-between mb-1.5">
-          {isScrum ? (
-            <span className="text-[11px] font-bold text-rose-500">{blockedCount} Blocked</span>
-          ) : (
-            <span className="text-[11px] font-bold text-teal-500">{issuesCount} WIP</span>
-          )}
+          <span className="text-[11px] font-bold text-emerald-500">{completedTasks} Done</span>
           <span className="text-[10px] font-bold text-slate-400">{percentage}%</span>
         </div>
         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -703,22 +781,21 @@ function ProjectListItem({
 
           {activeDropdownProjectId === project.id && (
             <>
-              <div className="fixed inset-0 z-40 cursor-default" onClick={(e) => { e.stopPropagation(); setActiveDropdownProjectId(null); }} />
               <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-1 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-150">
                 <button onClick={() => { onToggleFavorite(project.id); setActiveDropdownProjectId(null); }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5">
                   <Icons.star size={13} className={project.isFavorite ? 'text-amber-400' : 'text-slate-400'} fill={project.isFavorite ? 'currentColor' : 'none'} />
                   <span>{project.isFavorite ? 'Remove from starred' : 'Add to starred'}</span>
                 </button>
-                <button onClick={() => { setActiveDropdownProjectId(null); navigate(`/workspace/projects/${project.id}`); }}
+                <button onClick={() => { setActiveDropdownProjectId(null); setEditingProject(project); }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5">
                   <Icons.settings size={13} className="text-slate-400" />
-                  <span>Project settings</span>
+                  <span>Edit project</span>
                 </button>
                 <div className="h-px bg-slate-100 my-1" />
                 <button onClick={() => {
                   setActiveDropdownProjectId(null);
-                  if (confirm(`Xóa dự án "${project.name}"?`)) setProjects(prev => prev.filter(p => p.id !== project.id));
+                  setDeletingProject(project);
                 }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5">
                   <Icons.alertCircle size={13} className="text-rose-500" />

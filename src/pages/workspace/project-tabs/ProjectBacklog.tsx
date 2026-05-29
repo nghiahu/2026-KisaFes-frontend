@@ -9,9 +9,8 @@ import {
 } from '@dnd-kit/sortable';
 import {
   Plus, ChevronDown, ChevronRight,
-  Trash2, CheckSquare, Zap, AlertCircle,
-  MousePointer2, Edit3, MinusSquare, X,
-  Search, User, Calendar, MoveRight
+  Trash2, CheckSquare, Zap,
+  MousePointer2, Edit3, MinusSquare, X, MoveRight, AlertCircle
 } from 'lucide-react';
 import { sprintService, type Sprint } from '../../../services/sprint.service';
 import { taskService } from '../../../services/task.service';
@@ -22,6 +21,7 @@ import { Skeleton } from '../../../components/ui/skeleton';
 import { MassChangeStatusModal } from '../../../components/workspace/MassChangeStatusModal';
 import { MassEditFieldsModal } from '../../../components/workspace/MassEditFieldsModal';
 import { MassDeleteModal } from '../../../components/workspace/MassDeleteModal';
+import { Icons } from '../../../assets/icons';
 
 interface ProjectBacklogProps {
   projectId: string;
@@ -33,15 +33,23 @@ interface ProjectBacklogProps {
 import { DraggableTaskRow } from './components/DraggableTaskRow';
 import { SprintSection } from './components/SprintSection';
 import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
+import TaskDetailView from '../../../components/workspace/TaskDetailView';
+
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function ProjectBacklog({ projectId, currentProject }: ProjectBacklogProps) {
-  const [sprints, setSprints] = useState<Sprint[]>([]);
-  const [backlogTasks, setBacklogTasks] = useState<any[]>([]);
-  const [sprintTasks, setSprintTasks] = useState<any[]>([]); // all tasks in sprints
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const cachedData = queryClient.getQueryData(['projectBacklog', projectId]) as any;
+
+  const [sprints, setSprints] = useState<Sprint[]>(cachedData?.sprints || []);
+  const [backlogTasks, setBacklogTasks] = useState<any[]>(cachedData?.backlogTasks || []);
+  const [sprintTasks, setSprintTasks] = useState<any[]>(cachedData?.sprintTasks || []); // all tasks in sprints
+  const [isLoading, setIsLoading] = useState(!cachedData);
   const [expandedSprints, setExpandedSprints] = useState<Set<string>>(new Set());
   const [expandedBacklog, setExpandedBacklog] = useState(true);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const [selectedTaskDetail, setSelectedTaskDetail] = useState<any | null>(null);
 
   const [sprintModal, setSprintModal] = useState<{ open: boolean; sprint?: Sprint | null }>({ open: false });
   const [completeModal, setCompleteModal] = useState<{ open: boolean; sprint?: Sprint }>({ open: false });
@@ -56,9 +64,38 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
   const [activeTask, setActiveTask] = useState<any>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
-  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
-
   const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [deleteSprintConfirm, setDeleteSprintConfirm] = useState<string | null>(null);
+  const [errorAlertMessage, setErrorAlertMessage] = useState<string | null>(null);
+
+  // --- Filter State ---
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [activeFilterCategory, setActiveFilterCategory] = useState('Assignee');
+  const [filterAssignees, setFilterAssignees] = useState<string[]>([]);
+  const [filterAssigneeSearch, setFilterAssigneeSearch] = useState('');
+  const [filterTypes, setFilterTypes] = useState<string[]>([]);
+  const [filterStatuses, setFilterStatuses] = useState<string[]>([]);
+  const [filterPriorities, setFilterPriorities] = useState<string[]>([]);
+
+  const filterBtnRef = useRef<HTMLButtonElement>(null);
+  const filterPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        filterPanelRef.current && !filterPanelRef.current.contains(event.target as Node) &&
+        filterBtnRef.current && !filterBtnRef.current.contains(event.target as Node)
+      ) {
+        setShowFilterPanel(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const totalActiveFilters = filterAssignees.length + filterTypes.length + filterStatuses.length + filterPriorities.length;
+  // ---------------------
 
   const handleCreateTask = async (sprintId?: string | React.MouseEvent | React.KeyboardEvent, titleOverride?: string, typeOverride?: string, assigneeOverride?: any, dueDateOverride?: string) => {
     const actualSprintId = typeof sprintId === 'string' ? sprintId : undefined;
@@ -102,34 +139,13 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
     });
   };
 
-  const load = useCallback(async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    try {
+  const { data: backlogData, isFetching } = useQuery({
+    queryKey: ['projectBacklog', projectId],
+    queryFn: async () => {
       const [sprintsData, backlog] = await Promise.all([
         sprintService.getSprintsByProject(projectId),
         sprintService.getBacklog(projectId),
       ]);
-      setSprints(prevSprints => {
-        setExpandedSprints(prevExpanded => {
-          const nextExpanded = new Set(prevExpanded);
-          const existingIds = new Set(prevSprints.map(s => s.id));
-          if (existingIds.size === 0) {
-            sprintsData.forEach(s => {
-              if (s.status !== 'COMPLETED') nextExpanded.add(s.id);
-            });
-          } else {
-            sprintsData.forEach(s => {
-              if (!existingIds.has(s.id) && s.status !== 'COMPLETED') {
-                nextExpanded.add(s.id);
-              }
-            });
-          }
-          return nextExpanded;
-        });
-        return sprintsData;
-      });
-
-      // Load tasks for non-completed sprints
       const allSprintTasks: any[] = [];
       await Promise.all(
         sprintsData.map(async (s) => {
@@ -138,20 +154,48 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           allSprintTasks.push(...tasksWithSprintId);
         })
       );
-      setSprintTasks(allSprintTasks);
-      setBacklogTasks(backlog.map((t: any) => ({ ...t, sprintId: null })));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      if (!silent) setIsLoading(false);
-    }
-  }, [projectId]);
+      return {
+        sprints: sprintsData,
+        backlogTasks: backlog.map((t: any) => ({ ...t, sprintId: null })),
+        sprintTasks: allSprintTasks
+      };
+    },
+    enabled: !!projectId,
+    staleTime: 5 * 60 * 1000
+  });
 
   useEffect(() => {
-    if (projectId) {
-      load();
+    if (backlogData) {
+      setSprints(prevSprints => {
+        setExpandedSprints(prevExpanded => {
+          const nextExpanded = new Set(prevExpanded);
+          const existingIds = new Set(prevSprints.map(s => s.id));
+          if (existingIds.size === 0) {
+            backlogData.sprints.forEach((s: any) => {
+              if (s.status !== 'COMPLETED') nextExpanded.add(s.id);
+            });
+          } else {
+            backlogData.sprints.forEach((s: any) => {
+              if (!existingIds.has(s.id) && s.status !== 'COMPLETED') {
+                nextExpanded.add(s.id);
+              }
+            });
+          }
+          return nextExpanded;
+        });
+        return backlogData.sprints;
+      });
+      setSprintTasks(backlogData.sprintTasks);
+      setBacklogTasks(backlogData.backlogTasks);
+      setIsLoading(false);
     }
-  }, [projectId, load]);
+  }, [backlogData]);
+
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setIsLoading(true);
+    await queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
+    if (!silent) setIsLoading(false);
+  }, [projectId, queryClient]);
 
   const toggleSprint = (id: string) => {
     setExpandedSprints(prev => {
@@ -164,44 +208,33 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
   const handleMoveToSprint = async (taskId: string, sprintId: string | null) => {
     try {
       // Optimistic Update
-      let movedTask: any = null;
-      setSprintTasks(prev => {
-        const idx = prev.findIndex(t => t.id === taskId);
-        if (idx !== -1) {
-          movedTask = { ...prev[idx], sprintId };
-          return prev.filter(t => t.id !== taskId);
-        }
-        return prev;
-      });
-      setBacklogTasks(prev => {
-        const idx = prev.findIndex(t => t.id === taskId);
-        if (idx !== -1) {
-          movedTask = { ...prev[idx], sprintId };
-          return prev.filter(t => t.id !== taskId);
-        }
-        return prev;
-      });
+      const all = [...backlogTasks, ...sprintTasks];
+      const taskToMove = all.find(t => t.id === taskId);
 
-      // Wait for state to settle to avoid race conditions, though setState is async
-      setTimeout(() => {
-        if (!movedTask) {
-          const all = [...backlogTasks, ...sprintTasks];
-          movedTask = all.find(t => t.id === taskId);
-          if (movedTask) movedTask = { ...movedTask, sprintId };
+      if (taskToMove) {
+        const updatedTask = { ...taskToMove, sprintId };
+        
+        if (sprintId === null) {
+          // Move to backlog
+          setSprintTasks(prev => prev.filter(t => t.id !== taskId));
+          setBacklogTasks(prev => {
+            if (!prev.find(t => t.id === taskId)) return [...prev, updatedTask];
+            return prev.map(t => t.id === taskId ? updatedTask : t);
+          });
+        } else {
+          // Move to sprint
+          setBacklogTasks(prev => prev.filter(t => t.id !== taskId));
+          setSprintTasks(prev => {
+            if (!prev.find(t => t.id === taskId)) return [...prev, updatedTask];
+            return prev.map(t => t.id === taskId ? updatedTask : t);
+          });
         }
-        if (movedTask) {
-          if (sprintId === null) {
-            setBacklogTasks(prev => [...prev, movedTask]);
-          } else {
-            setSprintTasks(prev => [...prev, movedTask]);
-          }
-        }
-      }, 0);
+      }
 
       await sprintService.moveTaskToSprint(taskId, sprintId);
       load(true); // Silent load to sync exact order
     } catch (e) {
-      console.error(e);
+      console.error("Move task failed", e);
       load(true); // revert
     }
   };
@@ -210,15 +243,25 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
     try {
       const updated = await sprintService.startSprint(projectId, sprintId);
       setSprints(prev => prev.map(s => s.id === sprintId ? updated : s));
-    } catch (e: any) { alert(e?.response?.data?.message || 'Không thể bắt đầu sprint'); }
+    } catch (e: any) { 
+      setErrorAlertMessage(e?.response?.data?.message || 'Không thể bắt đầu sprint'); 
+    }
   };
 
-  const handleDeleteSprint = async (sprintId: string) => {
-    if (!confirm('Xóa sprint? Các task sẽ được chuyển về backlog.')) return;
+  const handleDeleteSprint = (sprintId: string) => {
+    setDeleteSprintConfirm(sprintId);
+  };
+
+  const executeDeleteSprint = async () => {
+    if (!deleteSprintConfirm) return;
     try {
-      await sprintService.deleteSprint(projectId, sprintId);
+      await sprintService.deleteSprint(projectId, deleteSprintConfirm);
       await load();
-    } catch (e: any) { alert(e?.response?.data?.message || 'Không thể xóa sprint'); }
+      setDeleteSprintConfirm(null);
+    } catch (e: any) { 
+      setDeleteSprintConfirm(null);
+      setErrorAlertMessage(e?.response?.data?.message || 'Không thể xóa sprint'); 
+    }
   };
 
   const handleDeleteTask = (taskId: string) => {
@@ -268,8 +311,35 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
     }
   };
 
-  const allTasks = [...backlogTasks, ...sprintTasks];
-  const backlogPoints = backlogTasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
+
+
+  const rawAllTasks = [...backlogTasks, ...sprintTasks];
+  const allTasks = rawAllTasks.filter(task => {
+    if (searchKeyword.trim() && !task.title?.toLowerCase().includes(searchKeyword.toLowerCase()) && !task.taskKey?.toLowerCase().includes(searchKeyword.toLowerCase())) {
+      return false;
+    }
+    if (filterAssignees.length > 0) {
+      const assigneeMatch = filterAssignees.includes('unassigned')
+        ? (!task.assigneeName || task.assigneeName === 'Unassigned')
+        : filterAssignees.includes(task.assigneeId);
+      const assigneeOr = filterAssignees.includes(task.assigneeId) ||
+        (filterAssignees.includes('unassigned') && (!task.assigneeName || task.assigneeName === 'Unassigned'));
+      if (!assigneeOr) return false;
+    }
+    if (filterTypes.length > 0) {
+      if (!filterTypes.map(t => t.toLowerCase()).includes((task.type || '').toLowerCase())) return false;
+    }
+    if (filterStatuses.length > 0) {
+      if (!filterStatuses.includes(task.statusId) && !filterStatuses.includes(task.status)) return false;
+    }
+    if (filterPriorities.length > 0) {
+      if (!filterPriorities.map(p => p.toLowerCase()).includes((task.priority || 'medium').toLowerCase())) return false;
+    }
+    return true;
+  });
+
+  const filteredBacklogTasks = allTasks.filter(t => !t.sprintId);
+  const backlogPoints = filteredBacklogTasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
 
   const { setNodeRef: setBacklogNodeRef, isOver: isBacklogOver } = useDroppable({
     id: 'backlog-container',
@@ -309,13 +379,170 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           {/* Toolbar */}
           <div className="flex items-center gap-2 mb-4">
             <div className="relative">
-              <input type="text" placeholder="Search backlog" className="pl-8 pr-3 py-1.5 text-[13px] border border-slate-200 rounded-sm w-48 focus:outline-none focus:border-blue-400" />
+              <input
+                type="text"
+                placeholder="Search backlog"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                className="pl-8 pr-3 py-1.5 text-[13px] border border-slate-200 rounded-sm w-48 focus:outline-none focus:border-blue-400"
+              />
               <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <Icons.search size={14} />
               </div>
             </div>
-            <div className="flex items-center justify-center px-3 py-1.5 text-[13px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer rounded-sm">
-              Filter
+
+            <div className="relative">
+              <button
+                ref={filterBtnRef}
+                onClick={() => setShowFilterPanel(v => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all shadow-sm ${totalActiveFilters > 0
+                    ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'
+                    : 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700'
+                  }`}
+              >
+                <Icons.filter size={13} className={totalActiveFilters > 0 ? 'text-blue-500' : 'text-slate-400'} />
+                <span>Filter</span>
+                {totalActiveFilters > 0 && (
+                  <span className="ml-0.5 bg-blue-600 text-white text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                    {totalActiveFilters}
+                  </span>
+                )}
+              </button>
+
+              {/* Filter Dropdown */}
+              {showFilterPanel && (
+                <div
+                  ref={filterPanelRef}
+                  className="absolute top-full left-0 mt-1.5 w-[420px] bg-white border border-slate-200 shadow-2xl rounded-xl z-[200] overflow-hidden"
+                >
+                  <div className="flex" style={{ minHeight: 240 }}>
+                    <div className="w-36 border-r border-slate-100 py-1.5 shrink-0 bg-slate-50/60">
+                      {[
+                        { id: 'Assignee', count: filterAssignees.length },
+                        { id: 'Work type', count: filterTypes.length },
+                        { id: 'Status', count: filterStatuses.length },
+                        { id: 'Priority', count: filterPriorities.length },
+                      ].map(cat => (
+                        <button
+                          key={cat.id}
+                          onClick={() => setActiveFilterCategory(cat.id)}
+                          className={`w-full flex items-center justify-between px-3 py-2 text-[12px] font-medium text-left transition-colors ${activeFilterCategory === cat.id
+                              ? 'bg-white text-blue-700 border-l-2 border-blue-600 shadow-sm'
+                              : 'text-slate-600 hover:bg-white/70 border-l-2 border-transparent'
+                            }`}
+                        >
+                          <span>{cat.id}</span>
+                          {cat.count > 0 && (
+                            <span className="bg-blue-600 text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center shrink-0">{cat.count}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex-1 py-2 px-3 overflow-y-auto max-h-[300px]">
+                      {activeFilterCategory === 'Assignee' && (
+                        <div className="flex flex-col h-full">
+                          <div className="sticky top-0 bg-white pb-2 z-10">
+                            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                              <Icons.search size={12} className="text-slate-400 shrink-0" />
+                              <input
+                                type="text"
+                                placeholder="Search assignee..."
+                                value={filterAssigneeSearch}
+                                onChange={e => setFilterAssigneeSearch(e.target.value)}
+                                className="flex-1 text-[12px] text-slate-700 bg-transparent outline-none placeholder:text-slate-400"
+                              />
+                              {filterAssigneeSearch && (
+                                <button onClick={() => setFilterAssigneeSearch('')} className="text-slate-400 hover:text-slate-600 shrink-0">
+                                  <Icons.x size={11} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          <div className="overflow-y-auto space-y-0.5">
+                            {[
+                              { id: 'unassigned', name: 'Unassigned', avatar: null },
+                              ...(currentProject?.members || []).map((m: any) => ({ id: m.id, name: m.name, avatar: m.avatar }))
+                            ].filter(member => !filterAssigneeSearch.trim() || member.name.toLowerCase().includes(filterAssigneeSearch.toLowerCase())).map(member => {
+                              const checked = filterAssignees.includes(member.id);
+                              return (
+                                <label key={member.id} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => setFilterAssignees(prev => checked ? prev.filter(x => x !== member.id) : [...prev, member.id])}
+                                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+                                  />
+                                  {member.avatar
+                                    ? <img src={member.avatar} alt={member.name} className="w-5 h-5 rounded-full object-cover border border-slate-200 shrink-0" />
+                                    : <div className="w-5 h-5 rounded-full bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0"><Icons.user size={10} /></div>
+                                  }
+                                  <span className="text-[12px] font-medium text-slate-700 truncate">{member.name}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {activeFilterCategory === 'Work type' && (
+                        <div className="space-y-0.5">
+                          {[{ v: 'Epic', color: 'text-violet-600' }, { v: 'Task', color: 'text-blue-600' }, { v: 'Incident', color: 'text-rose-600' }, { v: 'Service Request', color: 'text-amber-600' }].map(({ v, color }) => {
+                            const checked = filterTypes.includes(v);
+                            return (
+                              <label key={v} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" checked={checked} onChange={() => setFilterTypes(prev => checked ? prev.filter(x => x !== v) : [...prev, v])} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5" />
+                                <span className={`text-[12px] font-semibold ${color}`}>{v}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {activeFilterCategory === 'Status' && (
+                        <div className="space-y-0.5">
+                          {(currentProject?.statuses || []).map((s: any) => {
+                            const checked = filterStatuses.includes(s.statusId);
+                            return (
+                              <label key={s.statusId} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" checked={checked} onChange={() => setFilterStatuses(prev => checked ? prev.filter(x => x !== s.statusId) : [...prev, s.statusId])} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5" />
+                                <span className="text-[12px] font-medium text-slate-700">{s.label}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {activeFilterCategory === 'Priority' && (
+                        <div className="space-y-0.5">
+                          {['Highest', 'High', 'Medium', 'Low', 'Lowest'].map(priority => {
+                            const checked = filterPriorities.includes(priority);
+                            return (
+                              <label key={priority} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" checked={checked} onChange={() => setFilterPriorities(prev => checked ? prev.filter(x => x !== priority) : [...prev, priority])} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5" />
+                                <span className={`text-[12px] font-medium`}>{priority}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between px-3 py-2 border-t border-slate-100 bg-slate-50/50">
+                    <button
+                      onClick={() => { setFilterAssignees([]); setFilterTypes([]); setFilterStatuses([]); setFilterPriorities([]); }}
+                      className={`text-[11px] font-semibold transition-colors ${totalActiveFilters > 0 ? 'text-slate-500 hover:text-slate-800' : 'text-slate-300 cursor-default'
+                        }`}
+                    >
+                      Clear all
+                    </button>
+                    <button
+                      onClick={() => setShowFilterPanel(false)}
+                      className="text-[11px] font-bold px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -338,6 +565,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
               selectedTaskIds={selectedTaskIds}
               onToggleTask={handleToggleTask}
               onTaskUpdated={() => load(true)}
+              onTaskClick={(t: any) => setSelectedTaskDetail(t)}
             />
           ))}
 
@@ -357,11 +585,11 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
 
               <input
                 type="checkbox"
-                checked={backlogTasks.length > 0 && backlogTasks.every(t => selectedTaskIds.has(t.id))}
+                checked={filteredBacklogTasks.length > 0 && filteredBacklogTasks.every(t => selectedTaskIds.has(t.id))}
                 onChange={(e) => {
                   e.stopPropagation();
                   const checked = e.target.checked;
-                  backlogTasks.forEach(t => {
+                  filteredBacklogTasks.forEach(t => {
                     if (checked && !selectedTaskIds.has(t.id)) handleToggleTask(t.id);
                     else if (!checked && selectedTaskIds.has(t.id)) handleToggleTask(t.id);
                   });
@@ -373,7 +601,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
               <h3 className="font-bold text-slate-800 text-[13px] truncate">Backlog</h3>
 
               <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
-                <span>({backlogTasks.length} work {backlogTasks.length === 1 ? 'item' : 'items'})</span>
+                <span>({filteredBacklogTasks.length} work {filteredBacklogTasks.length === 1 ? 'item' : 'items'})</span>
               </div>
 
               <div className="flex-1" />
@@ -391,13 +619,13 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
             {/* Tasks */}
             {expandedBacklog && (
               <div className="flex flex-col border border-slate-200 border-t-0 bg-white rounded-b-sm min-h-[100px] pointer-events-auto">
-                <SortableContext id="backlog-context" items={backlogTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                  {backlogTasks.length === 0 && (
+                <SortableContext id="backlog-context" items={filteredBacklogTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                  {filteredBacklogTasks.length === 0 && (
                     <div className="border border-dashed border-slate-300 bg-slate-50/50 text-slate-500 text-[13px] text-center py-6 mx-2 my-2 rounded-sm select-none">
-                      Backlog của bạn đang trống.
+                      {searchKeyword || totalActiveFilters > 0 ? "Không có task nào thỏa mãn điều kiện lọc." : "Backlog của bạn đang trống."}
                     </div>
                   )}
-                  {backlogTasks.map(task => (
+                  {filteredBacklogTasks.map(task => (
                     <DraggableTaskRow
                       key={task.id}
                       task={task}
@@ -408,6 +636,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
                       isSelected={selectedTaskIds.has(task.id)}
                       onToggle={handleToggleTask}
                       onTaskUpdated={() => load(true)}
+                      onTaskClick={(t) => setSelectedTaskDetail(t)}
                     />
                   ))}
                 </SortableContext>
@@ -579,16 +808,16 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           <div className="bg-white rounded-2xl shadow-2xl w-[400px] overflow-hidden border border-slate-200" onClick={e => e.stopPropagation()}>
             <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <h3 className="font-extrabold text-slate-800 text-sm">Di chuyển {selectedTaskIds.size} Task</h3>
-              <button onClick={() => setShowMassMoveModal(false)} className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors"><X size={14}/></button>
+              <button onClick={() => setShowMassMoveModal(false)} className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors"><X size={14} /></button>
             </div>
             <div className="p-3 max-h-[350px] overflow-y-auto flex flex-col gap-1.5">
-              <button 
-                onClick={async () => { 
+              <button
+                onClick={async () => {
                   setShowMassMoveModal(false);
                   setIsChangingStatus(true);
                   try {
                     await Promise.all(Array.from(selectedTaskIds).map(id => sprintService.moveTaskToSprint(id, null)));
-                  } catch(e) { console.error(e); }
+                  } catch (e) { console.error(e); }
                   setSelectedTaskIds(new Set());
                   setIsChangingStatus(false);
                   load(true);
@@ -600,7 +829,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
                 </div>
                 Backlog
               </button>
-              
+
               {sprints?.length ? (
                 <div className="px-3 py-2 mt-2">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sprints</span>
@@ -608,14 +837,14 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
               ) : null}
 
               {sprints?.map(sprint => (
-                <button 
+                <button
                   key={sprint.id}
-                  onClick={async () => { 
+                  onClick={async () => {
                     setShowMassMoveModal(false);
                     setIsChangingStatus(true);
                     try {
                       await Promise.all(Array.from(selectedTaskIds).map(id => sprintService.moveTaskToSprint(id, sprint.id)));
-                    } catch(e) { console.error(e); }
+                    } catch (e) { console.error(e); }
                     setSelectedTaskIds(new Set());
                     setIsChangingStatus(false);
                     load(true);
@@ -654,6 +883,88 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           await load();
         }}
       />
+
+      {/* Task Detail Modal */}
+      {selectedTaskDetail && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-end bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
+          <div
+            className="absolute inset-0"
+            onClick={() => setSelectedTaskDetail(null)}
+          />
+          <div className="relative bg-white w-full max-w-[1000px] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="flex-1 flex overflow-hidden">
+              <TaskDetailView
+                task={selectedTaskDetail}
+                currentProject={currentProject}
+                onClose={() => setSelectedTaskDetail(null)}
+                onUpdateTaskLocally={(taskId, updates) => {
+                  setSelectedTaskDetail(prev => prev && prev.id === taskId ? { ...prev, ...updates } : prev);
+                  load(true);
+                }}
+              />
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+      {/* Delete Sprint Confirm Modal */}
+      {deleteSprintConfirm && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-[400px] overflow-hidden border border-slate-200 scale-in-center">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3 bg-rose-50/50">
+              <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-4 h-4 text-rose-600" />
+              </div>
+              <h3 className="font-extrabold text-slate-800 text-sm">Xóa Sprint</h3>
+            </div>
+            <div className="px-5 py-4 text-[13px] text-slate-600 font-medium">
+              Bạn có chắc chắn muốn xóa sprint này không? Tất cả các công việc (tasks) trong sprint sẽ được chuyển về Backlog. Hành động này không thể hoàn tác.
+            </div>
+            <div className="px-5 py-4 border-t border-slate-100 flex justify-end gap-2 bg-slate-50/50">
+              <button 
+                onClick={() => setDeleteSprintConfirm(null)} 
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={executeDeleteSprint} 
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition-colors"
+              >
+                Xóa Sprint
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Error Alert Modal */}
+      {errorAlertMessage && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-[360px] overflow-hidden border border-slate-200 scale-in-center">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-4 h-4 text-orange-600" />
+              </div>
+              <h3 className="font-extrabold text-slate-800 text-sm">Thông báo</h3>
+            </div>
+            <div className="px-5 py-5 text-[13px] text-slate-600 font-medium text-center">
+              {errorAlertMessage}
+            </div>
+            <div className="px-5 py-3 border-t border-slate-100 flex justify-center bg-slate-50/50">
+              <button 
+                onClick={() => setErrorAlertMessage(null)} 
+                className="px-6 py-2 w-full text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
     </>
   );
 }

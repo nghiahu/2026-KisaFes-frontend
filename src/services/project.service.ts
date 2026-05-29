@@ -51,5 +51,9 @@ export const projectService = {
     const response = await axiosClient.patch(`/projects/${projectId}/name`, { name });
     return response.data;
   },
+  updateProjectInfo: async (projectId: string, data: { name: string, description: string, categoryId: string }): Promise<any> => {
+    const response = await axiosClient.put(`/projects/${projectId}/info`, data);
+    return response.data;
+  },
 };
 

@@ -53,3 +53,26 @@ Always prioritize using these existing components over building new ones from sc
 ## 8. Data & State Management Rules
 - **State Cục bộ (Local State):** Use `useState` or `useReducer` strictly for UI state (e.g., modals, form inputs, toggle states, drag-and-drop local positioning). Keep local state as close to the consuming component as possible.
 - **Quản lý trong Store (Global State):** Data that is shared across multiple pages or distant components (e.g., user profiles, project configurations) MUST be stored in Redux slices. Ensure to synchronize global state with backend API calls seamlessly.
+
+## 9. Engineering Standards
+*(Derived from `engineering-standards.json`)*
+
+- **Core Architecture:** Single responsibility, separation of concerns, event-driven, feature-based, extensibility first, clean architecture.
+- **Backend:** Spring Boot (REST APIs). Thin controllers rule applies.
+- **Naming Conventions:**
+  - **Components:** `PascalCase`
+  - **Hooks:** `camelCase` (with `use` prefix)
+  - **Utils:** `kebab_case`
+  - **Constants:** `UPPER_SNAKE_CASE`
+  - **Database:** `snake_case_plural` (Tables), `snake_case` (Columns)
+- **CSS & Theming:** Global theme required. Standard structure includes `globals.css`, `theme.css`, `reset.css`, `typography.css`, `animations.css`.
+- **Security & Quality:** 
+  - Rule: "Must Not Trust Frontend" (Backend must validate everything).
+  - Unit tests are required.
+  - Commits must follow conventional commits.
+  - i18n is required (`src/i18n/locales`).
+- **Golden Rules:**
+  - Do not duplicate business logic.
+  - Do not hardcode values (use semantic tokens).
+  - Everything should be extensible.
+  - Maintainability over shortcuts.

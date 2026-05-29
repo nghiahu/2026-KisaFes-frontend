@@ -3,7 +3,8 @@ import { Icons } from '../../assets/icons';
 import UserDropdown from '../common/UserDropdown';
 import NotificationDropdown from './NotificationDropdown';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchNotifications } from '../../store/slices/notificationSlice';
+import { fetchNotifications, addNotificationSocket } from '../../store/slices/notificationSlice';
+import { socketService } from '../../services/socketService';
 
 export default function WorkspaceHeader() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,8 +30,23 @@ export default function WorkspaceHeader() {
   }, [dispatch]);
 
   useEffect(() => {
-    const pending = notifications.filter((n: any) => n.status === 'PENDING').length;
-    setUnreadCount(pending);
+    if (!user || !user.id) return;
+
+    socketService.connect(() => {
+      socketService.subscribe(`/topic/notifications/${user.id}`, (newNotification) => {
+        // Formulate the notification to match the UI expected format
+        dispatch(addNotificationSocket(newNotification));
+      });
+    });
+
+    return () => {
+      socketService.disconnect();
+    };
+  }, [user, dispatch]);
+
+  useEffect(() => {
+    const unread = notifications.filter((n: any) => !n.read).length;
+    setUnreadCount(unread);
   }, [notifications]);
 
   return (

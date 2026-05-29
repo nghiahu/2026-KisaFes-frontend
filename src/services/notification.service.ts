@@ -9,8 +9,9 @@ export interface NotificationResponse {
   projectId: string;
   projectName: string;
   message: string;
-  type: 'INVITATION' | 'SYSTEM';
+  type: 'INVITATION' | 'SYSTEM' | 'ASSIGNMENT' | 'SUCCESS' | 'WARNING';
   status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'READ';
+  read: boolean;
   createdAt: string;
 }
 
@@ -26,5 +27,12 @@ export const notificationService = {
   declineInvitation: async (id: string): Promise<NotificationResponse> => {
     const response: any = await axiosClient.post(`/notifications/${id}/decline`);
     return response.data;
+  },
+  markAsRead: async (id: string): Promise<NotificationResponse> => {
+    const response: any = await axiosClient.post(`/notifications/${id}/read`);
+    return response.data;
+  },
+  markAllAsRead: async (): Promise<void> => {
+    await axiosClient.post('/notifications/read-all');
   }
 };

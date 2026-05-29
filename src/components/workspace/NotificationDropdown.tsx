@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { type NotificationResponse } from '../../services/notification.service';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchNotifications, acceptInvitation, declineInvitation } from '../../store/slices/notificationSlice';
+import { fetchNotifications, acceptInvitation, declineInvitation, markAsReadThunk, markAllAsReadThunk } from '../../store/slices/notificationSlice';
 import { Icons } from '../../assets/icons';
 import { X } from 'lucide-react';
 
@@ -86,9 +86,18 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
           Thông báo của bạn
         </h3>
         {notifications.length > 0 && (
-          <span className="text-[0.75rem] px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded-full">
-            {notifications.filter(n => n.status === 'PENDING').length} mới
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[0.75rem] px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded-full">
+              {notifications.filter(n => !n.read).length} mới
+            </span>
+            <button 
+              onClick={() => dispatch(markAllAsReadThunk())}
+              className="text-slate-400 hover:text-blue-600 transition-colors"
+              title="Đánh dấu tất cả đã đọc"
+            >
+              <Icons.check size={14} strokeWidth={3} />
+            </button>
+          </div>
         )}
       </div>
 
@@ -110,8 +119,18 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
             </div>
           </div>
         ) : (
-          notifications.map((item) => (
-            <div key={item.id} className="p-4 hover:bg-slate-50/50 transition-all flex gap-3">
+          notifications.map((item) => {
+            const isUnread = !item.read;
+            return (
+            <div 
+              key={item.id} 
+              onClick={() => {
+                if (isUnread) dispatch(markAsReadThunk(item.id));
+              }}
+              className={`p-4 transition-all flex gap-3 cursor-pointer ${
+                isUnread ? 'bg-blue-50/30 hover:bg-blue-50/50' : 'hover:bg-slate-50/50'
+              }`}
+            >
               {/* Avatar / Icon */}
               <div className="shrink-0">
                 {item.senderAvatar ? (
@@ -181,7 +200,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
                 )}
               </div>
             </div>
-          ))
+          )})
         )}
       </div>
     </div>

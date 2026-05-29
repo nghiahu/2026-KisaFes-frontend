@@ -682,7 +682,7 @@ export default function CreateProject() {
                               {group.permissions.map((perm) => {
                                 const isChecked = roles[activeRoleIndex].permissions.includes(perm.id);
                                 return (
-                                  <label key={perm.id} className="flex items-center gap-3 cursor-pointer group">
+                                  <label key={perm.id} onClick={() => togglePermission(activeRoleIndex, perm.id)} className="flex items-center gap-3 cursor-pointer group">
                                     <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                                       isChecked ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300 group-hover:border-blue-400'
                                     }`}>

@@ -1,0 +1,86 @@
+{
+  "projectStandards": {
+    "architecture": {
+      "principles": [
+        "single_responsibility",
+        "separation_of_concerns",
+        "event_driven_architecture",
+        "feature_based_architecture",
+        "extensibility_first",
+        "clean_architecture"
+      ]
+    },
+    "naming": {
+      "general": {
+        "components": "PascalCase",
+        "hooks": "camelCase_with_use_prefix",
+        "utils": "kebab_case",
+        "constants": "UPPER_SNAKE_CASE"
+      }
+    },
+    "frontend": {
+      "architecture": {
+        "style": "feature_based"
+      }
+    },
+    "backend": {
+      "framework": "Spring Boot"
+    },
+    "database": {
+      "naming": {
+        "tables": "snake_case_plural",
+        "columns": "snake_case"
+      }
+    },
+    "api": {
+      "style": "REST"
+    },
+    "permissions": {
+      "style": "permission_based"
+    },
+    "notifications": {
+      "architecture": "event_driven"
+    },
+    "css": {
+      "globalThemeRequired": true,
+      "structure": {
+        "stylesFolder": [
+          "globals.css",
+          "theme.css",
+          "reset.css",
+          "typography.css",
+          "animations.css"
+        ]
+      }
+    },
+    "i18n": {
+      "required": true,
+      "structure": {
+        "path": "src/i18n/locales"
+      }
+    },
+    "security": {
+      "rules": {
+        "mustNotTrustFrontend": true
+      }
+    },
+    "testing": {
+      "unitTest": {
+        "required": true
+      }
+    },
+    "git": {
+      "commitConvention": {
+        "style": "conventional_commits"
+      }
+    },
+    "goldenRules": [
+      "do_not_duplicate_business_logic",
+      "do_not_hardcode_values",
+      "everything_should_be_extensible",
+      "controllers_must_be_thin",
+      "semantic_tokens_over_raw_values",
+      "maintainability_over_shortcuts"
+    ]
+  }
+}
