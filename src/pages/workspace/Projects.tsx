@@ -8,7 +8,7 @@ import type { Category } from '../../types/category.interface';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchProjects } from '../../store/slices/projectSlice';
 import { fetchCategories } from '../../store/slices/categorySlice';
-import { Skeleton } from '../../components/ui/skeleton';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { projectService } from '../../services/project.service';
 
 export default function Projects() {

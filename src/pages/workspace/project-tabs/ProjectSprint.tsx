@@ -23,8 +23,8 @@ interface ProjectSprintProps {
 }
 
 import { SortableTaskCard } from './components/SortableTaskCard';
-import { Skeleton } from '../../../components/ui/skeleton';
-import { Progress } from '../../../components/ui/progress';
+import { Skeleton } from '../../../components/ui/Skeleton';
+import { Progress } from '../../../components/ui/Progress';
 
 import { DroppableColumn } from './components/DroppableColumn';
 import { Icons } from '../../../assets/icons';

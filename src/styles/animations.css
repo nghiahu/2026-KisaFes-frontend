@@ -1,0 +1,103 @@
+/* Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fanOutLeft {
+  from {
+    opacity: 0;
+    transform: translateX(30px) rotate(-20deg) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(-12deg) scale(0.96);
+  }
+}
+
+@keyframes fanOutRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px) rotate(20deg) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(12deg) scale(0.96);
+  }
+}
+
+@keyframes fanOutCenter {
+  from {
+    opacity: 0;
+    transform: translateY(22px) rotate(10deg) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(3deg) scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-fan-left {
+  animation: fanOutLeft 0.7s ease-out forwards;
+}
+
+.animate-fan-right {
+  animation: fanOutRight 0.7s ease-out forwards;
+}
+
+.animate-fan-center {
+  animation: fanOutCenter 0.7s ease-out forwards;
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* ==================== Session Expired Modal ==================== */
+@keyframes sessionModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sessionModalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

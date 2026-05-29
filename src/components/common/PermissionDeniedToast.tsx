@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Icons } from '../../assets/icons';
-import { permissionDeniedEvent } from '../../utils/permissionDeniedEvent';
+import { permissionDeniedEvent } from '../../utils/permission-denied-event';
 
 export default function PermissionDeniedToast() {
   const [message, setMessage] = useState<string | null>(null);

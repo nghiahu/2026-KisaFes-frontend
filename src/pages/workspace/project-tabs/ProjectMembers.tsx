@@ -36,7 +36,7 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
 
   const handleOpenCreateRole = () => {
     if (!hasRoleManagePermission()) {
-      import('../../../utils/permissionDeniedEvent').then(({ permissionDeniedEvent }) => {
+      import('../../../utils/permission-denied-event').then(({ permissionDeniedEvent }) => {
         permissionDeniedEvent.emit("Bạn không có quyền quản lý vai trò trong dự án này.");
       });
       return;
@@ -46,7 +46,7 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
 
   const handleOpenEditRole = (role: any) => {
     if (!hasRoleManagePermission()) {
-      import('../../../utils/permissionDeniedEvent').then(({ permissionDeniedEvent }) => {
+      import('../../../utils/permission-denied-event').then(({ permissionDeniedEvent }) => {
         permissionDeniedEvent.emit("Bạn không có quyền quản lý vai trò trong dự án này.");
       });
       return;

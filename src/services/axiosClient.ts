@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { store } from '../store';
 import { setToken } from '../store/slices/authSlice';
-import { sessionExpiredEvent } from '../utils/sessionExpiredEvent';
-import { permissionDeniedEvent } from '../utils/permissionDeniedEvent';
+import { sessionExpiredEvent } from '../utils/session-expired-event';
+import { permissionDeniedEvent } from '../utils/permission-denied-event';
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',

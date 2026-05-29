@@ -3,7 +3,7 @@ import { router } from './routes'
 import { useAuthInitialize } from './hooks/useAuthInitialize'
 import { useSelector } from 'react-redux'
 import type { RootState } from './store'
-import { Skeleton } from './components/ui/skeleton'
+import { Skeleton } from './components/ui/Skeleton'
 
 export default function App() {
   useAuthInitialize()

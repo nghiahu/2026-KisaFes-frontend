@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
-import { sessionExpiredEvent } from '../../utils/sessionExpiredEvent';
+import { sessionExpiredEvent } from '../../utils/session-expired-event';
 
 export default function SessionExpiredModal() {
   const [visible, setVisible] = useState(false);

@@ -22,7 +22,7 @@ import ProjectMembers from './project-tabs/ProjectMembers';
 import ProjectSettings from './project-tabs/ProjectSettings';
 import ProjectCalendar from './project-tabs/ProjectCalendar';
 import InviteMemberModal from '../../components/workspace/InviteMemberModal';
-import { Skeleton } from '../../components/ui/skeleton';
+import { Skeleton } from '../../components/ui/Skeleton';
 
 type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
 
@@ -77,7 +77,7 @@ export default function ProjectDetail() {
 
   const handleStartEditName = () => {
     if (!hasProjectUpdatePermission()) {
-      import('../../utils/permissionDeniedEvent').then(({ permissionDeniedEvent }) => {
+      import('../../utils/permission-denied-event').then(({ permissionDeniedEvent }) => {
         permissionDeniedEvent.emit('Bạn không có quyền chỉnh sửa tên dự án này.');
       });
       return;
