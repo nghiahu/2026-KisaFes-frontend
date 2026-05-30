@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
@@ -6,7 +9,7 @@ import defaultMan from '../../assets/avatar_def_man.png';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useProject } from '../../hooks/api/useProjects';
 import { useCategories } from '../../hooks/api/useCategories';
-import { socketService } from '../../services/socketService';
+import { useProjectWebSocket } from '../../hooks/api/useProjectWebSocket';
 import { projectService } from '../../services/project.service';
 import categoryService from '../../services/category.service';
 
@@ -25,6 +28,14 @@ import InviteMemberModal from '../../components/workspace/InviteMemberModal';
 import { Skeleton } from '../../components/ui/Skeleton';
 
 type TabType = 'overview' | 'list' | 'board' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
+
+const editProjectSchema = z.object({
+  name: z.string().min(1, 'Tên dự án không được để trống'),
+  categoryId: z.string().min(1, 'Category không được để trống'),
+  description: z.string().optional()
+});
+
+type EditProjectFormValues = z.infer<typeof editProjectSchema>;
 
 export default function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -48,7 +59,11 @@ export default function ProjectDetail() {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const [editFormData, setEditFormData] = useState({ name: '', description: '', categoryId: '' });
+
+  const { register: registerEdit, handleSubmit: handleEditSubmitWrapper, reset: resetEditForm, formState: { errors: editErrors } } = useForm<EditProjectFormValues>({
+    resolver: zodResolver(editProjectSchema),
+    defaultValues: { name: '', description: '', categoryId: '' }
+  });
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteInput, setDeleteInput] = useState('');
@@ -105,11 +120,10 @@ export default function ProjectDetail() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onEditSubmit = async (data: EditProjectFormValues) => {
     try {
       setIsUpdating(true);
-      await projectService.updateProjectInfo(currentProject.id, editFormData as any);
+      await projectService.updateProjectInfo(currentProject.id, data as any);
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
       setIsEditingInfo(false);
     } catch (err) {
@@ -151,46 +165,8 @@ export default function ProjectDetail() {
     }
   }, [currentProject?.methodology, activeTab, projectId, currentProject]);
 
-  useEffect(() => {
-    if (!projectId) return;
-
-    socketService.connect(() => {
-      const sub = socketService.subscribe(`/topic/project/${projectId}`, (event: any) => {
-        console.log("WebSocket event received:", event);
-        if (event && event.type) {
-          switch (event.type) {
-            case "CREATE_TASK":
-            case "UPDATE_TASK":
-            case "TASK_MOVED":
-            case "TASK_REORDERED":
-            case "DELETE_TASK":
-              queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
-              break;
-            case "UPDATE_PROJECT":
-              queryClient.invalidateQueries({ queryKey: ['project', projectId] });
-              break;
-            case "SPRINT_CREATED":
-            case "SPRINT_UPDATED":
-            case "SPRINT_STARTED":
-            case "SPRINT_COMPLETED":
-            case "SPRINT_DELETED":
-              // Sprint changes are handled by the individual tab components via their own reload
-              break;
-            default:
-              break;
-          }
-        }
-      });
-
-      return () => {
-        if (sub) sub.unsubscribe();
-      };
-    });
-
-    return () => {
-      socketService.disconnect();
-    };
-  }, [projectId, dispatch]);
+  // Handle WebSockets for this project
+  useProjectWebSocket(projectId);
 
 
 
@@ -376,7 +352,7 @@ export default function ProjectDetail() {
                 </button>
                 <button onClick={() => { 
                     setShowDropdown(false); 
-                    setEditFormData({ name: currentProject.name, description: currentProject.description, categoryId: categories.find((c: any) => c.name === currentProject.category)?.id || '' }); 
+                    resetEditForm({ name: currentProject.name, description: currentProject.description || '', categoryId: categories.find((c: any) => c.name === currentProject.category)?.id || '' }); 
                     setIsEditingInfo(true); 
                   }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
@@ -478,24 +454,26 @@ export default function ProjectDetail() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in zoom-in-95 duration-200">
             <h3 className="text-xl font-bold text-slate-900 mb-4">Edit Project</h3>
-            <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
+            <form onSubmit={handleEditSubmitWrapper(onEditSubmit)} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-slate-700">Project Name</label>
-                <input required type="text" className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  value={editFormData.name} onChange={e => setEditFormData({ ...editFormData, name: e.target.value })} />
+                <input type="text" className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.name ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-slate-200 focus:ring-blue-500/20 focus:border-blue-500'}`}
+                  {...registerEdit('name')} />
+                {editErrors.name && <p className="text-rose-500 text-xs font-medium">{editErrors.name.message}</p>}
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-slate-700">Category</label>
-                <select required className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  value={editFormData.categoryId} onChange={e => setEditFormData({ ...editFormData, categoryId: e.target.value })}>
+                <select className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.categoryId ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-slate-200 focus:ring-blue-500/20 focus:border-blue-500'}`}
+                  {...registerEdit('categoryId')}>
                   <option value="" disabled>Select category</option>
                   {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
+                {editErrors.categoryId && <p className="text-rose-500 text-xs font-medium">{editErrors.categoryId.message}</p>}
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-slate-700">Description</label>
                 <textarea className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" rows={3}
-                  value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />
+                  {...registerEdit('description')} />
               </div>
               <div className="flex items-center justify-end gap-3 mt-4">
                 <button type="button" onClick={() => setIsEditingInfo(false)} className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>

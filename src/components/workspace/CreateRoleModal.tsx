@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Icons } from '../../assets/icons';
 import { projectService } from '../../services/project.service';
+
+const roleSchema = z.object({
+  name: z.string().min(1, 'Tên Role không được để trống'),
+  permissions: z.array(z.string()).min(1, 'Vui lòng chọn ít nhất 1 quyền cho role này.')
+});
+
+type RoleFormValues = z.infer<typeof roleSchema>;
 
 interface CreateRoleModalProps {
   projectId: string;
@@ -100,9 +110,16 @@ const PRESET_TEMPLATES = [
 ];
 
 export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToEdit }: CreateRoleModalProps) {
-  const [name, setName] = useState(roleToEdit ? roleToEdit.name : '');
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RoleFormValues>({
+    resolver: zodResolver(roleSchema),
+    defaultValues: {
+      name: roleToEdit ? roleToEdit.name : '',
+      permissions: roleToEdit ? roleToEdit.permissions || [] : []
+    }
+  });
+
+  const selectedPermissions = watch('permissions') || [];
   const [selectedPreset, setSelectedPreset] = useState('CUSTOM');
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(roleToEdit ? roleToEdit.permissions || [] : []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,53 +127,45 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
     if (selectedPreset !== 'CUSTOM') {
       const preset = PRESET_TEMPLATES.find(p => p.id === selectedPreset);
       if (preset) {
-        setSelectedPermissions(preset.permissions);
+        setValue('permissions', preset.permissions, { shouldValidate: true });
       }
     }
-  }, [selectedPreset]);
+  }, [selectedPreset, setValue]);
 
   const handleTogglePermission = (permissionId: string) => {
     setSelectedPreset('CUSTOM');
-    setSelectedPermissions(prev => 
-      prev.includes(permissionId)
-        ? prev.filter(id => id !== permissionId)
-        : [...prev, permissionId]
-    );
+    const newPerms = selectedPermissions.includes(permissionId)
+      ? selectedPermissions.filter((id: string) => id !== permissionId)
+      : [...selectedPermissions, permissionId];
+    setValue('permissions', newPerms, { shouldValidate: true });
   };
 
   const handleToggleGroup = (groupPermissions: string[]) => {
     setSelectedPreset('CUSTOM');
     const allIncluded = groupPermissions.every(p => selectedPermissions.includes(p));
+    let newPerms: string[];
     if (allIncluded) {
-      setSelectedPermissions(prev => prev.filter(p => !groupPermissions.includes(p)));
+      newPerms = selectedPermissions.filter((p: string) => !groupPermissions.includes(p));
     } else {
-      setSelectedPermissions(prev => {
-        const newSet = new Set([...prev, ...groupPermissions]);
-        return Array.from(newSet);
-      });
+      const newSet = new Set([...selectedPermissions, ...groupPermissions]);
+      newPerms = Array.from(newSet);
     }
+    setValue('permissions', newPerms, { shouldValidate: true });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    if (selectedPermissions.length === 0) {
-      setError('Vui lòng chọn ít nhất 1 quyền cho role này.');
-      return;
-    }
-
+  const onRoleSubmit = async (data: RoleFormValues) => {
     setIsSubmitting(true);
     setError(null);
     try {
       if (roleToEdit) {
         await projectService.updateCustomRole(projectId, roleToEdit.id, {
-          name: name.trim(),
-          permissions: selectedPermissions
+          name: data.name.trim(),
+          permissions: data.permissions
         });
       } else {
         await projectService.addCustomRole(projectId, {
-          name: name.trim(),
-          permissions: selectedPermissions
+          name: data.name.trim(),
+          permissions: data.permissions
         });
       }
       onSuccess();
@@ -193,7 +202,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
         </div>
 
         <div className="overflow-y-auto p-6 flex-1 bg-slate-50/30">
-          <form id="create-role-form" onSubmit={handleSubmit} className="space-y-8">
+          <form id="create-role-form" onSubmit={handleSubmit(onRoleSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Tên Role */}
               <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -204,11 +213,10 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                 <input
                   type="text"
                   placeholder="VD: Senior Developer"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+                  className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all font-medium ${errors.name ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/20'}`}
+                  {...register('name')}
                 />
+                {errors.name && <p className="text-rose-500 text-xs mt-2 font-medium">{errors.name.message}</p>}
               </div>
 
               {/* Mẫu có sẵn */}
@@ -243,9 +251,12 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                   <Icons.checkSquare size={18} className="text-blue-500" />
                   Chi tiết phân quyền
                 </label>
-                <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
-                  Đã chọn {selectedPermissions.length} quyền
-                </span>
+                <div className="flex items-center gap-3">
+                  {errors.permissions && <span className="text-rose-500 text-xs font-medium">{errors.permissions.message}</span>}
+                  <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+                    Đã chọn {selectedPermissions.length} quyền
+                  </span>
+                </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -316,7 +327,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
           <button
             type="submit"
             form="create-role-form"
-            disabled={isSubmitting || !name.trim() || selectedPermissions.length === 0}
+            disabled={isSubmitting}
             className="px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-600/20"
           >
             {isSubmitting ? (

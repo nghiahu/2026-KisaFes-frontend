@@ -5,9 +5,13 @@ import NotificationDropdown from './NotificationDropdown';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { NOTIFICATION_KEYS, useNotificationsQuery } from '../../hooks/api/useNotifications';
-import { socketService } from '../../services/socketService';
+import { useNotificationWebSocket } from '../../hooks/api/useNotificationWebSocket';
 
-export default function WorkspaceHeader() {
+interface WorkspaceHeaderProps {
+  onOpenMobileMenu?: () => void;
+}
+
+export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -29,23 +33,8 @@ export default function WorkspaceHeader() {
 
   // Removed dispatch(fetchNotifications()) as useNotificationsQuery will handle fetching
 
-  useEffect(() => {
-    if (!user || !user.id) return;
-
-    socketService.connect(() => {
-      socketService.subscribe(`/topic/notifications/${user.id}`, (newNotification) => {
-        // Formulate the notification to match the UI expected format
-        queryClient.setQueryData<any[]>(NOTIFICATION_KEYS.all, (old) => {
-          if (!old) return [newNotification];
-          return [newNotification, ...old];
-        });
-      });
-    });
-
-    return () => {
-      socketService.disconnect();
-    };
-  }, [user, dispatch]);
+  // Handle WebSockets for user notifications
+  useNotificationWebSocket(user?.id);
 
   useEffect(() => {
     const unread = notifications.filter((n: any) => !n.read).length;
@@ -54,10 +43,17 @@ export default function WorkspaceHeader() {
 
   return (
     <header className="h-18 shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 md:px-6 flex items-center justify-between z-30 sticky top-0">
-      {/* Left: Search */}
-      <div className="flex-1 max-w-md mr-4 sm:mr-0">
+      {/* Left: Hamburger & Search */}
+      <div className="flex flex-1 items-center gap-2 max-w-md mr-4 sm:mr-0">
+        <button 
+          onClick={onOpenMobileMenu}
+          className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-md transition-colors"
+        >
+          <Icons.menu size={20} />
+        </button>
+
         <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-lg border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all w-full max-w-[230px] sm:max-w-none">
-          <Icons.search size={16} className="text-slate-400" />
+          <Icons.search size={16} className="text-slate-400 shrink-0" />
           <input
             type="text"
             value={searchTerm}

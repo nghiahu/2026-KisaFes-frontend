@@ -43,11 +43,15 @@ const getProjectColor = (name: string) => {
 interface WorkspaceSidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export default function WorkspaceSidebar({
   collapsed,
   onToggle,
+  mobileOpen = false,
+  onCloseMobile,
 }: WorkspaceSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -74,9 +78,10 @@ export default function WorkspaceSidebar({
       `}</style>
       <aside 
         style={{ fontFamily: 'Inter, sans-serif' }}
-        className={`flex flex-col bg-white border-r border-slate-200 h-screen transition-all duration-300 relative z-40 ${
-          collapsed ? 'w-[68px]' : 'w-[280px]'
-        }`}
+        className={`flex flex-col bg-white border-r border-slate-200 h-screen transition-all duration-300 z-40 
+          ${mobileOpen ? 'fixed left-0 top-0 translate-x-0' : 'fixed left-0 top-0 -translate-x-full md:relative md:translate-x-0'}
+          ${collapsed && !mobileOpen ? 'w-[68px]' : 'w-[280px]'}
+        `}
       >
         {/* Header */}
         <div className={`flex items-center px-[16px] py-[16px] shrink-0 border-b border-slate-200 ${
@@ -87,17 +92,26 @@ export default function WorkspaceSidebar({
               K
             </div>
             {!collapsed && (
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <span className="text-[14px] font-bold text-slate-900 tracking-tight block truncate">KisaFres</span>
                 <span className="text-[11px] font-medium text-slate-500 block">Workspace</span>
               </div>
             )}
+            {/* Close button for mobile */}
+            {mobileOpen && (
+              <button 
+                onClick={onCloseMobile}
+                className="md:hidden p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+              >
+                <Icons.x size={16} />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Collapse Toggle Button */}
+        {/* Collapse Toggle Button (Hidden on mobile) */}
         <button
-          className="absolute -right-3 top-6 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 shadow-sm transition-all z-50 hover:border-slate-300"
+          className="hidden md:flex absolute -right-3 top-6 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-400 hover:text-slate-600 shadow-sm transition-all z-50 hover:border-slate-300"
           onClick={onToggle}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >

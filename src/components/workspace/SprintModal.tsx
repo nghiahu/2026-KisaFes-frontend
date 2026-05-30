@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Icons } from '../../assets/icons';
 import { sprintService, type Sprint, type SprintCreateRequest } from '../../services/sprint.service';
 
@@ -9,31 +12,49 @@ interface SprintModalProps {
   onSuccess: (sprint: Sprint) => void;
 }
 
+const sprintSchema = z.object({
+  name: z.string().min(1, 'Tên sprint không được để trống'),
+  goal: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional()
+}).refine(data => {
+  if (data.startDate && data.endDate) {
+    return new Date(data.startDate) <= new Date(data.endDate);
+  }
+  return true;
+}, {
+  message: 'Ngày kết thúc phải sau ngày bắt đầu',
+  path: ['endDate']
+});
+
+type SprintFormValues = z.infer<typeof sprintSchema>;
+
 export default function SprintModal({ projectId, sprint, onClose, onSuccess }: SprintModalProps) {
   const isEdit = !!sprint;
-  const [name, setName] = useState(sprint?.name || '');
-  const [goal, setGoal] = useState(sprint?.goal || '');
-  const [startDate, setStartDate] = useState(sprint?.startDate?.substring(0, 10) || '');
-  const [endDate, setEndDate] = useState(sprint?.endDate?.substring(0, 10) || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) { setError('Tên sprint không được để trống'); return; }
-    if (startDate && endDate && startDate >= endDate) {
-      setError('Ngày bắt đầu phải trước ngày kết thúc');
-      return;
+  const { register, handleSubmit, formState: { errors } } = useForm<SprintFormValues>({
+    resolver: zodResolver(sprintSchema),
+    defaultValues: {
+      name: sprint?.name || '',
+      goal: sprint?.goal || '',
+      startDate: sprint?.startDate?.substring(0, 10) || '',
+      endDate: sprint?.endDate?.substring(0, 10) || ''
     }
+  });
+
+  const onSubmit = async (data: SprintFormValues) => {
     setIsSubmitting(true);
     setError('');
     try {
       const payload: SprintCreateRequest = {
-        name: name.trim(),
-        goal: goal.trim() || undefined,
-        startDate: startDate ? new Date(startDate).toISOString() : undefined,
-        endDate: endDate ? new Date(endDate).toISOString() : undefined,
+        name: data.name.trim(),
+        goal: data.goal?.trim() || undefined,
+        startDate: data.startDate ? new Date(data.startDate).toISOString() : undefined,
+        endDate: data.endDate ? new Date(data.endDate).toISOString() : undefined,
       };
+      
       let result: Sprint;
       if (isEdit && sprint) {
         result = await sprintService.updateSprint(projectId, sprint.id, payload);
@@ -64,30 +85,30 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex flex-col gap-4">
           {/* Sprint name */}
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1.5">Tên Sprint <span className="text-rose-500">*</span></label>
             <input
               type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              {...register('name')}
               placeholder="Sprint 1, Sprint 2..."
-              className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 font-semibold"
+              className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold ${errors.name ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-slate-200 focus:ring-violet-400/30 focus:border-violet-400'}`}
               autoFocus
             />
+            {errors.name && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.name.message}</p>}
           </div>
 
           {/* Goal */}
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1.5">Sprint Goal</label>
             <textarea
-              value={goal}
-              onChange={e => setGoal(e.target.value)}
+              {...register('goal')}
               placeholder="Mục tiêu của sprint này..."
               rows={2}
-              className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 font-semibold resize-none"
+              className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold resize-none ${errors.goal ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-slate-200 focus:ring-violet-400/30 focus:border-violet-400'}`}
             />
+            {errors.goal && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.goal.message}</p>}
           </div>
 
           {/* Dates */}
@@ -96,19 +117,19 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
               <label className="block text-xs font-bold text-slate-600 mb-1.5">Ngày bắt đầu</label>
               <input
                 type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 font-semibold"
+                {...register('startDate')}
+                className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold ${errors.startDate ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-slate-200 focus:ring-violet-400/30 focus:border-violet-400'}`}
               />
+              {errors.startDate && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.startDate.message}</p>}
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1.5">Ngày kết thúc</label>
               <input
                 type="date"
-                value={endDate}
-                onChange={e => setEndDate(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 font-semibold"
+                {...register('endDate')}
+                className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold ${errors.endDate ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-slate-200 focus:ring-violet-400/30 focus:border-violet-400'}`}
               />
+              {errors.endDate && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.endDate.message}</p>}
             </div>
           </div>
 

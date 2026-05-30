@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Icons } from '../../assets/icons';
 import { projectService } from '../../services/project.service';
 import { userService } from '../../services/userService';
@@ -10,8 +13,19 @@ interface InviteMemberModalProps {
   projectId: string;
 }
 
+const inviteSchema = z.object({
+  email: z.string().email('Email không hợp lệ').min(1, 'Email không được để trống')
+});
+
+type InviteFormValues = z.infer<typeof inviteSchema>;
+
 export default function InviteMemberModal({ onClose, projectName, projectId }: InviteMemberModalProps) {
-  const [email, setEmail] = useState('');
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<InviteFormValues>({
+    resolver: zodResolver(inviteSchema),
+    defaultValues: { email: '' }
+  });
+  
+  const emailValue = watch('email');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
@@ -23,7 +37,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
   // Debounced search for users
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
-      const keyword = email.trim();
+      const keyword = emailValue.trim();
       if (!keyword || selectedUser?.email === keyword) {
         setSearchResults([]);
         setSearchDropdownOpen(false);
@@ -45,22 +59,20 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
     }, 400);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [email, selectedUser]);
+  }, [emailValue, selectedUser]);
 
   const selectUser = (user: any) => {
     setSelectedUser(user);
-    setEmail(user.email);
+    setValue('email', user.email, { shouldValidate: true });
     setSearchDropdownOpen(false);
   };
 
-  const handleInvite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
+  const onInviteSubmit = async (data: InviteFormValues) => {
     
     setIsSending(true);
     setError(null);
     try {
-      await projectService.inviteMember(projectId, email.trim());
+      await projectService.inviteMember(projectId, data.email.trim());
       setSuccess(true);
       setTimeout(() => {
         onClose();
@@ -95,7 +107,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
           </button>
         </div>
         
-        <form onSubmit={handleInvite} className="p-6">
+        <form onSubmit={handleSubmit(onInviteSubmit)} className="p-6">
           <div className="mb-4 relative">
             <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide">
               Tìm kiếm Email hoặc Tên thành viên
@@ -104,10 +116,9 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
               <Icons.search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                required
-                value={email}
+                {...register('email')}
                 onChange={(e) => {
-                  setEmail(e.target.value);
+                  register('email').onChange(e);
                   if (selectedUser && selectedUser.email !== e.target.value) {
                     setSelectedUser(null);
                   }
@@ -116,7 +127,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                   if (searchResults.length > 0) setSearchDropdownOpen(true);
                 }}
                 placeholder="Nhập email hoặc tên của thành viên..."
-                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-sm text-slate-800 animate-in"
+                className={`w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:bg-white focus:ring-4 transition-all font-medium text-sm text-slate-800 animate-in ${errors.email ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10 bg-rose-50' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/10 bg-slate-50'}`}
                 disabled={isSending || success}
                 autoComplete="off"
               />
@@ -126,6 +137,13 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                 </div>
               )}
             </div>
+            
+            {errors.email && (
+              <p className="text-rose-500 text-xs mt-2 font-medium flex items-center gap-1">
+                <Icons.alertCircle size={12} />
+                {errors.email.message}
+              </p>
+            )}
 
             {/* Selected User Badge */}
             {selectedUser && (
@@ -143,7 +161,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             )}
 
             {/* Dropdown Results */}
-            {searchDropdownOpen && email.trim() !== '' && (
+            {searchDropdownOpen && emailValue.trim() !== '' && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setSearchDropdownOpen(false)} />
                 <div className="absolute left-0 right-0 z-20 mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-56 overflow-y-auto">
@@ -198,7 +216,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             </button>
             <button
               type="submit"
-              disabled={isSending || success || !email.trim()}
+              disabled={isSending || success || !emailValue.trim()}
               className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center gap-2"
             >
               {isSending ? (

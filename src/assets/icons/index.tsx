@@ -86,7 +86,8 @@ import {
   PartyPopper,
   AlertTriangle,
   Sun,
-  PieChart
+  PieChart,
+  Menu
 } from 'lucide-react';
 
 export const Icons = {
@@ -178,4 +179,5 @@ export const Icons = {
   alertTriangle: AlertTriangle,
   sun: Sun,
   pieChart: PieChart,
+  menu: Menu
 };
