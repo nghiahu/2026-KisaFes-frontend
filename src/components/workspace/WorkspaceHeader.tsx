@@ -3,7 +3,8 @@ import { Icons } from '../../assets/icons';
 import UserDropdown from '../common/UserDropdown';
 import NotificationDropdown from './NotificationDropdown';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchNotifications, addNotificationSocket } from '../../store/slices/notificationSlice';
+import { useQueryClient } from '@tanstack/react-query';
+import { NOTIFICATION_KEYS, useNotificationsQuery } from '../../hooks/api/useNotifications';
 import { socketService } from '../../services/socketService';
 
 export default function WorkspaceHeader() {
@@ -12,7 +13,8 @@ export default function WorkspaceHeader() {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const dispatch = useAppDispatch();
-  const notifications = useAppSelector(state => state.notification.notifications);
+  const queryClient = useQueryClient();
+  const { data: notifications = [] } = useNotificationsQuery();
 
   // Read user directly from Redux store — always in sync with login/logout
   const rawUser = useAppSelector(state => state.auth.user);
@@ -25,9 +27,7 @@ export default function WorkspaceHeader() {
     avatar: rawUser.avatar || rawUser.avatarUrl || rawUser.avatar_url || null,
   } : null;
 
-  useEffect(() => {
-    dispatch(fetchNotifications());
-  }, [dispatch]);
+  // Removed dispatch(fetchNotifications()) as useNotificationsQuery will handle fetching
 
   useEffect(() => {
     if (!user || !user.id) return;
@@ -35,7 +35,10 @@ export default function WorkspaceHeader() {
     socketService.connect(() => {
       socketService.subscribe(`/topic/notifications/${user.id}`, (newNotification) => {
         // Formulate the notification to match the UI expected format
-        dispatch(addNotificationSocket(newNotification));
+        queryClient.setQueryData<any[]>(NOTIFICATION_KEYS.all, (old) => {
+          if (!old) return [newNotification];
+          return [newNotification, ...old];
+        });
       });
     });
 

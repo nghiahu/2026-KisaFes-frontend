@@ -5,9 +5,9 @@ import { useSelector } from 'react-redux';
 import defaultMan from '../../assets/avatar_def_man.png';
 import type { Project, ProjectStatus } from '../../types/project.interface';
 import type { Category } from '../../types/category.interface';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchProjects } from '../../store/slices/projectSlice';
-import { fetchCategories } from '../../store/slices/categorySlice';
+import { useAppDispatch } from '../../store/hooks';
+import { useProjects } from '../../hooks/api/useProjects';
+import { useCategories } from '../../hooks/api/useCategories';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { projectService } from '../../services/project.service';
 
@@ -31,14 +31,8 @@ export default function Projects() {
 
   const user = useSelector((state: any) => state.auth.user);
 
-  const dispatch = useAppDispatch();
-  const { projects: backendProjects, loading: isProjectsLoading } = useAppSelector((state) => state.project);
-  const { categories: backendCategories, loading: isCategoriesLoading } = useAppSelector((state) => state.category);
-
-  useEffect(() => {
-    dispatch(fetchProjects());
-    dispatch(fetchCategories());
-  }, [dispatch]);
+  const { data: backendProjects, isLoading: isProjectsLoading, refetch: refetchProjects } = useProjects();
+  const { data: backendCategories = [], isLoading: isCategoriesLoading } = useCategories();
 
   // Global click listener to close dropdowns
   useEffect(() => {
@@ -170,7 +164,7 @@ export default function Projects() {
     try {
       setIsUpdating(true);
       await projectService.updateProjectInfo(editingProject.id, editFormData);
-      dispatch(fetchProjects()); // reload
+      refetchProjects(); // reload
       setEditingProject(null);
     } catch (err) {
       console.error(err);
@@ -180,18 +174,26 @@ export default function Projects() {
     }
   };
 
-  const handleDeleteSubmit = (e: React.FormEvent) => {
+  const handleDeleteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!deletingProject) return;
     if (deleteInput !== `delete ${deletingProject.code}`) {
       alert(`Vui lòng nhập đúng "delete ${deletingProject.code}" để xác nhận.`);
       return;
     }
-    // Perform deletion
-    setProjects(prev => prev.filter(p => p.id !== deletingProject.id));
-    // TODO: Call API to delete project here
-    setDeletingProject(null);
-    setDeleteInput('');
+    
+    try {
+      setIsUpdating(true);
+      await projectService.deleteProject(deletingProject.id);
+      refetchProjects();
+      setDeletingProject(null);
+      setDeleteInput('');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete project');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (

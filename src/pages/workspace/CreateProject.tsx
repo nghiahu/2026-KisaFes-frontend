@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Icons } from '../../assets/icons';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchCategories } from '../../store/slices/categorySlice';
-import { createProject } from '../../store/slices/projectSlice';
+import { useAppDispatch } from '../../store/hooks';
+import { useCategories } from '../../hooks/api/useCategories';
+import { useCreateProject } from '../../hooks/api/useProjects';
 import { userService } from '../../services/userService';
 import { AlertTriangle, Info, XCircle } from 'lucide-react';
 import type { Category } from '../../types/category.interface';
@@ -81,7 +81,8 @@ export default function CreateProject() {
   const navigate = useNavigate();
   const currentUser = useSelector((state: any) => state.auth.user);
   const dispatch = useAppDispatch();
-  const categories = useAppSelector(state => state.category.categories);
+  const { data: categories = [] } = useCategories();
+  const createProjectMutation = useCreateProject();
 
   const [activeTab, setActiveTab] = useState<'basic' | 'team' | 'roles' | 'workflow'>('basic');
   const [formData, setFormData] = useState({
@@ -125,9 +126,7 @@ export default function CreateProject() {
   };
 
   // Fetch categories on mount
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+  // Remove useEffect for fetchCategories as useCategories handles it automatically
 
   // Update defaults when category changes
   useEffect(() => {
@@ -268,7 +267,7 @@ export default function CreateProject() {
         statuses,
         boardColumns
       };
-      await dispatch(createProject(finalData)).unwrap();
+      await createProjectMutation.mutateAsync(finalData);
       
       setIsSubmitting(false);
       setShowSuccess(true);

@@ -5,7 +5,7 @@ import defaultMan from '../../../../assets/avatar_def_man.png';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { createPortal } from 'react-dom';
-import { updateTaskTitle, updateTaskAssignee, updateTaskPriority, updateTaskDueDate } from '../../../../store/slices/taskSlice';
+import { useUpdateTaskTitleMutation, useUpdateTaskAssigneeMutation, useUpdateTaskPriorityMutation, useUpdateTaskDueDateMutation } from '../../../../hooks/api/useTasks';
 
 const PRIORITIES = [
   { label: 'Highest', icon: <Icons.chevronsUp size={12} className="text-rose-500" />, color: 'text-rose-600' },
@@ -26,8 +26,13 @@ export const getPriorityIcon = (priority: string) => {
 };
 
 export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [], onTaskUpdate }: { task: any, isOverlay?: boolean, projectMembers?: any[], onTaskUpdate?: (id: string, updates: any) => void }) => {
-  const dispatch = useAppDispatch();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id, data: task });
+  
+  const projectId = task.projectId;
+  const updateTitleMutation = useUpdateTaskTitleMutation(projectId);
+  const updateAssigneeMutation = useUpdateTaskAssigneeMutation(projectId);
+  const updatePriorityMutation = useUpdateTaskPriorityMutation(projectId);
+  const updateDueDateMutation = useUpdateTaskDueDateMutation(projectId);
   
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
@@ -39,6 +44,11 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
   const [showPriority, setShowPriority] = useState(false);
   const [priorityPos, setPriorityPos] = useState({ top: 0, left: 0 });
 
+  const [showActions, setShowActions] = useState(false);
+  const [actionsPos, setActionsPos] = useState({ top: 0, left: 0 });
+
+  const deleteTaskMutation = useUpdateTaskTitleMutation(projectId); // Will use delete mutation below
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -49,14 +59,15 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
     const handleOutsideClick = () => {
       setShowPriority(false);
       setShowAssignee(false);
+      setShowActions(false);
     };
-    if (showPriority || showAssignee) {
+    if (showPriority || showAssignee || showActions) {
       window.addEventListener('pointerdown', handleOutsideClick);
     }
     return () => {
       window.removeEventListener('pointerdown', handleOutsideClick);
     };
-  }, [showPriority, showAssignee]);
+  }, [showPriority, showAssignee, showActions]);
 
   const handleTitleSubmit = async () => {
     if (!titleValue.trim() || titleValue.trim() === task.title) {
@@ -67,7 +78,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
     if (onTaskUpdate) onTaskUpdate(task.id, { title: newTitle });
     setIsEditingTitle(false);
     try {
-      if (task.dbId) await dispatch(updateTaskTitle({ taskId: task.dbId, title: newTitle })).unwrap();
+      if (task.id) await updateTitleMutation.mutateAsync({ taskId: task.id, title: newTitle });
     } catch (err) {
       console.error(err);
       if (onTaskUpdate) onTaskUpdate(task.id, { title: task.title });
@@ -79,7 +90,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
     const old = task.priority;
     if (onTaskUpdate) onTaskUpdate(task.id, { priority });
     try {
-      if (task.dbId) await dispatch(updateTaskPriority({ taskId: task.dbId, priority })).unwrap();
+      if (task.id) await updatePriorityMutation.mutateAsync({ taskId: task.id, priority });
     } catch (err) {
       console.error(err);
       if (onTaskUpdate) onTaskUpdate(task.id, { priority: old });
@@ -97,7 +108,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
     
     if (onTaskUpdate) onTaskUpdate(task.id, { assigneeId: newId, assigneeName: newName, assigneeAvatar: newAvatar });
     try {
-      if (task.dbId) await dispatch(updateTaskAssignee({ taskId: task.dbId, assigneeId: newId })).unwrap();
+      if (task.id) await updateAssigneeMutation.mutateAsync({ taskId: task.id, assigneeId: newId });
     } catch (err) {
       console.error(err);
       if (onTaskUpdate) onTaskUpdate(task.id, { assigneeId: oldId, assigneeName: oldName, assigneeAvatar: oldAvatar });
@@ -109,7 +120,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
     const old = task.dueDate;
     if (onTaskUpdate) onTaskUpdate(task.id, { dueDate: formatted });
     try {
-      if (task.dbId) await dispatch(updateTaskDueDate({ taskId: task.dbId, dueDate: formatted })).unwrap();
+      if (task.id) await updateDueDateMutation.mutateAsync({ taskId: task.id, dueDate: formatted });
     } catch (err) {
       console.error(err);
       if (onTaskUpdate) onTaskUpdate(task.id, { dueDate: old });
@@ -148,6 +159,21 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
             onChange={(e) => handleDueDateChange(e.target.value)}
             className="absolute w-0 h-0 opacity-0 pointer-events-none"
           />
+        </div>
+
+        {/* Actions Menu */}
+        <div className="relative">
+          <button 
+            onPointerDown={e => e.stopPropagation()}
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              setActionsPos({ top: rect.bottom + 4, left: rect.left - 100 });
+              setShowActions(true);
+            }}
+            className="p-1 text-slate-300 hover:text-slate-600 hover:bg-slate-50 rounded transition-colors"
+          >
+            <Icons.moreHorizontal size={14} />
+          </button>
         </div>
       </div>
       
@@ -260,6 +286,27 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
               </button>
             ))}
           </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Actions Dropdown */}
+      {showActions && createPortal(
+        <div
+          className="fixed w-[120px] bg-white border border-slate-200 shadow-xl rounded-md py-1 z-[9999]"
+          style={{ top: actionsPos.top, left: actionsPos.left }}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <button 
+            onClick={() => {
+              setShowActions(false);
+              // Fire an update with 'DELETE' signal or call delete mutation here
+              if (onTaskUpdate) onTaskUpdate(task.id, { _delete: true });
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+          >
+            <Icons.trash2 size={14} className="text-rose-500" /> Delete
+          </button>
         </div>,
         document.body
       )}

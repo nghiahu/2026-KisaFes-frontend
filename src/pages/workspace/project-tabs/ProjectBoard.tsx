@@ -3,8 +3,7 @@ import { Icons } from '../../../assets/icons';
 import {
   Plus, ChevronDown, CheckSquare, Zap, AlertCircle, User, Calendar, Search, X, CornerDownLeft
 } from 'lucide-react';
-import { useAppDispatch } from '../../../store/hooks';
-import { createTask, fetchTasksByProject, updateTaskStatus } from '../../../store/slices/taskSlice';
+import { useTasksQuery, useCreateTaskMutation, useUpdateTaskStatusMutation, useDeleteTaskMutation } from '../../../hooks/api/useTasks';
 import defaultMan from '../../../assets/avatar_def_man.png';
 
 import {
@@ -26,7 +25,6 @@ import { useDroppable } from '@dnd-kit/core';
 
 interface ProjectBoardProps {
   currentProject: any;
-  tasks: any[];
 }
 
 import { createPortal } from 'react-dom';
@@ -34,15 +32,30 @@ import { SortableTaskCard } from './components/SortableTaskCard';
 import { DroppableColumn } from './components/DroppableColumn';
 import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
 
-export default function ProjectBoard({ currentProject, tasks }: ProjectBoardProps) {
-  const dispatch = useAppDispatch();
-  const [boardTasks, setBoardTasks] = useState(tasks);
+export default function ProjectBoard({ currentProject }: ProjectBoardProps) {
+  const { data: tasksData } = useTasksQuery(currentProject?.id, { size: 1000 });
+  const tasksList = tasksData?.content || [];
+  const [boardTasks, setBoardTasks] = useState(tasksList);
+  
+  const updateStatusMutation = useUpdateTaskStatusMutation(currentProject?.id);
+  const createTaskMutation = useCreateTaskMutation(currentProject?.id);
 
   useEffect(() => {
-    setBoardTasks(tasks);
-  }, [tasks]);
+    setBoardTasks(tasksList);
+  }, [tasksList]);
 
-  const handleTaskUpdate = (taskId: string, updates: any) => {
+  const deleteTaskMutation = useDeleteTaskMutation(currentProject?.id || '');
+
+  const handleTaskUpdate = async (taskId: string, updates: any) => {
+    if (updates._delete) {
+      setBoardTasks(prev => prev.filter(t => t.id !== taskId));
+      try {
+        await deleteTaskMutation.mutateAsync(taskId);
+      } catch (err) {
+        console.error("Failed to delete task:", err);
+      }
+      return;
+    }
     setBoardTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
   };
 
@@ -57,14 +70,7 @@ export default function ProjectBoard({ currentProject, tasks }: ProjectBoardProp
     })
   );
 
-  useEffect(() => {
-    if (currentProject?.id) {
-      dispatch(fetchTasksByProject({ 
-        projectId: currentProject.id, 
-        params: { size: 1000 } 
-      }));
-    }
-  }, [currentProject?.id, dispatch]);
+  // Removed manual fetchTasksByProject dispatch as useTasksQuery handles it automatically
 
   const handleAddTask = async (columnId: string, title: string, type: string, assignee: any, dueDate: string) => {
     if (!title.trim() || !currentProject) return;
@@ -74,21 +80,16 @@ export default function ProjectBoard({ currentProject, tasks }: ProjectBoardProp
     const statusId = column?.defaultStatusId || column?.mappedStatusIds?.[0] || '';
 
     try {
-      await dispatch(createTask({
+      await createTaskMutation.mutateAsync({
         projectId: currentProject.id,
         title: title.trim(),
         statusId: statusId,
         type: type,
         assigneeId: assignee && assignee !== 'automatic' ? assignee.id : null,
         dueDate: dueDate ? `${dueDate}T00:00:00` : null
-      })).unwrap();
+      });
       
       setShowAddTask(null);
-      
-      dispatch(fetchTasksByProject({ 
-        projectId: currentProject.id,
-        params: { size: 1000 }
-      }));
     } catch (err) {
       console.error("Failed to add task via UI:", err);
     }
@@ -136,13 +137,8 @@ export default function ProjectBoard({ currentProject, tasks }: ProjectBoardProp
           setBoardTasks(prev => prev.map(t => t.id === activeTaskId ? { ...t, statusId: targetStatusId } : t));
           
           try {
-             if (draggedTask.dbId) {
-                await dispatch(updateTaskStatus({ taskId: draggedTask.dbId, statusId: targetStatusId })).unwrap();
-                // Optionally refetch tasks to ensure board is perfectly in sync
-                dispatch(fetchTasksByProject({ 
-                  projectId: currentProject.id,
-                  params: { size: 1000 }
-                }));
+              if (draggedTask.id) {
+                await updateStatusMutation.mutateAsync({ taskId: draggedTask.id, statusId: targetStatusId });
              }
           } catch(err) {
              console.error("Failed to update status on drag drop:", err);

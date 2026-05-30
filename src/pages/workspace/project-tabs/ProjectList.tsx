@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Icons } from '../../../assets/icons';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { updateTaskStatus, createTask, fetchTasksByProject, updateTaskAssignee, updateTaskPriority, updateTaskDueDate, updateTaskTitle, deleteTask } from '../../../store/slices/taskSlice';
+import { useAppDispatch } from '../../../store/hooks';
+import { useTasksQuery, useUpdateTaskStatusMutation, useCreateTaskMutation, useUpdateTaskAssigneeMutation, useUpdateTaskPriorityMutation, useUpdateTaskDueDateMutation, useUpdateTaskTitleMutation, useDeleteTaskMutation } from '../../../hooks/api/useTasks';
 import defaultAvatar from '../../../assets/avatar_def_man.png';
 import { MassChangeStatusModal } from '../../../components/workspace/MassChangeStatusModal';
 import { MassEditFieldsModal } from '../../../components/workspace/MassEditFieldsModal';
@@ -11,14 +11,13 @@ import TaskDetailView from '../../../components/workspace/TaskDetailView';
 
 
 interface ProjectListProps {
-  projectId: string;
   currentProject: any;
-  tasks: any[];
-  setTasks: React.Dispatch<React.SetStateAction<any[]>>;
+  projectId: string;
 }
 
-export default function ProjectList({ projectId, currentProject, tasks, setTasks }: ProjectListProps) {
+export default function ProjectList({ currentProject, projectId }: ProjectListProps) {
   const dispatch = useAppDispatch();
+  const [tasks, setTasks] = useState<any[]>([]);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskAssignee, setNewTaskAssignee] = useState<any>(null); // 'automatic' or user object or null (unassigned)
@@ -116,7 +115,26 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
   const groupBtnRef = useRef<HTMLButtonElement>(null);
   const groupDropdownRef = useRef<HTMLDivElement>(null);
 
-  const { totalElements, totalPages } = useAppSelector(state => state.task);
+  const { data: tasksData } = useTasksQuery(projectId, {
+    page: currentPage,
+    size: itemsPerPage,
+    keyword: searchKeyword || undefined
+  });
+  const totalElements = tasksData?.totalElements || 0;
+  const totalPages = tasksData?.totalPages || 1;
+  const fetchedTasks = tasksData?.content || [];
+
+  useEffect(() => {
+    setTasks(fetchedTasks);
+  }, [fetchedTasks]);
+
+  const updateStatusMutation = useUpdateTaskStatusMutation(projectId);
+  const createTaskMutation = useCreateTaskMutation(projectId);
+  const updateAssigneeMutation = useUpdateTaskAssigneeMutation(projectId);
+  const updatePriorityMutation = useUpdateTaskPriorityMutation(projectId);
+  const updateDueDateMutation = useUpdateTaskDueDateMutation(projectId);
+  const updateTitleMutation = useUpdateTaskTitleMutation(projectId);
+  const deleteTaskMutation = useDeleteTaskMutation(projectId);
 
   const GROUP_OPTIONS = [
     { id: 'status', label: 'Status' },
@@ -339,23 +357,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     };
   }, [showTypeDropdown, isCreatingTask, activeStatusDropdownId, activeAssigneeDropdownId, activePriorityDropdownId, showFilterPanel, showGroupDropdown]);
 
-  // Fetch from backend when pagination or search changes
-  useEffect(() => {
-    if (projectId) {
-      // Debounce search slightly or just fetch directly
-      const timer = setTimeout(() => {
-        dispatch(fetchTasksByProject({
-          projectId,
-          params: {
-            page: currentPage,
-            size: itemsPerPage,
-            keyword: searchKeyword || undefined
-          }
-        }));
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [projectId, currentPage, itemsPerPage, searchKeyword, dispatch]);
+  // Removed fetchTasksByProject manual dispatch as useTasksQuery handles dependency arrays automatically
 
   // Auto-focus search input when assignee dropdown opens
   useEffect(() => {
@@ -381,24 +383,14 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     if (!newTaskTitle || !newTaskTitle.trim() || !currentProject) return;
     const firstStatusId = currentProject.statuses?.[0]?.statusId || "";
     try {
-      await dispatch(createTask({
+      await createTaskMutation.mutateAsync({
         projectId: currentProject.id,
         title: newTaskTitle.trim(),
         statusId: firstStatusId,
         type: newTaskType.toLowerCase(),
         assigneeId: newTaskAssignee && newTaskAssignee !== 'automatic' ? newTaskAssignee.id : null,
         dueDate: newTaskDueDate ? `${newTaskDueDate}T00:00:00` : null
-      })).unwrap();
-
-      // Refetch current page to maintain correct pagination UI
-      dispatch(fetchTasksByProject({
-        projectId: currentProject.id,
-        params: {
-          page: currentPage,
-          size: itemsPerPage,
-          keyword: searchKeyword || undefined
-        }
-      }));
+      });
 
       setNewTaskTitle('');
       setNewTaskAssignee(null);
@@ -422,8 +414,8 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     ));
 
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskAssignee({ taskId: task.dbId, assigneeId: newAssigneeId })).unwrap();
+      if (task.id) {
+        await updateAssigneeMutation.mutateAsync({ taskId: task.id, assigneeId: newAssigneeId });
       }
     } catch (err) {
       console.error("Failed to update assignee:", err);
@@ -440,8 +432,8 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     // Optimistic update
     setTasks(prev => prev.map(t => t.id === task.id ? { ...t, priority } : t));
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskPriority({ taskId: task.dbId, priority })).unwrap();
+      if (task.id) {
+        await updatePriorityMutation.mutateAsync({ taskId: task.id, priority });
       }
     } catch (err) {
       console.error('Failed to update priority:', err);
@@ -454,8 +446,8 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     const oldDate = task.dueDate;
     setTasks(prev => prev.map(t => t.id === task.id ? { ...t, dueDate: formattedDate } : t));
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskDueDate({ taskId: task.dbId, dueDate: formattedDate })).unwrap();
+      if (task.id) {
+        await updateDueDateMutation.mutateAsync({ taskId: task.id, dueDate: formattedDate });
       }
     } catch (err) {
       console.error("Failed to update due date:", err);
@@ -474,8 +466,8 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
     setTasks(prev => prev.map(t => t.id === task.id ? { ...t, title: newTitle } : t));
     setActiveEditTitleId(null);
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskTitle({ taskId: task.dbId, title: newTitle })).unwrap();
+      if (task.id) {
+        await updateTitleMutation.mutateAsync({ taskId: task.id, title: newTitle });
       }
     } catch (err) {
       console.error("Failed to update task title:", err);
@@ -1048,9 +1040,49 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                                 );
                                 case 'actions': return (
                                   <td key={col.id} style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }} className="py-3.5 px-4 text-center">
-                                    <button className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-all">
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (activeActionDropdownId === task.id) {
+                                          setActiveActionDropdownId(null);
+                                        } else {
+                                          const rect = e.currentTarget.getBoundingClientRect();
+                                          setActionDropdownPos({ top: rect.bottom + 4, left: rect.left - 120 });
+                                          setActiveActionDropdownId(task.id);
+                                        }
+                                      }}
+                                      className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-all"
+                                    >
                                       <Icons.moreHorizontal size={14} />
                                     </button>
+                                    {activeActionDropdownId === task.id && createPortal(
+                                      <div
+                                        ref={actionDropdownRef}
+                                        className="fixed w-[150px] bg-white border border-slate-200 shadow-xl rounded-md py-1 z-[9999]"
+                                        style={{ top: actionDropdownPos.top, left: actionDropdownPos.left }}
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <button 
+                                          onClick={() => { setActiveActionDropdownId(null); setSelectedTask(task); }}
+                                          className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        >
+                                          <Icons.settings size={14} className="text-slate-400" /> Edit Task
+                                        </button>
+                                        <div className="h-px bg-slate-100 my-1" />
+                                        <button 
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveActionDropdownId(null);
+                                            setDeleteModalTask(task);
+                                            setDeleteConfirmText('');
+                                          }}
+                                          className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                                        >
+                                          <Icons.trash2 size={14} className="text-rose-500" /> Delete
+                                        </button>
+                                      </div>,
+                                      document.body
+                                    )}
                                   </td>
                                 );
                                 default: return null;
@@ -1397,8 +1429,8 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
 
                                             setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: statusObj.label, statusId: statusObj.statusId } : t));
                                             try {
-                                              if (task.dbId) {
-                                                await dispatch(updateTaskStatus({ taskId: task.dbId, statusId: statusObj.statusId })).unwrap();
+                                              if (task.id) {
+                                                await updateStatusMutation.mutateAsync({ taskId: task.id, statusId: statusObj.statusId });
                                               }
                                             } catch (err) {
                                               console.error("Failed to update status in backend:", err);
@@ -1509,25 +1541,25 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                                 style={{ top: actionDropdownPos.top, left: actionDropdownPos.left }}
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <button className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-                                  <Icons.eye size={14} className="text-slate-400" /> View
-                                </button>
-                                <button className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-                                  <Icons.activity size={14} className="text-slate-400" /> Comment
-                                </button>
-                                <div className="h-px bg-slate-100 my-1" />
-                                <button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveActionDropdownId(null);
-                                    setDeleteModalTask(task);
-                                    setDeleteConfirmText('');
-                                  }}
-                                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-rose-600 hover:bg-rose-50 transition-colors"
-                                >
-                                  <Icons.trash2 size={14} className="text-rose-500" /> Delete
-                                </button>
-                              </div>,
+                                        <button 
+                                          onClick={() => { setActiveActionDropdownId(null); setSelectedTask(task); }}
+                                          className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        >
+                                          <Icons.settings size={14} className="text-slate-400" /> Edit Task
+                                        </button>
+                                        <div className="h-px bg-slate-100 my-1" />
+                                        <button 
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveActionDropdownId(null);
+                                            setDeleteModalTask(task);
+                                            setDeleteConfirmText('');
+                                          }}
+                                          className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                                        >
+                                          <Icons.trash2 size={14} className="text-rose-500" /> Delete
+                                        </button>
+                                      </div>,
                               document.body
                             )}
                           </td>
@@ -1557,14 +1589,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                       </span>
                       <button
                         onClick={() => {
-                          if (projectId) dispatch(fetchTasksByProject({
-                            projectId,
-                            params: {
-                              page: currentPage,
-                              size: itemsPerPage,
-                              keyword: searchKeyword || undefined
-                            }
-                          }));
+                          // removed
                         }}
                         className="p-1 text-slate-400 hover:text-slate-600 rounded shrink-0"
                         title="Reset tasks"
@@ -1928,12 +1953,10 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                     onClick={async () => {
                       try {
                         setIsDeleting(true);
-                        await dispatch(deleteTask(deleteModalTask.dbId || deleteModalTask.id)).unwrap();
+                        await deleteTaskMutation.mutateAsync(deleteModalTask.id);
                         setDeleteModalTask(null);
                         if (tasks.length === 1 && currentPage > 1) {
                           setCurrentPage(currentPage - 1);
-                        } else if (projectId) {
-                          dispatch(fetchTasksByProject({ projectId, params: { page: currentPage, size: itemsPerPage } }));
                         }
                       } catch (e) {
                         console.error(e);
@@ -1964,7 +1987,7 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                     ? tasks.filter(t => !excludedTaskIds.has(t.id))
                     : tasks.filter(t => selectedTaskIds.has(t.id));
                   
-                  await Promise.all(tasksToUpdate.map(t => dispatch(updateTaskStatus({ taskId: t.dbId || t.id, statusId })).unwrap()));
+                  await Promise.all(tasksToUpdate.map(t => updateStatusMutation.mutateAsync({ taskId: t.dbId || t.id, statusId })));
                 } catch (e) {
                   console.error(e);
                 } finally {
@@ -1973,10 +1996,6 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                   setIsAllSelected(false);
                   setSelectedTaskIds(new Set());
                   setExcludedTaskIds(new Set());
-                  
-                  if (projectId) {
-                    dispatch(fetchTasksByProject({ projectId, params: { page: currentPage, size: itemsPerPage } }));
-                  }
                 }
               }}
               statuses={currentProject?.statuses || []}
@@ -2001,13 +2020,13 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                   const taskPromises = tasksToUpdate.map(async (t) => {
                     const taskId = t.dbId || t.id;
                     if (data.assigneeId !== undefined) {
-                      await dispatch(updateTaskAssignee({ taskId, assigneeId: data.assigneeId })).unwrap();
+                      await updateAssigneeMutation.mutateAsync({ taskId, assigneeId: data.assigneeId });
                     }
                     if (data.priority !== undefined) {
-                      await dispatch(updateTaskPriority({ taskId, priority: data.priority })).unwrap();
+                      await updatePriorityMutation.mutateAsync({ taskId, priority: data.priority });
                     }
                     if (data.dueDate !== undefined) {
-                      await dispatch(updateTaskDueDate({ taskId, dueDate: data.dueDate })).unwrap();
+                      await updateDueDateMutation.mutateAsync({ taskId, dueDate: data.dueDate });
                     }
                   });
                   
@@ -2020,10 +2039,6 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                   setIsAllSelected(false);
                   setSelectedTaskIds(new Set());
                   setExcludedTaskIds(new Set());
-                  
-                  if (projectId) {
-                    dispatch(fetchTasksByProject({ projectId, params: { page: currentPage, size: itemsPerPage } }));
-                  }
                 }
               }}
             />
@@ -2039,17 +2054,13 @@ export default function ProjectList({ projectId, currentProject, tasks, setTasks
                 ? tasks.filter(t => !excludedTaskIds.has(t.id))
                 : tasks.filter(t => selectedTaskIds.has(t.id));
               
-              await Promise.all(tasksToDelete.map(t => dispatch(deleteTask(t.dbId || t.id)).unwrap()));
+              await Promise.all(tasksToDelete.map(t => deleteTaskMutation.mutateAsync(t.dbId || t.id)));
               
               setShowMassDeleteModal(false);
               setDeleteConfirmText('');
               setIsAllSelected(false);
               setSelectedTaskIds(new Set());
               setExcludedTaskIds(new Set());
-              
-              if (projectId) {
-                dispatch(fetchTasksByProject({ projectId, params: { page: currentPage, size: itemsPerPage } }));
-              }
             }}
           />
         </div>

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchProjects } from '../../store/slices/projectSlice';
-
+import { useAppDispatch } from '../../store/hooks';
+import { useProjects } from '../../hooks/api/useProjects';
 const navSections = [
   {
     id: "main",
@@ -53,11 +52,7 @@ export default function WorkspaceSidebar({
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const projects = useAppSelector(state => state.project.projects);
-
-  useEffect(() => {
-    dispatch(fetchProjects());
-  }, [location.pathname, dispatch]);
+  const { data: projects = [] } = useProjects();
 
   const isActive = (path: string) => {
     if (path === '/workspace') return location.pathname === '/workspace';

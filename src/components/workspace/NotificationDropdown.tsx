@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { type NotificationResponse } from '../../services/notification.service';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchNotifications, acceptInvitation, declineInvitation, markAsReadThunk, markAllAsReadThunk } from '../../store/slices/notificationSlice';
+import { useNotificationsQuery, useAcceptInvitationMutation, useDeclineInvitationMutation, useMarkAsReadMutation, useMarkAllAsReadMutation } from '../../hooks/api/useNotifications';
 import { Icons } from '../../assets/icons';
 import { X } from 'lucide-react';
 
@@ -11,14 +10,13 @@ interface NotificationDropdownProps {
 }
 
 export default function NotificationDropdown({ onClose, onNotificationsCountChange }: NotificationDropdownProps) {
-  const dispatch = useAppDispatch();
-  const { notifications, loading } = useAppSelector(state => state.notification);
+  const { data: notifications = [], isLoading: loading } = useNotificationsQuery();
+  const acceptInvitationMutation = useAcceptInvitationMutation();
+  const declineInvitationMutation = useDeclineInvitationMutation();
+  const markAsReadMutation = useMarkAsReadMutation();
+  const markAllAsReadMutation = useMarkAllAsReadMutation();
   const [actioningId, setActioningId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    dispatch(fetchNotifications());
-  }, [dispatch]);
 
   useEffect(() => {
     // Click outside listener
@@ -36,7 +34,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
   const handleAccept = async (id: string) => {
     try {
       setActioningId(id);
-      await dispatch(acceptInvitation(id)).unwrap();
+      await acceptInvitationMutation.mutateAsync(id);
     } catch (error) {
       console.error('Failed to accept invitation:', error);
     } finally {
@@ -47,7 +45,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
   const handleDecline = async (id: string) => {
     try {
       setActioningId(id);
-      await dispatch(declineInvitation(id)).unwrap();
+      await declineInvitationMutation.mutateAsync(id);
     } catch (error) {
       console.error('Failed to decline invitation:', error);
     } finally {
@@ -91,7 +89,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
               {notifications.filter(n => !n.read).length} mới
             </span>
             <button 
-              onClick={() => dispatch(markAllAsReadThunk())}
+              onClick={() => markAllAsReadMutation.mutate()}
               className="text-slate-400 hover:text-blue-600 transition-colors"
               title="Đánh dấu tất cả đã đọc"
             >
@@ -125,7 +123,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
             <div 
               key={item.id} 
               onClick={() => {
-                if (isUnread) dispatch(markAsReadThunk(item.id));
+                if (isUnread) markAsReadMutation.mutate(item.id);
               }}
               className={`p-4 transition-all flex gap-3 cursor-pointer ${
                 isUnread ? 'bg-blue-50/30 hover:bg-blue-50/50' : 'hover:bg-slate-50/50'

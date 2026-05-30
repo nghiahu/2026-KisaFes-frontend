@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Icons } from '../../assets/icons';
 import defaultAvatar from '../../assets/avatar_def_man.png';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { updateTaskStatus, updateTaskAssignee, updateTaskPriority, updateTaskDueDate, updateTaskTitle, addSubTask, toggleSubTask, deleteSubTask, updateTaskDescription } from '../../store/slices/taskSlice';
+import { useAppSelector } from '../../store/hooks';
+import { useUpdateTaskTitleMutation, useUpdateTaskDescriptionMutation, useAddSubTaskMutation, useToggleSubTaskMutation, useDeleteSubTaskMutation, useUpdateTaskStatusMutation, useUpdateTaskAssigneeMutation, useUpdateTaskPriorityMutation, useUpdateTaskDueDateMutation } from '../../hooks/api/useTasks';
 import TiptapEditor from './TiptapEditor';
 import { activityService } from '../../services/activity.service';
 import { commentService, type CommentResponse } from '../../services/comment.service';
@@ -18,7 +18,16 @@ interface TaskDetailViewProps {
 }
 
 export default function TaskDetailView({ task, currentProject, onClose, onUpdateTaskLocally }: TaskDetailViewProps) {
-  const dispatch = useAppDispatch();
+  const projectId = currentProject?.id || '';
+  const updateTitleMutation = useUpdateTaskTitleMutation(projectId);
+  const updateDescriptionMutation = useUpdateTaskDescriptionMutation(projectId);
+  const addSubTaskMutation = useAddSubTaskMutation(projectId);
+  const toggleSubTaskMutation = useToggleSubTaskMutation(projectId);
+  const deleteSubTaskMutation = useDeleteSubTaskMutation(projectId);
+  const updateStatusMutation = useUpdateTaskStatusMutation(projectId);
+  const updateAssigneeMutation = useUpdateTaskAssigneeMutation(projectId);
+  const updatePriorityMutation = useUpdateTaskPriorityMutation(projectId);
+  const updateDueDateMutation = useUpdateTaskDueDateMutation(projectId);
   const currentUser = useAppSelector(state => state.auth.user);
   const [activeTab, setActiveTab] = useState<'All' | 'Comments' | 'History'>('All');
   const [comments, setComments] = useState<CommentResponse[]>([]);
@@ -224,8 +233,8 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     onUpdateTaskLocally(task.id, { title: newTitle });
     setIsEditingTitle(false);
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskTitle({ taskId: task.dbId, title: newTitle })).unwrap();
+      if (task.id) {
+        await updateTitleMutation.mutateAsync({ taskId: task.id, title: newTitle });
       }
     } catch (error) {
       console.error("Failed to update title:", error);
@@ -238,7 +247,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     if (!newSubtaskTitle.trim() || !task.dbId) return;
     
     try {
-      const updatedTask = await dispatch(addSubTask({ taskId: task.dbId, title: newSubtaskTitle.trim() })).unwrap();
+      const updatedTask = await addSubTaskMutation.mutateAsync({ taskId: task.id, title: newSubtaskTitle.trim() });
       setNewSubtaskTitle('');
       setShowAddSubtask(false);
       onUpdateTaskLocally(task.id, updatedTask);
@@ -250,7 +259,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   const handleToggleSubtask = async (subtaskId: string) => {
     if (!task.dbId) return;
     try {
-      const updatedTask = await dispatch(toggleSubTask({ taskId: task.dbId, subtaskId })).unwrap();
+      const updatedTask = await toggleSubTaskMutation.mutateAsync({ taskId: task.id, subtaskId });
       onUpdateTaskLocally(task.id, updatedTask);
     } catch (error) {
       console.error("Failed to toggle subtask:", error);
@@ -264,7 +273,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   const confirmDeleteSubtask = async () => {
     if (!task.dbId || !subtaskIdToDelete) return;
     try {
-      const updatedTask = await dispatch(deleteSubTask({ taskId: task.dbId, subtaskId: subtaskIdToDelete })).unwrap();
+      const updatedTask = await deleteSubTaskMutation.mutateAsync({ taskId: task.id, subtaskId: subtaskIdToDelete });
       onUpdateTaskLocally(task.id, updatedTask);
     } catch (error) {
       console.error("Failed to delete subtask:", error);
@@ -278,8 +287,8 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     if (task.statusId === statusId || task.status === statusLabel) return;
     onUpdateTaskLocally(task.id, { status: statusLabel, statusId });
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskStatus({ taskId: task.dbId, statusId })).unwrap();
+      if (task.id) {
+        await updateStatusMutation.mutateAsync({ taskId: task.id, statusId });
       }
     } catch (error) {
       console.error("Failed to update status:", error);
@@ -292,8 +301,8 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     const newAssigneeName = member ? member.name : 'Unassigned';
     onUpdateTaskLocally(task.id, { assigneeId: newAssigneeId, assigneeName: newAssigneeName });
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskAssignee({ taskId: task.dbId, assigneeId: newAssigneeId })).unwrap();
+      if (task.id) {
+        await updateAssigneeMutation.mutateAsync({ taskId: task.id, assigneeId: newAssigneeId });
       }
     } catch (error) {
       console.error("Failed to update assignee:", error);
@@ -305,8 +314,8 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     if (task.priority === priority) return;
     onUpdateTaskLocally(task.id, { priority });
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskPriority({ taskId: task.dbId, priority })).unwrap();
+      if (task.id) {
+        await updatePriorityMutation.mutateAsync({ taskId: task.id, priority });
       }
     } catch (error) {
       console.error("Failed to update priority:", error);
@@ -317,8 +326,8 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     const formattedDate = newDate ? `${newDate}T00:00:00` : null;
     onUpdateTaskLocally(task.id, { dueDate: formattedDate });
     try {
-      if (task.dbId) {
-        await dispatch(updateTaskDueDate({ taskId: task.dbId, dueDate: formattedDate })).unwrap();
+      if (task.id) {
+        await updateDueDateMutation.mutateAsync({ taskId: task.id, dueDate: formattedDate });
       }
     } catch (error) {
       console.error("Failed to update due date:", error);
@@ -418,9 +427,9 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                   onSave={async () => {
                     setIsEditingDescription(false);
                     onUpdateTaskLocally(task.id, { description: editDescription });
-                    if (task.dbId) {
+                    if (task.id) {
                       try {
-                        const updatedTask = await dispatch(updateTaskDescription({ taskId: task.dbId, description: editDescription })).unwrap();
+                        const updatedTask = await updateDescriptionMutation.mutateAsync({ taskId: task.id, description: editDescription });
                         onUpdateTaskLocally(task.id, updatedTask);
                       } catch (error) {
                         console.error("Failed to update description:", error);

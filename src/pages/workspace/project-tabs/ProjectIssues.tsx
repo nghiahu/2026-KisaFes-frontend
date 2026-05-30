@@ -1,12 +1,13 @@
 import { Icons } from '../../../assets/icons';
 import defaultMan from '../../../assets/avatar_def_man.png';
+import { useTasksQuery } from '../../../hooks/api/useTasks';
+import { useParams } from 'react-router-dom';
 
-interface ProjectIssuesProps {
-  tasks: any[];
-}
-
-export default function ProjectIssues({ tasks }: ProjectIssuesProps) {
-  const issuesList = tasks.filter(t => t.type === 'bug' || t.title.toLowerCase().includes('bug') || t.title.toLowerCase().includes('fix'));
+export default function ProjectIssues() {
+  const { projectId } = useParams();
+  const { data: tasksData } = useTasksQuery(projectId || '', { page: 0, size: 100 });
+  const tasks = tasksData?.content || [];
+  const issuesList = tasks.filter((t: any) => t.type === 'bug' || t.title.toLowerCase().includes('bug') || t.title.toLowerCase().includes('fix'));
 
   return (
     <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col gap-4 m-6">

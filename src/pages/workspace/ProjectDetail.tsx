@@ -4,8 +4,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
 import defaultMan from '../../assets/avatar_def_man.png';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { useProject } from '../../hooks/api/useProjects';
+import { useCategories } from '../../hooks/api/useCategories';
 import { socketService } from '../../services/socketService';
-import { wsUpdateTask, wsCreateTask, wsDeleteTask } from '../../store/slices/taskSlice';
 import { projectService } from '../../services/project.service';
 import categoryService from '../../services/category.service';
 
@@ -20,11 +21,10 @@ import ProjectRoadmap from './project-tabs/ProjectRoadmap';
 import ProjectIssues from './project-tabs/ProjectIssues';
 import ProjectMembers from './project-tabs/ProjectMembers';
 import ProjectSettings from './project-tabs/ProjectSettings';
-import ProjectCalendar from './project-tabs/ProjectCalendar';
 import InviteMemberModal from '../../components/workspace/InviteMemberModal';
 import { Skeleton } from '../../components/ui/Skeleton';
 
-type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
+type TabType = 'overview' | 'list' | 'board' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
 
 export default function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -32,25 +32,14 @@ export default function ProjectDetail() {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
 
-  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => categoryService.getAllCategories(),
-    staleTime: 60 * 60 * 1000, // Cache for 1 hour
-  });
+  const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
-  const { data: backendProject, isLoading: isProjectLoading } = useQuery({
-    queryKey: ['project', projectId],
-    queryFn: () => projectService.getProjectById(projectId!),
-    enabled: !!projectId,
-  });
-
-  const { tasks: backendTasks } = useAppSelector(state => state.task);
+  const { data: backendProject, isLoading: isProjectLoading, refetch: refetchProject } = useProject(projectId);
 
   const [currentProject, setCurrentProject] = useState<any>(null);
   const loading = isProjectLoading || isCategoriesLoading;
   const [activeTab, setActiveTab] = useState<TabType>('list');
   const [isFavorite, setIsFavorite] = useState(false);
-  const [tasks, setTasks] = useState<any[]>([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState('');
@@ -171,22 +160,14 @@ export default function ProjectDetail() {
         if (event && event.type) {
           switch (event.type) {
             case "CREATE_TASK":
-              dispatch(wsCreateTask(event.data));
-              break;
             case "UPDATE_TASK":
-              dispatch(wsUpdateTask(event.data));
-              break;
             case "TASK_MOVED":
-              dispatch(wsUpdateTask(event.data));
-              break;
             case "TASK_REORDERED":
-              dispatch(wsUpdateTask(event.data));
+            case "DELETE_TASK":
+              queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               break;
             case "UPDATE_PROJECT":
               queryClient.invalidateQueries({ queryKey: ['project', projectId] });
-              break;
-            case "DELETE_TASK":
-              dispatch(wsDeleteTask(event.data));
               break;
             case "SPRINT_CREATED":
             case "SPRINT_UPDATED":
@@ -246,24 +227,7 @@ export default function ProjectDetail() {
     } else if (!isProjectLoading && !backendProject) {
       setCurrentProject(null);
     }
-
-    if (backendTasks && backendTasks.length > 0 && backendProject && backendProject.id === projectId) {
-      setTasks(backendTasks.map((t: any) => ({
-        ...t,
-        id: t.taskKey,
-        dbId: t.id,
-        title: t.title,
-        status: t.statusLabel || 'To Do',
-        statusId: t.statusId,
-        priority: t.priority || 'Medium',
-        assignee: t.assigneeName || 'Unassigned',
-        reporter: t.reporterName || 'nghĩa Ngô',
-        type: t.type || 'task'
-      })));
-    } else {
-      setTasks([]);
-    }
-  }, [backendProject, backendTasks, categories, projectId, isProjectLoading]);
+  }, [backendProject, categories, projectId, isProjectLoading]);
 
   const isScrum = currentProject?.methodology === 'SCRUM';
 
@@ -271,17 +235,15 @@ export default function ProjectDetail() {
   const baseTabs = [
     { id: 'overview' as TabType, label: 'Summary', icon: Icons.fileText },
     { id: 'list' as TabType, label: 'List', icon: Icons.listTodo },
-    { id: 'board' as TabType, label: 'Board', icon: Icons.kanbanSquare },
-    { id: 'calendar' as TabType, label: 'Calendar', icon: Icons.calendar },
+    { id: 'board' as TabType, label: 'Board', icon: Icons.layoutDashboard },
     { id: 'members' as TabType, label: 'Members', icon: Icons.users },
     { id: 'forms' as TabType, label: 'Forms', icon: Icons.clipboardList },
     { id: 'settings' as TabType, label: 'Settings', icon: Icons.settings },
   ];
 
-  // Scrum-specific tabs
-  const scrumOnlyTabs: { id: TabType; label: string; icon: any }[] = [
-    { id: 'backlog', label: 'Backlog', icon: Icons.listTodo },
-    { id: 'sprint', label: 'Sprint Board', icon: Icons.zap },
+  const scrumOnlyTabs = [
+    { id: 'backlog' as TabType, label: 'Backlog', icon: Icons.layers },
+    { id: 'sprint' as TabType, label: 'Active Sprint', icon: Icons.zap },
   ];
 
   const tabs = isScrum
@@ -290,9 +252,8 @@ export default function ProjectDetail() {
       baseTabs[1], // List
       scrumOnlyTabs[0], // Backlog
       scrumOnlyTabs[1], // Sprint Board
-      baseTabs[3], // Calendar
-      baseTabs[4], // Members
-      baseTabs[6], // Settings
+      baseTabs[3], // Members
+      baseTabs[5], // Settings
     ]
     : baseTabs;
 
@@ -478,28 +439,27 @@ export default function ProjectDetail() {
 
       {/* Dynamic Tabs Content Viewport */}
       <div className="flex-1 flex flex-col min-h-0 bg-white">
-        {activeTab === 'overview' && <ProjectOverview currentProject={currentProject} tasks={tasks} setActiveTab={(t) => {
+        {activeTab === 'overview' && <ProjectOverview currentProject={currentProject} setActiveTab={(t) => {
           setActiveTab(t);
           if (projectId) localStorage.setItem(`project_tab_${projectId}`, t);
         }} />}
-        {activeTab === 'list' && <ProjectList projectId={projectId!} currentProject={currentProject} tasks={tasks} setTasks={setTasks} />}
-        {activeTab === 'board' && <ProjectBoard currentProject={currentProject} tasks={tasks} />}
-        {activeTab === 'calendar' && <ProjectCalendar currentProject={currentProject} tasks={tasks} />}
+        {activeTab === 'list' && <ProjectList projectId={projectId!} currentProject={currentProject} />}
+        {activeTab === 'board' && <ProjectBoard currentProject={currentProject} />}
         {activeTab === 'backlog' && <ProjectBacklog projectId={projectId!} currentProject={currentProject} />}
         {activeTab === 'sprint' && <ProjectSprint projectId={projectId!} currentProject={currentProject} />}
 
         {activeTab === 'roadmap' && <ProjectRoadmap />}
-        {activeTab === 'issues' && <ProjectIssues tasks={tasks} />}
+        {activeTab === 'issues' && <ProjectIssues />}
         {activeTab === 'members' && (
           <ProjectMembers
             currentProject={currentProject}
-            onUpdate={() => dispatch(fetchProjectById(projectId!))}
+            onUpdate={() => refetchProject()}
           />
         )}
         {activeTab === 'settings' && (
           <ProjectSettings
             currentProject={currentProject}
-            onUpdate={() => dispatch(fetchProjectById(projectId!))}
+            onUpdate={() => refetchProject()}
           />
         )}
       </div>

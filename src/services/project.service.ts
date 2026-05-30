@@ -55,5 +55,9 @@ export const projectService = {
     const response = await axiosClient.put(`/projects/${projectId}/info`, data);
     return response.data;
   },
+  deleteProject: async (projectId: string): Promise<any> => {
+    const response = await axiosClient.delete(`/projects/${projectId}`);
+    return response.data;
+  },
 };
 

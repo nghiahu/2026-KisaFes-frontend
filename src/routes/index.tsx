@@ -1,22 +1,37 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import React, { Suspense } from 'react'
 import AuthLayout from '../layouts/AuthLayout'
 import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler'
 import LandingLayout from '../layouts/LandingLayout'
-import ProfileLayout from '../layouts/ProfileLayout'
-import ProfileSettings from '../pages/ProfileSettings'
-import RootLayout from '../layouts/RootLayout'
-import WorkspaceLayout from '../layouts/WorkspaceLayout'
-import Dashboard from '../pages/workspace/Dashboard'
-import Projects from '../pages/workspace/Projects'
-import CreateProject from '../pages/workspace/CreateProject'
-import ProjectDetail from '../pages/workspace/ProjectDetail'
-import Inbox from '../pages/workspace/Inbox'
-import MyTasks from '../pages/workspace/MyTasks'
 import ProtectedRoute from './ProtectedRoute'
+
+// Lazy loaded layouts
+const ProfileLayout = React.lazy(() => import('../layouts/ProfileLayout'))
+const RootLayout = React.lazy(() => import('../layouts/RootLayout'))
+const WorkspaceLayout = React.lazy(() => import('../layouts/WorkspaceLayout'))
+
+// Lazy loaded pages
+const ProfileSettings = React.lazy(() => import('../pages/ProfileSettings'))
+const Dashboard = React.lazy(() => import('../pages/workspace/Dashboard'))
+const Projects = React.lazy(() => import('../pages/workspace/Projects'))
+const CreateProject = React.lazy(() => import('../pages/workspace/CreateProject'))
+const ProjectDetail = React.lazy(() => import('../pages/workspace/ProjectDetail'))
+const Inbox = React.lazy(() => import('../pages/workspace/Inbox'))
+const MyTasks = React.lazy(() => import('../pages/workspace/MyTasks'))
+
+const SuspenseLoader = () => (
+  <div className="flex h-screen w-screen items-center justify-center bg-[#F4F5F7]">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 export const router = createBrowserRouter([
   {
-    element: <RootLayout />,
+    element: (
+      <Suspense fallback={<SuspenseLoader />}>
+        <RootLayout />
+      </Suspense>
+    ),
     children: [
       {
         path: '/',
@@ -56,7 +71,13 @@ export const router = createBrowserRouter([
       },
       {
         path: '/profile',
-        element: <ProtectedRoute><ProfileLayout /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<SuspenseLoader />}>
+              <ProfileLayout />
+            </Suspense>
+          </ProtectedRoute>
+        ),
         children: [
           {
             path: '',
@@ -74,7 +95,13 @@ export const router = createBrowserRouter([
       },
       {
         path: '/workspace',
-        element: <ProtectedRoute><WorkspaceLayout /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<SuspenseLoader />}>
+              <WorkspaceLayout />
+            </Suspense>
+          </ProtectedRoute>
+        ),
         children: [
           {
             path: '',

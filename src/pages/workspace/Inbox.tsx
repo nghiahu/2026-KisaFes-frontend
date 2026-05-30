@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchNotifications, acceptInvitation, declineInvitation, markAsReadThunk, markAllAsReadThunk } from '../../store/slices/notificationSlice';
+import { useNotificationsQuery, useAcceptInvitationMutation, useDeclineInvitationMutation, useMarkAsReadMutation, useMarkAllAsReadMutation } from '../../hooks/api/useNotifications';
 import { Icons } from '../../assets/icons';
 import { Check, Info, AlertTriangle, Send } from 'lucide-react';
 
@@ -25,16 +25,15 @@ const timeAgo = (dateStr: string) => {
 };
 
 export default function Inbox() {
-  const dispatch = useAppDispatch();
-  const { notifications, loading } = useAppSelector(state => state.notification);
+  const { data: notifications = [], isLoading: loading } = useNotificationsQuery();
+  const acceptInvitationMutation = useAcceptInvitationMutation();
+  const declineInvitationMutation = useDeclineInvitationMutation();
+  const markAsReadMutation = useMarkAsReadMutation();
+  const markAllAsReadMutation = useMarkAllAsReadMutation();
   
   const [filter, setFilter] = useState<'ALL' | 'UNREAD'>('ALL');
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [actioningId, setActioningId] = useState<string | null>(null);
-
-  useEffect(() => {
-    dispatch(fetchNotifications());
-  }, [dispatch]);
 
   // Use real data from Redux
   const displayNotifications = notifications;
@@ -46,10 +45,9 @@ export default function Inbox() {
 
   const handleAccept = async (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    if (id.startsWith('mock-')) return; // ignore mock actions
     try {
       setActioningId(id);
-      await dispatch(acceptInvitation(id)).unwrap();
+      await acceptInvitationMutation.mutateAsync(id);
     } catch (error) {
       console.error('Failed to accept invitation:', error);
     } finally {
@@ -59,10 +57,9 @@ export default function Inbox() {
 
   const handleDecline = async (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    if (id.startsWith('mock-')) return;
     try {
       setActioningId(id);
-      await dispatch(declineInvitation(id)).unwrap();
+      await declineInvitationMutation.mutateAsync(id);
     } catch (error) {
       console.error('Failed to decline invitation:', error);
     } finally {
@@ -133,7 +130,7 @@ export default function Inbox() {
               
               {/* Mark all as read */}
               <button 
-                onClick={() => dispatch(markAllAsReadThunk())}
+                onClick={() => markAllAsReadMutation.mutate()}
                 className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" 
                 title="Mark all as read"
               >
@@ -167,7 +164,7 @@ export default function Inbox() {
                       onClick={() => {
                         setSelectedItem(item);
                         if (isUnread) {
-                          dispatch(markAsReadThunk(item.id));
+                          markAsReadMutation.mutate(item.id);
                         }
                       }}
                       className={`p-4 cursor-pointer transition-all flex gap-3 m-2 rounded-lg ${

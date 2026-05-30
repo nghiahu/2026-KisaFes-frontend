@@ -13,8 +13,7 @@ import {
   Bug, SquareCheck, CircleDot, Play, AlertCircle,
 } from 'lucide-react';
 import { sprintService, type Sprint } from '../../../services/sprint.service';
-import { useAppDispatch } from '../../../store/hooks';
-import { updateTaskStatus } from '../../../store/slices/taskSlice';
+// Removed useAppDispatch
 import defaultMan from '../../../assets/avatar_def_man.png';
 
 interface ProjectSprintProps {
@@ -28,13 +27,14 @@ import { Progress } from '../../../components/ui/Progress';
 
 import { DroppableColumn } from './components/DroppableColumn';
 import { Icons } from '../../../assets/icons';
-import { createTask } from '../../../store/slices/taskSlice';
+import { useTasksQuery, useUpdateTaskStatusMutation, useDeleteTaskMutation, useCreateTaskMutation } from '../../../hooks/api/useTasks';
 import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
 
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function ProjectSprint({ projectId, currentProject }: ProjectSprintProps) {
-  const dispatch = useAppDispatch();
+  const updateStatusMutation = useUpdateTaskStatusMutation(projectId);
+  const createTaskMutation = useCreateTaskMutation(projectId);
   const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [activeTask, setActiveTask] = useState<any>(null);
@@ -101,7 +101,7 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
         // Optimistic update
         setTasks(prev => prev.map(t => t.id === activeTaskId ? { ...t, statusId: targetStatusId } : t));
         try {
-          await dispatch(updateTaskStatus({ taskId: draggedTask.id, statusId: targetStatusId })).unwrap();
+          await updateStatusMutation.mutateAsync({ taskId: draggedTask.id, statusId: targetStatusId });
           await load(true); // refresh metrics silently
         } catch (e) {
           console.error('Failed to update status', e);
@@ -111,7 +111,18 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
     }
   };
 
-  const handleTaskUpdate = (taskId: string, updates: any) => {
+  const deleteTaskMutation = useDeleteTaskMutation(currentProject?.id || '');
+
+  const handleTaskUpdate = async (taskId: string, updates: any) => {
+    if (updates._delete) {
+      setTasks(prev => prev.filter(t => t.id !== taskId));
+      try {
+        await deleteTaskMutation.mutateAsync(taskId);
+      } catch (err) {
+        console.error("Failed to delete task:", err);
+      }
+      return;
+    }
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
   };
 
@@ -123,14 +134,14 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
     const statusId = column?.defaultStatusId || column?.mappedStatusIds?.[0] || '';
 
     try {
-      const res = await dispatch(createTask({
+      const res = await createTaskMutation.mutateAsync({
         projectId: currentProject.id,
         title: title.trim(),
         statusId: statusId,
         type: type,
         assigneeId: assignee && assignee !== 'automatic' ? assignee.id : null,
         dueDate: dueDate ? `${dueDate}T00:00:00` : null
-      })).unwrap();
+      });
       
       if (res?.id) {
         await sprintService.moveTaskToSprint(res.id, activeSprint.id);

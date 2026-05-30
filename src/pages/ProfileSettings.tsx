@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useDispatch } from 'react-redux';
 import type { UpdateProfilePayload } from '../services/userService';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchProfile, updateProfile } from '../store/slices/userSlice';
+import { useUserProfileQuery, useUpdateUserProfileMutation } from '../hooks/api/useUser';
 import { authService } from '../services/auth.service';
 import defaultAvatar from '../assets/avatar_def_man.png';
 import type { User } from '../types/user.interface';
@@ -31,7 +31,9 @@ export default function ProfileSettings() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
-  const { profile: apiUser, loading: isProfileLoading } = useAppSelector(state => state.user);
+
+  const { data: apiUser, isLoading: isProfileLoading } = useUserProfileQuery();
+  const updateProfileMutation = useUpdateUserProfileMutation();
 
   const {
     register,
@@ -46,10 +48,6 @@ export default function ProfileSettings() {
   const bioValue = watch('bio') || '';
 
   useEffect(() => {
-    dispatch(fetchProfile());
-  }, [dispatch]);
-
-  useEffect(() => {
     if (apiUser) {
       const mappedUser: User = {
         id: apiUser.id,
@@ -59,7 +57,7 @@ export default function ProfileSettings() {
         avatar: apiUser.avatar,
         bio: apiUser.bio,
         isPublic: apiUser.isPublic,
-        roles: [] // Mặc định không dùng trong UI này
+        roles: []
       };
 
       setUser(mappedUser);
@@ -117,7 +115,7 @@ export default function ProfileSettings() {
         avatar: avatarPreview,
       };
 
-      const updatedApiUser = await dispatch(updateProfile(payload)).unwrap();
+      const updatedApiUser = await updateProfileMutation.mutateAsync(payload);
 
       const mappedUpdatedUser: User = {
         id: updatedApiUser.id,

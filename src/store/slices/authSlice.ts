@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-interface AuthState {
+export interface AuthState {
   // Trạng thái cho luồng đăng ký
   registrationData: {
     fullName?: string;

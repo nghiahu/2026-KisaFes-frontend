@@ -5,13 +5,19 @@ import { Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+import { useTasksQuery } from '../../../hooks/api/useTasks';
+import { useParams } from 'react-router-dom';
+
 interface ProjectOverviewProps {
   currentProject: any;
-  tasks: any[];
   setActiveTab: (tab: any) => void;
 }
 
-export default function ProjectOverview({ currentProject, tasks, setActiveTab }: ProjectOverviewProps) {
+export default function ProjectOverview({ currentProject, setActiveTab }: ProjectOverviewProps) {
+  const { projectId } = useParams();
+  const { data: tasksData } = useTasksQuery(projectId || '', { page: 0, size: 100 });
+  const tasks = tasksData?.content || [];
+
   // Dynamic stats calculation for Summary Dashboard
   const totalCount = tasks.length;
   const completedCount = tasks.filter(t => t.status === 'Done' || t.status?.toLowerCase().includes('done') || t.status?.toLowerCase().includes('hoàn thành')).length;
@@ -125,17 +131,17 @@ export default function ProjectOverview({ currentProject, tasks, setActiveTab }:
     assigneeCounts[name] = (assigneeCounts[name] || 0) + 1;
   });
 
-  const uniqueAssignees = Array.from(new Set(tasks.map(t => t.assignee || 'Unassigned')));
+  const uniqueAssignees = Array.from(new Set<string>(tasks.map((t: any) => t.assignee || 'Unassigned')));
   if (uniqueAssignees.length === 0) uniqueAssignees.push('Unassigned');
 
-  const assigneeStats = uniqueAssignees.map(name => {
+  const assigneeStats = uniqueAssignees.map((name: string) => {
     const count = assigneeCounts[name] || 0;
     const percentage = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
     return {
       name,
       count,
       percentage,
-      avatar: name === 'Unassigned' ? null : defaultMan
+      avatar: name === 'Unassigned' ? undefined : defaultMan
     };
   });
 

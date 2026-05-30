@@ -19,8 +19,8 @@ interface BacklogToolbarProps {
   filterPriorities: string[];
   setFilterPriorities: React.Dispatch<React.SetStateAction<string[]>>;
   totalActiveFilters: number;
-  filterBtnRef: React.RefObject<HTMLButtonElement>;
-  filterPanelRef: React.RefObject<HTMLDivElement>;
+  filterBtnRef: React.RefObject<HTMLButtonElement | null>;
+  filterPanelRef: React.RefObject<HTMLDivElement | null>;
   currentProject: any;
 }
 
