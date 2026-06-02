@@ -5,13 +5,16 @@ import defaultMan from '../../../assets/avatar_def_man.png';
 import CreateRoleModal from '../../../components/workspace/CreateRoleModal';
 import ConfirmModal from '../../../components/common/ConfirmModal';
 import { useAppSelector } from '../../../store/hooks';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface ProjectMembersProps {
   currentProject: any;
   onUpdate: () => void;
+  onOpenInviteModal?: () => void;
 }
 
-export default function ProjectMembers({ currentProject, onUpdate }: ProjectMembersProps) {
+export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteModal }: ProjectMembersProps) {
+  const queryClient = useQueryClient();
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [showRoleMenu, setShowRoleMenu] = useState<string | null>(null);
   const [showCreateRole, setShowCreateRole] = useState(false);
@@ -86,6 +89,7 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
   // Modal states
   const [memberToRemove, setMemberToRemove] = useState<any>(null);
   const [memberToRestore, setMemberToRestore] = useState<any>(null);
+  const [teamToRemove, setTeamToRemove] = useState<any>(null);
   const [alertInfo, setAlertInfo] = useState<{title: string, message: string} | null>(null);
 
   const isOwner = (memberId: string) => currentProject.ownerId === memberId;
@@ -157,6 +161,29 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
     if (filter === 'INACTIVE') return member.active === false;
     return true;
   });
+
+  const { data: projectTeams = [], refetch: refetchProjectTeams } = useQuery({
+    queryKey: ['projectTeams', currentProject.id],
+    queryFn: () => projectService.getProjectTeams(currentProject.id),
+  });
+
+  const handleRemoveTeam = async () => {
+    if (!teamToRemove) return;
+    setLoadingAction(`remove_team_${teamToRemove.id}`);
+    try {
+      await projectService.removeTeamFromProject(currentProject.id, teamToRemove.id);
+      refetchProjectTeams();
+      queryClient.invalidateQueries({ queryKey: ['project', currentProject.id] });
+      setTeamToRemove(null);
+    } catch (err: any) {
+      setAlertInfo({
+        title: "Lỗi",
+        message: err.response?.data?.message || "Có lỗi xảy ra khi xóa nhóm"
+      });
+    } finally {
+      setLoadingAction(null);
+    }
+  };
 
   return (
     <div className="flex-1 p-6 flex flex-col gap-6 animate-in fade-in duration-300">
@@ -291,6 +318,68 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
         ))}
       </div>
 
+      {/* Danh sách Nhóm (Teams) */}
+      <div className="border-t border-slate-200 pt-6 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <Icons.users size={20} className="text-emerald-600" />
+              Nhóm tham gia dự án (Teams)
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">Các nhóm đã được thêm vào dự án</p>
+          </div>
+          {onOpenInviteModal && (
+            <button 
+              onClick={onOpenInviteModal}
+              className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg text-sm font-bold transition-colors"
+            >
+              <Icons.plus size={16} />
+              <span>Thêm Nhóm</span>
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {projectTeams.map((team: any) => (
+            <div key={team.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center gap-3">
+                {team.avatar ? (
+                  <img src={team.avatar} alt={team.name} className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0" />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0">
+                    <Icons.users size={24} />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <h3 className="font-bold text-sm text-slate-800 truncate">{team.name}</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 truncate">{team.description || 'Không có mô tả'}</p>
+                </div>
+              </div>
+
+              <div className="relative">
+                <button 
+                  onClick={() => setTeamToRemove(team)}
+                  className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                  disabled={loadingAction === `remove_team_${team.id}`}
+                  title="Xóa nhóm khỏi dự án"
+                >
+                  {loadingAction === `remove_team_${team.id}` ? (
+                    <div className="w-4 h-4 rounded-full border-2 border-slate-200 border-t-rose-500 animate-spin" />
+                  ) : (
+                    <Icons.trash2 size={16} />
+                  )}
+                </button>
+              </div>
+            </div>
+          ))}
+          {(!projectTeams || projectTeams.length === 0) && (
+            <div className="col-span-full py-8 text-center text-slate-400 text-sm italic">
+              Chưa có nhóm nào được thêm vào dự án
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Danh sách vai trò custom */}
       <div className="border-t border-slate-200 pt-6 mt-6">
         <div className="flex items-center justify-between mb-4">
@@ -394,6 +483,19 @@ export default function ProjectMembers({ currentProject, onUpdate }: ProjectMemb
         cancelText="Hủy"
         isDestructive={false}
         isLoading={loadingAction === `restore_${memberToRestore?.id}`}
+      />
+
+      {/* Modal Xóa Nhóm */}
+      <ConfirmModal
+        isOpen={!!teamToRemove}
+        onClose={() => setTeamToRemove(null)}
+        onConfirm={handleRemoveTeam}
+        title="Xóa nhóm khỏi dự án"
+        message={`Bạn có chắc chắn muốn xóa nhóm ${teamToRemove?.name} khỏi dự án? Tất cả thành viên trong nhóm này sẽ không còn quyền truy cập dựa trên nhóm nữa.`}
+        confirmText="Xóa nhóm"
+        cancelText="Hủy"
+        isDestructive={true}
+        isLoading={loadingAction === `remove_team_${teamToRemove?.id}`}
       />
 
       {/* Modal Thông Báo / Lỗi */}

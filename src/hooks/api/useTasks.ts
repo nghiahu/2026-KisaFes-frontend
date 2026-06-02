@@ -145,3 +145,36 @@ export function useDeleteSubTaskMutation(projectId: string) {
     }
   });
 }
+
+export function useUpdateTaskTeamMutation(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ taskId, teamId }: { taskId: string; teamId: string | null }) => 
+      taskService.updateTaskTeam(taskId, teamId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TASK_KEYS.all(projectId) });
+    },
+  });
+}
+
+export function useUploadAttachmentMutation(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ taskId, file }: { taskId: string; file: File }) => 
+      taskService.uploadAttachment(taskId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TASK_KEYS.all(projectId) });
+    },
+  });
+}
+
+export function useDeleteAttachmentMutation(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) => 
+      taskService.deleteAttachment(taskId, attachmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TASK_KEYS.all(projectId) });
+    },
+  });
+}

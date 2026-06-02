@@ -3,7 +3,22 @@ import { createPortal } from 'react-dom';
 import { Icons } from '../../assets/icons';
 import defaultAvatar from '../../assets/avatar_def_man.png';
 import { useAppSelector } from '../../store/hooks';
-import { useUpdateTaskTitleMutation, useUpdateTaskDescriptionMutation, useAddSubTaskMutation, useToggleSubTaskMutation, useDeleteSubTaskMutation, useUpdateTaskStatusMutation, useUpdateTaskAssigneeMutation, useUpdateTaskPriorityMutation, useUpdateTaskDueDateMutation } from '../../hooks/api/useTasks';
+import { 
+  useUpdateTaskTitleMutation, 
+  useUpdateTaskDescriptionMutation, 
+  useAddSubTaskMutation, 
+  useToggleSubTaskMutation, 
+  useDeleteSubTaskMutation, 
+  useUpdateTaskStatusMutation, 
+  useUpdateTaskAssigneeMutation, 
+  useUpdateTaskPriorityMutation, 
+  useUpdateTaskDueDateMutation,
+  useDeleteTaskMutation,
+  useUpdateTaskTeamMutation,
+  useUploadAttachmentMutation,
+  useDeleteAttachmentMutation
+} from '../../hooks/api/useTasks';
+import { projectService } from '../../services/project.service';
 import TiptapEditor from './TiptapEditor';
 import { activityService } from '../../services/activity.service';
 import { commentService, type CommentResponse } from '../../services/comment.service';
@@ -15,9 +30,10 @@ interface TaskDetailViewProps {
   currentProject: any;
   onClose: () => void;
   onUpdateTaskLocally: (taskId: string, updates: any) => void;
+  onDeleteRequest?: (task: any) => void;
 }
 
-export default function TaskDetailView({ task, currentProject, onClose, onUpdateTaskLocally }: TaskDetailViewProps) {
+export default function TaskDetailView({ task, currentProject, onClose, onUpdateTaskLocally, onDeleteRequest }: TaskDetailViewProps) {
   const projectId = currentProject?.id || '';
   const updateTitleMutation = useUpdateTaskTitleMutation(projectId);
   const updateDescriptionMutation = useUpdateTaskDescriptionMutation(projectId);
@@ -28,6 +44,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   const updateAssigneeMutation = useUpdateTaskAssigneeMutation(projectId);
   const updatePriorityMutation = useUpdateTaskPriorityMutation(projectId);
   const updateDueDateMutation = useUpdateTaskDueDateMutation(projectId);
+  const updateTeamMutation = useUpdateTaskTeamMutation(projectId);
+  const uploadAttachmentMutation = useUploadAttachmentMutation(projectId);
+  const deleteAttachmentMutation = useDeleteAttachmentMutation(projectId);
+
   const currentUser = useAppSelector(state => state.auth.user);
   const [activeTab, setActiveTab] = useState<'All' | 'Comments' | 'History'>('All');
   const [comments, setComments] = useState<CommentResponse[]>([]);
@@ -44,6 +64,11 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showAssigneeDropdown, setShowAssigneeDropdown] = useState(false);
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
+  const [showTeamDropdown, setShowTeamDropdown] = useState(false);
+  const [showAllAttachments, setShowAllAttachments] = useState(false);
+  const [projectTeams, setProjectTeams] = useState<any[]>([]);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
   const [editTitle, setEditTitle] = useState(task.title);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
@@ -51,10 +76,12 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   const [showAddSubtask, setShowAddSubtask] = useState(false);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [subtaskIdToDelete, setSubtaskIdToDelete] = useState<string | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const assigneeDropdownRef = useRef<HTMLDivElement>(null);
   const priorityDropdownRef = useRef<HTMLDivElement>(null);
+  const teamDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: Event) => {
@@ -67,6 +94,9 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
       }
       if (priorityDropdownRef.current && !priorityDropdownRef.current.contains(mouseEvent.target as Node)) {
         setShowPriorityDropdown(false);
+      }
+      if (teamDropdownRef.current && !teamDropdownRef.current.contains(mouseEvent.target as Node)) {
+        setShowTeamDropdown(false);
       }
 
       // Close comment dropdown if clicking outside
@@ -86,9 +116,9 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   }, [activeDropdownCommentId, replyToCommentId]);
 
   const fetchComments = async () => {
-    if (!task.dbId) return;
+    if (!(task.dbId || task.id)) return;
     try {
-      const data = await commentService.getCommentsByTaskId(task.dbId);
+      const data = await commentService.getCommentsByTaskId((task.dbId || task.id));
       setComments(data);
     } catch (err) {
       console.error("Failed to fetch comments:", err);
@@ -96,9 +126,9 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   };
 
   const fetchActivities = async () => {
-    if (!task.dbId) return;
+    if (!(task.dbId || task.id)) return;
     try {
-      const data = await activityService.getActivitiesByTaskId(task.dbId);
+      const data = await activityService.getActivitiesByTaskId((task.dbId || task.id));
       // Filter out comments from activities, keeping only STATUS_CHANGE history
       setActivities(data.filter(act => act.type === 'STATUS_CHANGE'));
     } catch (err) {
@@ -107,21 +137,29 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   };
 
   useEffect(() => {
-    if (task.dbId) {
+    if ((task.dbId || task.id)) {
       setLoadingActivities(true);
       Promise.all([fetchComments(), fetchActivities()]).finally(() => {
         setLoadingActivities(false);
       });
     }
-  }, [task.dbId]);
+  }, [(task.dbId || task.id)]);
+
+  useEffect(() => {
+    if (projectId) {
+      projectService.getProjectTeams(projectId)
+        .then(data => setProjectTeams(data || []))
+        .catch(err => console.error("Failed to fetch project teams:", err));
+    }
+  }, [projectId]);
 
   // STOMP WebSocket comment events listener
   useEffect(() => {
-    if (!currentProject?.id || !task.dbId) return;
+    if (!currentProject?.id || !(task.dbId || task.id)) return;
     const sub = socketService.subscribe(`/topic/project/${currentProject.id}`, (event: any) => {
       if (event.type === 'CREATE_COMMENT') {
         const newC = event.data;
-        if (newC.taskId === task.dbId) {
+        if (newC.taskId === (task.dbId || task.id)) {
           setComments(prev => {
             if (prev.some(c => c.id === newC.id)) return prev;
             return [...prev, newC];
@@ -129,7 +167,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
         }
       } else if (event.type === 'UPDATE_COMMENT') {
         const updatedC = event.data;
-        if (updatedC.taskId === task.dbId) {
+        if (updatedC.taskId === (task.dbId || task.id)) {
           setComments(prev => prev.map(c => c.id === updatedC.id ? updatedC : c));
         }
       } else if (event.type === 'DELETE_COMMENT') {
@@ -137,7 +175,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
         setComments(prev => prev.filter(c => c.id !== deletedId));
       } else if (event.type === 'UPDATE_TASK') {
         const updatedTask = event.data;
-        if (updatedTask.id === task.dbId) {
+        if (updatedTask.id === (task.dbId || task.id)) {
           fetchActivities();
         }
       }
@@ -145,7 +183,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     return () => {
       sub?.unsubscribe();
     };
-  }, [currentProject?.id, task.dbId]);
+  }, [currentProject?.id, (task.dbId || task.id)]);
 
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -166,25 +204,38 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     }
   };
 
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim() && attachedImages.length === 0) return;
-    if (!task.dbId) return;
+    if (!(task.dbId || task.id) || isSubmittingComment) return;
+    
+    setIsSubmittingComment(true);
     try {
-      const newComment = await commentService.createComment(task.dbId, {
+      const newComment = await commentService.createComment((task.dbId || task.id), {
         content: commentText.trim(),
         imageUrls: attachedImages.length > 0 ? attachedImages : null
       });
-      setComments(prev => [...prev, newComment]);
+      setComments(prev => {
+        if (prev.some(c => c.id === newComment.id)) return prev;
+        return [...prev, newComment];
+      });
       setCommentText('');
       setAttachedImages([]);
     } catch (err) {
       console.error("Failed to add comment:", err);
+    } finally {
+      setIsSubmittingComment(false);
     }
   };
 
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+
   const handleAddReply = async (targetComment: CommentResponse) => {
-    if (!replyText.trim() || !task.dbId) return;
+    if (!replyText.trim() || !(task.dbId || task.id) || isSubmittingReply) return;
+    
+    setIsSubmittingReply(true);
     try {
       const parentId = targetComment.parentId || targetComment.id;
       let content = replyText.trim();
@@ -192,15 +243,20 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
       if (!content.startsWith(cleanMention)) {
         content = `${cleanMention} ${content}`;
       }
-      const newComment = await commentService.createComment(task.dbId, {
+      const newComment = await commentService.createComment((task.dbId || task.id), {
         content,
         parentId
       });
-      setComments(prev => [...prev, newComment]);
+      setComments(prev => {
+        if (prev.some(c => c.id === newComment.id)) return prev;
+        return [...prev, newComment];
+      });
       setReplyText('');
       setReplyToCommentId(null);
     } catch (err) {
       console.error("Failed to add reply:", err);
+    } finally {
+      setIsSubmittingReply(false);
     }
   };
 
@@ -244,7 +300,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
 
   const handleAddSubtask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSubtaskTitle.trim() || !task.dbId) return;
+    if (!newSubtaskTitle.trim() || !(task.dbId || task.id)) return;
     
     try {
       const updatedTask = await addSubTaskMutation.mutateAsync({ taskId: task.id, title: newSubtaskTitle.trim() });
@@ -257,7 +313,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   };
 
   const handleToggleSubtask = async (subtaskId: string) => {
-    if (!task.dbId) return;
+    if (!(task.dbId || task.id)) return;
     try {
       const updatedTask = await toggleSubTaskMutation.mutateAsync({ taskId: task.id, subtaskId });
       onUpdateTaskLocally(task.id, updatedTask);
@@ -271,7 +327,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
   };
 
   const confirmDeleteSubtask = async () => {
-    if (!task.dbId || !subtaskIdToDelete) return;
+    if (!(task.dbId || task.id) || !subtaskIdToDelete) return;
     try {
       const updatedTask = await deleteSubTaskMutation.mutateAsync({ taskId: task.id, subtaskId: subtaskIdToDelete });
       onUpdateTaskLocally(task.id, updatedTask);
@@ -300,12 +356,69 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     const newAssigneeId = member ? member.id : null;
     const newAssigneeName = member ? member.name : 'Unassigned';
     onUpdateTaskLocally(task.id, { assigneeId: newAssigneeId, assigneeName: newAssigneeName });
+
     try {
-      if (task.id) {
+      if (newAssigneeId) {
         await updateAssigneeMutation.mutateAsync({ taskId: task.id, assigneeId: newAssigneeId });
+      } else {
+        await updateAssigneeMutation.mutateAsync({ taskId: task.id, assigneeId: null });
       }
     } catch (error) {
-      console.error("Failed to update assignee:", error);
+      console.error("Failed to update assignee", error);
+    }
+  };
+
+  const handleTeamUpdate = async (team: any) => {
+    setShowTeamDropdown(false);
+    const newTeamId = team ? team.id : null;
+    const newTeamName = team ? team.name : null;
+    onUpdateTaskLocally(task.id, { teamId: newTeamId, teamName: newTeamName });
+
+    try {
+      const res = await updateTeamMutation.mutateAsync({ taskId: task.id, teamId: newTeamId });
+      if (res && res.data) {
+        onUpdateTaskLocally(task.id, { teamId: res.data.teamId });
+      }
+    } catch (error) {
+      console.error("Failed to update team", error);
+    }
+  };
+
+  const handleAttachmentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAttachment(true);
+    try {
+      const res = await uploadAttachmentMutation.mutateAsync({ taskId: task.id, file });
+      if (res && res.attachments) {
+        onUpdateTaskLocally(task.id, { attachments: res.attachments });
+      } else if (res && res.data && res.data.attachments) {
+        onUpdateTaskLocally(task.id, { attachments: res.data.attachments });
+      }
+    } catch (err) {
+      console.error("Failed to upload attachment", err);
+      alert("Lỗi tải lên tệp đính kèm!");
+    } finally {
+      setUploadingAttachment(false);
+      if (attachmentInputRef.current) attachmentInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa tệp này?")) return;
+    try {
+      const res = await deleteAttachmentMutation.mutateAsync({ taskId: task.id, attachmentId });
+      if (res && res.attachments) {
+        onUpdateTaskLocally(task.id, { attachments: res.attachments });
+      } else if (res && res.data && res.data.attachments) {
+        onUpdateTaskLocally(task.id, { attachments: res.data.attachments });
+      } else if (res && res.data) {
+        onUpdateTaskLocally(task.id, { attachments: [] });
+      } else {
+        onUpdateTaskLocally(task.id, { attachments: [] });
+      }
+    } catch (err) {
+      console.error("Failed to delete attachment", err);
     }
   };
 
@@ -594,10 +707,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                         </div>
                         <button 
                           type="submit" 
-                          disabled={!commentText.trim() && attachedImages.length === 0}
+                          disabled={(!commentText.trim() && attachedImages.length === 0) || isSubmittingComment}
                           className="px-3 py-1 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Save
+                          {isSubmittingComment ? 'Saving...' : 'Save'}
                         </button>
                       </div>
                     </div>
@@ -864,10 +977,11 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                       <div className="flex items-center gap-2 mt-1">
                                         <button 
                                           type="button"
+                                          disabled={isSubmittingReply}
                                           onClick={() => handleAddReply(c)}
-                                          className="px-4 py-1.5 bg-[#0052cc] hover:bg-[#0047b3] text-white rounded font-bold text-[13px] transition-colors shadow-sm"
+                                          className="px-4 py-1.5 bg-[#0052cc] hover:bg-[#0047b3] text-white rounded font-bold text-[13px] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                          Save
+                                          {isSubmittingReply ? 'Saving...' : 'Save'}
                                         </button>
                                         <button 
                                           type="button"
@@ -1084,9 +1198,33 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
               <button className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-md border border-slate-200 transition-colors shadow-sm" title="Share">
                 <Icons.share2 size={16} />
               </button>
-              <button className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-md border border-slate-200 transition-colors shadow-sm">
-                <Icons.moreHorizontal size={16} />
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-md border border-slate-200 transition-colors shadow-sm focus:outline-none"
+                >
+                  <Icons.moreHorizontal size={16} />
+                </button>
+                {isMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)}></div>
+                    <div className="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-20">
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          if (onDeleteRequest) {
+                            onDeleteRequest(task);
+                          }
+                        }}
+                        className="w-full px-3 py-1.5 text-[13px] font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                      >
+                        <Icons.trash2 size={14} />
+                        Delete Task
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Status & Actions */}
@@ -1176,6 +1314,46 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     )}
                   </div>
                 </div>
+                {/* Team */}
+                <div className="flex items-center">
+                  <div className="w-[120px] text-[13px] font-semibold text-slate-500 shrink-0">Team</div>
+                  <div className="relative flex-1" ref={teamDropdownRef}>
+                    <button
+                      onClick={() => setShowTeamDropdown(!showTeamDropdown)}
+                      className="flex items-center gap-2 hover:bg-slate-100 p-1 -ml-1 rounded transition-colors w-full text-left"
+                    >
+                      <span className={`text-[13px] truncate ${task.teamId ? 'text-slate-700 font-semibold' : 'text-slate-400 font-medium'}`}>
+                        {task.teamId && projectTeams.find(t => t.id === task.teamId) 
+                          ? projectTeams.find(t => t.id === task.teamId).name 
+                          : 'None'}
+                      </span>
+                    </button>
+
+                    {showTeamDropdown && (
+                      <div className="absolute top-full left-0 mt-1 w-[220px] bg-white border border-slate-200 shadow-xl rounded-lg py-1 z-50">
+                        <button
+                          onClick={() => handleTeamUpdate(null)}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          <div className="w-6 h-6 rounded-md bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400 shrink-0"><Icons.x size={12} /></div>
+                          None
+                        </button>
+                        {projectTeams.map((t: any) => (
+                          <button
+                            key={t.id}
+                            onClick={() => handleTeamUpdate(t)}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                          >
+                            <div className="w-6 h-6 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                              {t.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <span className="truncate">{t.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 {/* Priority */}
                 <div className="flex items-center">
@@ -1207,12 +1385,52 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 </div>
 
                 {/* Attachment */}
-                <div className="flex items-center">
-                  <div className="w-[120px] text-[13px] font-semibold text-slate-500 shrink-0">Attachment</div>
-                  <button className="text-[13px] font-medium text-slate-400 hover:bg-slate-100 p-1 -ml-1 rounded transition-colors flex-1 text-left flex items-center gap-1.5">
-                    <Icons.paperclip size={14} className="text-slate-400" />
-                    <span>None</span>
-                  </button>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center">
+                    <div className="w-[120px] text-[13px] font-semibold text-slate-500 shrink-0">Attachment</div>
+                    <button 
+                      className="text-[13px] font-medium text-slate-400 hover:bg-slate-100 p-1 -ml-1 rounded transition-colors flex-1 text-left flex items-center gap-1.5"
+                      onClick={() => attachmentInputRef.current?.click()}
+                      disabled={uploadingAttachment}
+                    >
+                      <Icons.paperclip size={14} className={uploadingAttachment ? "text-blue-500 animate-spin" : "text-slate-400"} />
+                      <span>{uploadingAttachment ? 'Uploading...' : 'Add attachment'}</span>
+                    </button>
+                    <input 
+                      type="file" 
+                      ref={attachmentInputRef} 
+                      className="hidden" 
+                      onChange={handleAttachmentUpload}
+                    />
+                  </div>
+                  {task.attachments && task.attachments.length > 0 && (
+                    <div className="flex flex-col gap-2 ml-[120px]">
+                      {task.attachments.slice(0, 3).map((file: any) => (
+                        <div key={file.fileId} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-md p-2 group">
+                          <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] text-blue-600 hover:underline truncate">
+                            <Icons.fileText size={14} className="shrink-0" />
+                            <span className="truncate max-w-[150px]">{file.fileName}</span>
+                          </a>
+                          <button 
+                            onClick={() => handleDeleteAttachment(file.fileId)}
+                            className="text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Delete attachment"
+                          >
+                            <Icons.x size={14} />
+                          </button>
+                        </div>
+                      ))}
+                      {task.attachments.length > 3 && (
+                        <button
+                          onClick={() => setShowAllAttachments(true)}
+                          className="text-[12px] font-semibold text-slate-500 hover:text-blue-600 transition-colors self-start mt-1 bg-slate-100 px-3 py-1 rounded-md flex items-center gap-1"
+                        >
+                          <Icons.layers size={12} />
+                          Xem tất cả {task.attachments.length} tệp
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Due Date */}
@@ -1248,19 +1466,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 </div>
 
 
-                {/* Team */}
-                <div className="flex items-center">
-                  <div className="w-[120px] text-[13px] font-semibold text-slate-500 shrink-0">Team</div>
-                  <button className="text-[13px] font-medium text-slate-400 hover:bg-slate-100 p-1 -ml-1 rounded transition-colors flex-1 text-left">None</button>
-                </div>
 
                 <div className="h-px bg-slate-200 my-2"></div>
 
-                {/* Start date */}
-                <div className="flex items-center">
-                  <div className="w-[120px] text-[13px] font-semibold text-slate-500 shrink-0">Start date</div>
-                  <button className="text-[13px] font-medium text-slate-400 hover:bg-slate-100 p-1 -ml-1 rounded transition-colors flex-1 text-left">None</button>
-                </div>
+
 
                 {/* Reporter */}
                 <div className="flex items-center">
@@ -1311,6 +1520,57 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
               </div>
             </div>
           )}
+      {/* All Attachments Modal */}
+      {showAllAttachments && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md border border-slate-100 flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-200">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Icons.paperclip size={18} className="text-blue-500" />
+                Tất cả tệp đính kèm ({task.attachments?.length || 0})
+              </h3>
+              <button 
+                onClick={() => setShowAllAttachments(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+              >
+                <Icons.x size={18} />
+              </button>
+            </div>
+            
+            <div className="p-5 overflow-y-auto flex-1 custom-scrollbar">
+              <div className="flex flex-col gap-3">
+                {task.attachments?.map((file: any) => (
+                  <div key={file.fileId} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3 hover:border-blue-200 transition-colors group">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                        <Icons.fileText size={20} />
+                      </div>
+                      <div className="min-w-0">
+                        <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-slate-700 hover:text-blue-600 hover:underline truncate block">
+                          {file.fileName}
+                        </a>
+                        <span className="text-[11px] text-slate-400 mt-0.5 block">Đính kèm vào dự án</span>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        handleDeleteAttachment(file.fileId);
+                        if (task.attachments?.length <= 4) {
+                          setShowAllAttachments(false);
+                        }
+                      }}
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0"
+                      title="Xóa tệp"
+                    >
+                      <Icons.trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

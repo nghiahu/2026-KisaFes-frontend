@@ -6,8 +6,10 @@ export interface NotificationResponse {
   senderId: string;
   senderName: string;
   senderAvatar: string | null;
-  projectId: string;
-  projectName: string;
+  projectId: string | null;
+  projectName: string | null;
+  teamId: string | null;
+  teamName: string | null;
   message: string;
   type: 'INVITATION' | 'SYSTEM' | 'ASSIGNMENT' | 'SUCCESS' | 'WARNING';
   status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'READ';

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { useNotificationsQuery, useAcceptInvitationMutation, useDeclineInvitationMutation, useMarkAsReadMutation, useMarkAllAsReadMutation } from '../../hooks/api/useNotifications';
+import { useNotificationsQuery, useAcceptInvitationMutation, useDeclineInvitationMutation, useMarkAsReadMutation, useMarkAllAsReadMutation, NOTIFICATION_KEYS } from '../../hooks/api/useNotifications';
+import { useQueryClient } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
 import { Check, Info, AlertTriangle, Send } from 'lucide-react';
 
@@ -35,6 +36,11 @@ export default function Inbox() {
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [actioningId, setActioningId] = useState<string | null>(null);
 
+  // Local status override — same pattern as NotificationDropdown
+  // Needed because selectedItem is a stale snapshot and won't update automatically
+  const [localStatus, setLocalStatus] = useState<Map<string, string>>(new Map());
+  const queryClient = useQueryClient();
+
   // Use real data from Redux
   const displayNotifications = notifications;
 
@@ -45,11 +51,17 @@ export default function Inbox() {
 
   const handleAccept = async (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    // Optimistic local update
+    setLocalStatus(prev => new Map(prev).set(id, 'ACCEPTED'));
     try {
       setActioningId(id);
       await acceptInvitationMutation.mutateAsync(id);
+      // Force refresh so localStorage persister gets the correct data
+      queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
     } catch (error) {
       console.error('Failed to accept invitation:', error);
+      // Revert on failure
+      setLocalStatus(prev => { const m = new Map(prev); m.delete(id); return m; });
     } finally {
       setActioningId(null);
     }
@@ -57,11 +69,14 @@ export default function Inbox() {
 
   const handleDecline = async (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    setLocalStatus(prev => new Map(prev).set(id, 'DECLINED'));
     try {
       setActioningId(id);
       await declineInvitationMutation.mutateAsync(id);
+      queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
     } catch (error) {
       console.error('Failed to decline invitation:', error);
+      setLocalStatus(prev => { const m = new Map(prev); m.delete(id); return m; });
     } finally {
       setActioningId(null);
     }
@@ -247,12 +262,12 @@ export default function Inbox() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-500 font-medium">Status</span>
                     <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide ${
-                      selectedItem.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
-                      selectedItem.status === 'ACCEPTED' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                      selectedItem.status === 'DECLINED' ? 'bg-rose-50 text-rose-600 border border-rose-100' :
+                      (localStatus.get(selectedItem.id) ?? selectedItem.status) === 'PENDING' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
+                      (localStatus.get(selectedItem.id) ?? selectedItem.status) === 'ACCEPTED' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
+                      (localStatus.get(selectedItem.id) ?? selectedItem.status) === 'DECLINED' ? 'bg-rose-50 text-rose-600 border border-rose-100' :
                       'bg-slate-100 text-slate-700 border border-slate-200'
                     }`}>
-                      {selectedItem.status}
+                      {localStatus.get(selectedItem.id) ?? selectedItem.status}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -264,52 +279,66 @@ export default function Inbox() {
                 </div>
 
                 {/* Invitations Action block (if real invitation) */}
-                {selectedItem.type === 'INVITATION' && selectedItem.status === 'PENDING' && (
-                  <div className="mt-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Project Invitation</h4>
-                      <p className="text-xs text-slate-600 mt-0.5">Please accept or decline this invitation to proceed.</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={(e) => handleAccept(selectedItem.id, e)}
-                        className="px-4 py-1.5 bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        onClick={(e) => handleDecline(selectedItem.id, e)}
-                        className="px-4 py-1.5 bg-white border border-[#E5E7EB] hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-all"
-                      >
-                        Decline
-                      </button>
-                    </div>
-                  </div>
-                )}
-                
-                {selectedItem.type === 'INVITATION' && selectedItem.status === 'ACCEPTED' && (
-                  <div className="mt-6 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                      <Check size={16} strokeWidth={3} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Accepted</h4>
-                      <p className="text-xs text-slate-600 mt-0.5">You have successfully joined the project.</p>
-                    </div>
-                  </div>
-                )}
+                {selectedItem.type === 'INVITATION' && (() => {
+                  // effectiveStatus: prefer local override over stale selectedItem snapshot
+                  const effectiveStatus = localStatus.get(selectedItem.id) ?? selectedItem.status;
+                  return (
+                    <>
+                      {effectiveStatus === 'PENDING' && (
+                        <div className="mt-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-between">
+                          <div>
+                            <h4 className="font-bold text-slate-900 text-sm">Project Invitation</h4>
+                            <p className="text-xs text-slate-600 mt-0.5">Please accept or decline this invitation to proceed.</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => handleAccept(selectedItem.id, e)}
+                              disabled={!!actioningId}
+                              className="px-4 py-1.5 bg-[#2563EB] hover:bg-blue-700 disabled:opacity-60 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                            >
+                              {actioningId === selectedItem.id ? (
+                                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : 'Accept'}
+                            </button>
+                            <button
+                              onClick={(e) => handleDecline(selectedItem.id, e)}
+                              disabled={!!actioningId}
+                              className="px-4 py-1.5 bg-white border border-[#E5E7EB] hover:bg-slate-50 disabled:opacity-60 text-slate-700 rounded-lg text-xs font-bold transition-all"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
-                {selectedItem.type === 'INVITATION' && selectedItem.status === 'DECLINED' && (
-                  <div className="mt-6 p-4 bg-rose-50/50 rounded-xl border border-rose-100 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
-                      <Icons.ban size={16} strokeWidth={3} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Declined</h4>
-                      <p className="text-xs text-slate-600 mt-0.5">You have declined this invitation.</p>
-                    </div>
-                  </div>
-                )}
+                      {effectiveStatus === 'ACCEPTED' && (
+                        <div className="mt-6 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                            <Check size={16} strokeWidth={3} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-slate-900 text-sm">Accepted</h4>
+                            <p className="text-xs text-slate-600 mt-0.5">You have successfully joined the project.</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {effectiveStatus === 'DECLINED' && (
+                        <div className="mt-6 p-4 bg-rose-50/50 rounded-xl border border-rose-100 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                            <Icons.ban size={16} strokeWidth={3} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-slate-900 text-sm">Declined</h4>
+                            <p className="text-xs text-slate-600 mt-0.5">You have declined this invitation.</p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+
+
               </div>
               
               {/* Right Body (Activity Log) */}

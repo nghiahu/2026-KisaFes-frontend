@@ -87,7 +87,15 @@ import {
   AlertTriangle,
   Sun,
   PieChart,
-  Menu
+  Menu,
+  Image,
+  Camera,
+  Folder,
+  Flag,
+  Hash,
+  ArrowRight,
+  PanelRightClose,
+  PanelRightOpen
 } from 'lucide-react';
 
 export const Icons = {
@@ -112,6 +120,8 @@ export const Icons = {
   bell: Bell,
   helpCircle: HelpCircle,
   chevronLeft: ChevronLeft,
+  image: Image,
+  camera: Camera,
   plus: Plus,
   users: Users,
   calendar: Calendar,
@@ -179,5 +189,11 @@ export const Icons = {
   alertTriangle: AlertTriangle,
   sun: Sun,
   pieChart: PieChart,
-  menu: Menu
+  menu: Menu,
+  folder: Folder,
+  flag: Flag,
+  hash: Hash,
+  arrowRight: ArrowRight,
+  panelRightClose: PanelRightClose,
+  panelRightOpen: PanelRightOpen,
 };

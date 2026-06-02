@@ -6,6 +6,8 @@ import { useAppDispatch } from '../../store/hooks';
 import { useCategories } from '../../hooks/api/useCategories';
 import { useCreateProject } from '../../hooks/api/useProjects';
 import { userService } from '../../services/userService';
+import { projectService } from '../../services/project.service';
+import { teamService } from '../../services/team.service';
 import { AlertTriangle, Info, XCircle } from 'lucide-react';
 import type { Category } from '../../types/category.interface';
 
@@ -95,6 +97,8 @@ export default function CreateProject() {
   const [methodology, setMethodology] = useState<'SCRUM' | 'KANBAN'>('KANBAN');
 
   const [members, setMembers] = useState<any[]>([]);
+  const [selectedTeams, setSelectedTeams] = useState<any[]>([]);
+  const [activeSearchTab, setActiveSearchTab] = useState<'user' | 'team'>('user');
   const [emailInput, setEmailInput] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -148,7 +152,7 @@ export default function CreateProject() {
     }
   }, [formData.categoryId, categories]);
 
-  // Debounced Search Users
+  // Debounced Search
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       const keyword = emailInput.trim();
@@ -160,19 +164,24 @@ export default function CreateProject() {
       
       setIsSearching(true);
       try {
-        const res: any = await userService.searchUsers(keyword);
-        // axiosClient đã tự động return response.data (ResponseWrapper)
-        // Nên danh sách user thực sự nằm ở res.data
-        const fetchedUsers = res.data || [];
-        
-        // Filter out users already in members
-        const filteredUsers = fetchedUsers.filter((u: any) => 
-          !members.some(m => m.email === u.email)
-        );
-        setSearchResults(filteredUsers);
+        if (activeSearchTab === 'user') {
+          const res: any = await userService.searchUsers(keyword);
+          const fetchedUsers = res.data || [];
+          const filteredUsers = fetchedUsers.filter((u: any) => 
+            !members.some(m => m.email === u.email)
+          );
+          setSearchResults(filteredUsers);
+        } else {
+          const res: any = await teamService.searchTeams(keyword);
+          const fetchedTeams = res || [];
+          const filteredTeams = fetchedTeams.filter((t: any) => 
+            !selectedTeams.some(st => st.id === t.id)
+          );
+          setSearchResults(filteredTeams);
+        }
         setSearchDropdownOpen(true);
       } catch (error) {
-        console.error('Failed to search users:', error);
+        console.error(`Failed to search ${activeSearchTab}:`, error);
         setSearchResults([]);
       } finally {
         setIsSearching(false);
@@ -180,24 +189,36 @@ export default function CreateProject() {
     }, 400);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [emailInput, members, currentUser]);
+  }, [emailInput, members, selectedTeams, activeSearchTab, currentUser]);
 
-  const addSelectedMember = (user: any) => {
-    if (members.some(m => m.email === user.email)) {
-      showAlert("Thành viên này đã được thêm vào danh sách mời!", "Trùng lặp", "warning");
-      return;
+  const addSelectedItem = (item: any) => {
+    if (activeSearchTab === 'user') {
+      if (members.some(m => m.email === item.email)) {
+        showAlert("Thành viên này đã được thêm vào danh sách mời!", "Trùng lặp", "warning");
+        return;
+      }
+      if (currentUser?.email && item.email.toLowerCase() === currentUser.email.toLowerCase()) {
+        showAlert("Bạn không thể tự mời chính mình vào dự án!", "Cảnh báo", "warning");
+        return;
+      }
+      setMembers([...members, item]);
+    } else {
+      if (selectedTeams.some(st => st.id === item.id)) {
+        showAlert("Nhóm này đã được thêm vào danh sách mời!", "Trùng lặp", "warning");
+        return;
+      }
+      setSelectedTeams([...selectedTeams, item]);
     }
-    if (currentUser?.email && user.email.toLowerCase() === currentUser.email.toLowerCase()) {
-      showAlert("Bạn không thể tự mời chính mình vào dự án!", "Cảnh báo", "warning");
-      return;
-    }
-    setMembers([...members, user]);
     setEmailInput('');
     setSearchDropdownOpen(false);
   };
 
   const removeMember = (email: string) => {
     setMembers(members.filter(m => m.email !== email));
+  };
+
+  const removeTeam = (teamId: string) => {
+    setSelectedTeams(selectedTeams.filter(t => t.id !== teamId));
   };
 
   const togglePermission = (roleIdx: number, perm: string) => {
@@ -267,7 +288,17 @@ export default function CreateProject() {
         statuses,
         boardColumns
       };
-      await createProjectMutation.mutateAsync(finalData);
+      const createdProject = await createProjectMutation.mutateAsync(finalData);
+      
+      if (selectedTeams.length > 0 && createdProject?.id) {
+        for (const team of selectedTeams) {
+          try {
+            await projectService.addTeamToProject(createdProject.id, team.id, 'default-role-id');
+          } catch (teamError) {
+            console.error(`Failed to add team ${team.name} to project:`, teamError);
+          }
+        }
+      }
       
       setIsSubmitting(false);
       setShowSuccess(true);
@@ -501,7 +532,25 @@ export default function CreateProject() {
 
           {activeTab === 'team' && (
             <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-300">
-              <SectionHeader title="Invite Team" description="Add members by email and assign them to roles later." />
+              <SectionHeader title="Invite Team & Members" description="Add members or teams by searching and assign them to roles later." />
+              
+              <div className="flex border-b border-slate-100 mb-2">
+                <button
+                  type="button"
+                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'user' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                  onClick={() => { setActiveSearchTab('user'); setSearchResults([]); setEmailInput(''); }}
+                >
+                  Mời cá nhân
+                </button>
+                <button
+                  type="button"
+                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'team' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                  onClick={() => { setActiveSearchTab('team'); setSearchResults([]); setEmailInput(''); }}
+                >
+                  Thêm nhóm (Team)
+                </button>
+              </div>
+
               <div className="flex flex-col gap-1 w-full">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
@@ -510,14 +559,13 @@ export default function CreateProject() {
                   <input
                     type="text"
                     className="w-full bg-slate-50 border border-slate-200 pl-11 pr-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold"
-                    placeholder="Search users by name or email..."
+                    placeholder={activeSearchTab === 'user' ? "Search users by name or email..." : "Search teams by name..."}
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     onFocus={() => {
                       if (searchResults.length > 0) setSearchDropdownOpen(true);
                     }}
                     onBlur={() => {
-                      // Timeout to allow click event on dropdown items
                       setTimeout(() => setSearchDropdownOpen(false), 200);
                     }}
                   />
@@ -533,31 +581,45 @@ export default function CreateProject() {
                       {searchResults.length > 0 ? (
                         <div className="p-2">
                           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-1">Kết quả tìm kiếm</div>
-                          {searchResults.map((user) => (
+                          {searchResults.map((item) => (
                             <button
-                              key={user.id}
+                              key={item.id}
                               type="button"
-                              onClick={() => addSelectedMember(user)}
+                              onClick={() => addSelectedItem(item)}
                               className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors text-left"
                             >
-                              {user.avatar ? (
-                                <img src={user.avatar} alt={user.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100" />
+                              {activeSearchTab === 'user' ? (
+                                <>
+                                  {item.avatar ? (
+                                    <img src={item.avatar} alt={item.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100" />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                                      {item.fullName?.charAt(0) || item.email?.charAt(0)}
+                                    </div>
+                                  )}
+                                  <div>
+                                    <div className="font-bold text-slate-800">{item.fullName || "User"}</div>
+                                    <div className="text-xs text-slate-500">{item.email}</div>
+                                  </div>
+                                </>
                               ) : (
-                                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
-                                  {user.fullName?.charAt(0) || user.email?.charAt(0)}
-                                </div>
+                                <>
+                                  <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold">
+                                    <Icons.users size={20} />
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-slate-800">{item.name || "Team"}</div>
+                                    <div className="text-xs text-slate-500">{item.members?.length || 0} members</div>
+                                  </div>
+                                </>
                               )}
-                              <div>
-                                <div className="font-bold text-slate-800">{user.fullName || "User"}</div>
-                                <div className="text-xs text-slate-500">{user.email}</div>
-                              </div>
                             </button>
                           ))}
                         </div>
                       ) : (
                         !isSearching && (
                           <div className="p-6 text-center text-slate-500 text-sm font-medium">
-                            Không tìm thấy người dùng nào phù hợp.
+                            Không tìm thấy kết quả nào phù hợp.
                           </div>
                         )
                       )}
@@ -566,30 +628,55 @@ export default function CreateProject() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Invited Members ({members.length})</label>
-                <div className="flex flex-col gap-2">
-                  {members.map(member => (
-                    <div key={member.email} className="flex items-center justify-between bg-white border border-slate-200 p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
-                      <div className="flex items-center gap-3">
-                        {member.avatar ? (
-                          <img src={member.avatar} alt={member.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100 border border-slate-200" />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
-                            {member.fullName?.charAt(0) || member.email?.charAt(0)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="flex flex-col gap-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Invited Members ({members.length})</label>
+                  <div className="flex flex-col gap-2">
+                    {members.map(member => (
+                      <div key={member.email} className="flex items-center justify-between bg-white border border-slate-200 p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-3">
+                          {member.avatar ? (
+                            <img src={member.avatar} alt={member.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100 border border-slate-200" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                              {member.fullName?.charAt(0) || member.email?.charAt(0)}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-bold text-slate-800 text-[14px]">{member.fullName || "User"}</div>
+                            <div className="text-xs text-slate-500">{member.email}</div>
                           </div>
-                        )}
-                        <div>
-                          <div className="font-bold text-slate-800 text-[14px]">{member.fullName || "User"}</div>
-                          <div className="text-xs text-slate-500">{member.email}</div>
                         </div>
+                        <button onClick={() => removeMember(member.email)} className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors">
+                          <Icons.trash2 size={16} />
+                        </button>
                       </div>
-                      <button onClick={() => removeMember(member.email)} className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors">
-                        <Icons.trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
-                  {members.length === 0 && <p className="text-sm text-slate-400 italic">No members invited yet.</p>}
+                    ))}
+                    {members.length === 0 && <p className="text-sm text-slate-400 italic">No members invited yet.</p>}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Selected Teams ({selectedTeams.length})</label>
+                  <div className="flex flex-col gap-2">
+                    {selectedTeams.map(team => (
+                      <div key={team.id} className="flex items-center justify-between bg-white border border-slate-200 p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold border border-purple-200">
+                            <Icons.users size={20} />
+                          </div>
+                          <div>
+                            <div className="font-bold text-slate-800 text-[14px]">{team.name || "Team"}</div>
+                            <div className="text-xs text-slate-500">{team.members?.length || 0} members</div>
+                          </div>
+                        </div>
+                        <button onClick={() => removeTeam(team.id)} className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors">
+                          <Icons.trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                    {selectedTeams.length === 0 && <p className="text-sm text-slate-400 italic">No teams selected yet.</p>}
+                  </div>
                 </div>
               </div>
             </div>

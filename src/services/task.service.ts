@@ -57,6 +57,24 @@ export const taskService = {
     const response = await axiosClient.patch(`/tasks/${taskId}/description`, { description });
     return response.data;
   },
+  updateTaskTeam: async (taskId: string, teamId: string | null): Promise<any> => {
+    const response = await axiosClient.patch(`/tasks/${taskId}/team`, { teamId });
+    return response.data;
+  },
+  uploadAttachment: async (taskId: string, file: File): Promise<any> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosClient.post(`/tasks/${taskId}/attachments`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+  deleteAttachment: async (taskId: string, attachmentId: string): Promise<any> => {
+    const response = await axiosClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`);
+    return response.data;
+  },
   addSubTask: async (taskId: string, title: string): Promise<any> => {
     const response = await axiosClient.post(`/tasks/${taskId}/subtasks`, { title });
     return response.data;

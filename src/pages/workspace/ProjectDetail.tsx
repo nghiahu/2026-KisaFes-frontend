@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
 import defaultMan from '../../assets/avatar_def_man.png';
@@ -20,6 +20,7 @@ import ProjectBoard from './project-tabs/ProjectBoard';
 import ProjectBacklog from './project-tabs/ProjectBacklog';
 import ProjectSprint from './project-tabs/ProjectSprint';
 import ProjectRoadmap from './project-tabs/ProjectRoadmap';
+import ProjectCalendar from './project-tabs/ProjectCalendar';
 
 import ProjectIssues from './project-tabs/ProjectIssues';
 import ProjectMembers from './project-tabs/ProjectMembers';
@@ -27,7 +28,7 @@ import ProjectSettings from './project-tabs/ProjectSettings';
 import InviteMemberModal from '../../components/workspace/InviteMemberModal';
 import { Skeleton } from '../../components/ui/Skeleton';
 
-type TabType = 'overview' | 'list' | 'board' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
+type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' | 'backlog' | 'sprint' | 'roadmap' | 'issues' | 'settings';
 
 const editProjectSchema = z.object({
   name: z.string().min(1, 'Tên dự án không được để trống'),
@@ -41,6 +42,9 @@ export default function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const location = useLocation();
+
+  const [activeTab, setActiveTab] = useState<TabType>('list');
   const queryClient = useQueryClient();
 
   const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
@@ -49,7 +53,6 @@ export default function ProjectDetail() {
 
   const [currentProject, setCurrentProject] = useState<any>(null);
   const loading = isProjectLoading || isCategoriesLoading;
-  const [activeTab, setActiveTab] = useState<TabType>('list');
   const [isFavorite, setIsFavorite] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -149,9 +152,13 @@ export default function ProjectDetail() {
   useEffect(() => {
     if (!projectId) return;
 
-    const savedTab = localStorage.getItem(`project_tab_${projectId}`);
-    setActiveTab((savedTab as TabType) || 'list');
-  }, [projectId]);
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab as TabType);
+    } else {
+      const savedTab = localStorage.getItem(`project_tab_${projectId}`);
+      setActiveTab((savedTab as TabType) || 'list');
+    }
+  }, [projectId, location.state]);
 
   useEffect(() => {
     if (!currentProject) return;
@@ -212,6 +219,7 @@ export default function ProjectDetail() {
     { id: 'overview' as TabType, label: 'Summary', icon: Icons.fileText },
     { id: 'list' as TabType, label: 'List', icon: Icons.listTodo },
     { id: 'board' as TabType, label: 'Board', icon: Icons.layoutDashboard },
+    { id: 'calendar' as TabType, label: 'Calendar', icon: Icons.calendar },
     { id: 'members' as TabType, label: 'Members', icon: Icons.users },
     { id: 'forms' as TabType, label: 'Forms', icon: Icons.clipboardList },
     { id: 'settings' as TabType, label: 'Settings', icon: Icons.settings },
@@ -228,8 +236,9 @@ export default function ProjectDetail() {
       baseTabs[1], // List
       scrumOnlyTabs[0], // Backlog
       scrumOnlyTabs[1], // Sprint Board
-      baseTabs[3], // Members
-      baseTabs[5], // Settings
+      baseTabs[3], // Calendar
+      baseTabs[4], // Members
+      baseTabs[6], // Settings
     ]
     : baseTabs;
 
@@ -242,7 +251,6 @@ export default function ProjectDetail() {
           <Skeleton className="h-3 w-3 bg-slate-100 rounded-full" />
           <Skeleton className="h-3 w-28 bg-slate-200" />
         </div>
-
         {/* Title row skeleton */}
         <div className="flex items-center gap-3 px-6 pt-4 pb-2 shrink-0">
           <Skeleton className="w-8 h-8 rounded-lg bg-blue-100" />
@@ -420,6 +428,11 @@ export default function ProjectDetail() {
           if (projectId) localStorage.setItem(`project_tab_${projectId}`, t);
         }} />}
         {activeTab === 'list' && <ProjectList projectId={projectId!} currentProject={currentProject} />}
+        {activeTab === 'calendar' && (
+          <div className="flex-1 flex flex-col min-h-0">
+            <ProjectCalendar currentProject={currentProject} projectId={projectId!} />
+          </div>
+        )}
         {activeTab === 'board' && <ProjectBoard currentProject={currentProject} />}
         {activeTab === 'backlog' && <ProjectBacklog projectId={projectId!} currentProject={currentProject} />}
         {activeTab === 'sprint' && <ProjectSprint projectId={projectId!} currentProject={currentProject} />}
@@ -430,6 +443,7 @@ export default function ProjectDetail() {
           <ProjectMembers
             currentProject={currentProject}
             onUpdate={() => refetchProject()}
+            onOpenInviteModal={() => setShowInviteModal(true)}
           />
         )}
         {activeTab === 'settings' && (

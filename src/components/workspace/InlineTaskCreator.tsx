@@ -10,13 +10,15 @@ interface InlineTaskCreatorProps {
   onCancel: () => void;
   projectMembers: any[];
   autoFocus?: boolean;
+  hideDueDate?: boolean;
 }
 
 export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
   onAdd,
   onCancel,
   projectMembers,
-  autoFocus = true
+  autoFocus = true,
+  hideDueDate = false
 }) => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskType, setNewTaskType] = useState('task');
@@ -134,17 +136,19 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
             )}
           </div>
 
-          {/* Date Picker */}
-          <div className="relative flex items-center">
-            <button type="button"
-              onClick={() => {
-                try { dateInputRef.current?.showPicker(); } catch (e) { dateInputRef.current?.focus(); }
-              }}
-              className={`p-1 rounded transition-colors border ${newTaskDueDate ? 'bg-blue-50 text-blue-600 border-blue-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100 border-slate-200'}`} title={newTaskDueDate ? `Due date: ${newTaskDueDate}` : 'Set due date'}>
-              <Calendar size={14} />
-            </button>
-            <input type="date" ref={dateInputRef} value={newTaskDueDate} onChange={(e) => setNewTaskDueDate(e.target.value)} className="absolute opacity-0 pointer-events-none w-0 h-0" style={{ top: '100%', right: 0 }} />
-          </div>
+          {/* Due Date Picker */}
+          {!hideDueDate && (
+            <div className="relative">
+              <button type="button" 
+                onClick={() => {
+                  try { dateInputRef.current?.showPicker(); } catch (e) { dateInputRef.current?.focus(); }
+                }}
+                className={`p-1 rounded transition-colors border ${newTaskDueDate ? 'bg-blue-50 text-blue-600 border-blue-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100 border-slate-200'}`} title={newTaskDueDate ? `Due date: ${newTaskDueDate}` : 'Set due date'}>
+                <Calendar size={14} />
+              </button>
+              <input type="date" ref={dateInputRef} value={newTaskDueDate} onChange={(e) => setNewTaskDueDate(e.target.value)} className="absolute opacity-0 pointer-events-none w-0 h-0" style={{ top: '100%', right: 0 }} />
+            </div>
+          )}
 
           {/* Assignee Picker */}
           <div className="relative">

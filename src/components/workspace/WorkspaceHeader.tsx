@@ -69,8 +69,8 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
         <a href="/workspace" className="text-[0.85rem] font-bold text-blue-600 border-b-2 border-blue-600 py-5 transition-all">
           Boards
         </a>
-        <a href="/workspace/team" className="text-[0.85rem] font-semibold text-slate-500 hover:text-slate-700 py-5 transition-all">
-          Team
+        <a href="/workspace/teams" className="text-[0.85rem] font-semibold text-slate-500 hover:text-slate-700 py-5 transition-all">
+          Teams
         </a>
         <a href="/workspace/calendar" className="text-[0.85rem] font-semibold text-slate-500 hover:text-slate-700 py-5 transition-all">
           Calendar
