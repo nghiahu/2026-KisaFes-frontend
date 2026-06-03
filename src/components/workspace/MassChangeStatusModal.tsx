@@ -43,7 +43,7 @@ export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
               </option>
             ))}
           </select>
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-muted-foreground">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m6 9 6 6 6-6"/>
             </svg>
@@ -54,7 +54,7 @@ export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
           <button 
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-3 py-1.5 text-[13px] font-medium text-slate-300 hover:bg-white/10 rounded-md transition-colors"
+            className="px-3 py-1.5 text-[13px] font-medium text-slate-300 hover:bg-card/10 rounded-md transition-colors"
           >
             Cancel
           </button>

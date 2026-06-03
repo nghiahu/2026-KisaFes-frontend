@@ -321,7 +321,7 @@ export default function CreateProject() {
       {/* Loading & Success Overlays */}
       {(isSubmitting || showSuccess) && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white p-10 rounded-[3rem] shadow-2xl flex flex-col items-center gap-6 max-w-sm w-full mx-4 border border-slate-100 animate-in zoom-in-95 duration-300">
+          <div className="bg-card p-10 rounded-[3rem] shadow-2xl flex flex-col items-center gap-6 max-w-sm w-full mx-4 border border-border animate-in zoom-in-95 duration-300">
             {isSubmitting ? (
               <>
                 <div className="relative w-20 h-20">
@@ -329,8 +329,8 @@ export default function CreateProject() {
                   <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-xl font-black text-slate-900">Creating Project</h3>
-                  <p className="text-slate-500 font-medium mt-1">Initializing workspace and roles...</p>
+                  <h3 className="text-xl font-black text-foreground">Creating Project</h3>
+                  <p className="text-muted-foreground font-medium mt-1">Initializing workspace and roles...</p>
                 </div>
               </>
             ) : (
@@ -339,8 +339,8 @@ export default function CreateProject() {
                   <Icons.check size={40} strokeWidth={3} />
                 </div>
                 <div className="text-center">
-                  <h3 className="text-xl font-black text-slate-900">Project Ready!</h3>
-                  <p className="text-slate-500 font-medium mt-1">Taking you to your workspace...</p>
+                  <h3 className="text-xl font-black text-foreground">Project Ready!</h3>
+                  <p className="text-muted-foreground font-medium mt-1">Taking you to your workspace...</p>
                 </div>
               </>
             )}
@@ -350,30 +350,30 @@ export default function CreateProject() {
 
       <div className={`flex flex-col gap-6 p-6 max-w-[1400px] mx-auto animate-in fade-in duration-500 ${isSubmitting || showSuccess ? 'blur-sm' : ''}`}>
       {/* Header Section */}
-      <div className="flex items-center justify-between bg-white/40 backdrop-blur-md p-6 rounded-[2rem] border border-slate-200/60 shadow-sm">
+      <div className="flex items-center justify-between bg-card/40 backdrop-blur-md p-6 rounded-[2rem] border border-border/60 shadow-sm">
         <div className="flex items-center gap-6">
           <button
             onClick={() => navigate('/workspace/projects')}
-            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm group"
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-card border border-border text-muted-foreground hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm group"
           >
             <Icons.chevronLeft size={24} className="group-hover:-translate-x-0.5 transition-transform" />
           </button>
           <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Create project</h1>
-            <p className="text-slate-500 font-medium text-sm">Design your professional workflow in seconds</p>
+            <h1 className="text-3xl font-black text-foreground tracking-tight">Create project</h1>
+            <p className="text-muted-foreground font-medium text-sm">Design your professional workflow in seconds</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/workspace/projects')}
-            className="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-white/50 transition-all"
+            className="px-6 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-card/50 transition-all"
           >
             Discard
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 hover:scale-[1.02]"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 dark:shadow-none dark:shadow-none hover:scale-[1.02]"
           >
             Save & Launch
           </button>
@@ -390,14 +390,14 @@ export default function CreateProject() {
         </aside>
 
         {/* Main Content Area */}
-        <main className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-blue-500/5 p-10 overflow-hidden min-h-[600px]">
+        <main className="bg-card rounded-[2.5rem] border border-border shadow-xl shadow-blue-500/5 p-10 overflow-hidden min-h-[600px]">
           {activeTab === 'basic' && (
             <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-right-4 duration-300">
               <SectionHeader title="Project Details" description="Basic information about your project." />
 
               {/* Methodology Selector */}
               <div className="flex flex-col gap-3">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Project Methodology</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Project Methodology</label>
                 <div className="grid grid-cols-2 gap-4">
                   {/* Scrum Card */}
                   <button
@@ -406,7 +406,7 @@ export default function CreateProject() {
                     className={`relative flex flex-col items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-200 overflow-hidden ${
                       methodology === 'SCRUM'
                         ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-100'
-                        : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/30'
+                        : 'border-border bg-card hover:border-violet-300 hover:bg-violet-50/30'
                     }`}
                   >
                     <img
@@ -418,10 +418,10 @@ export default function CreateProject() {
                     />
                     <div className="text-center">
                       <h4 className={`font-black text-base transition-colors ${
-                        methodology === 'SCRUM' ? 'text-violet-800' : 'text-slate-700'
+                        methodology === 'SCRUM' ? 'text-violet-800' : 'text-foreground'
                       }`}>Scrum</h4>
                       <p className={`text-[11px] font-semibold mt-0.5 transition-colors ${
-                        methodology === 'SCRUM' ? 'text-violet-500' : 'text-slate-400'
+                        methodology === 'SCRUM' ? 'text-violet-500' : 'text-muted-foreground'
                       }`}>Sprint-based delivery</p>
                     </div>
                     {methodology === 'SCRUM' && (
@@ -438,7 +438,7 @@ export default function CreateProject() {
                     className={`relative flex flex-col items-center gap-4 p-6 rounded-2xl border-2 text-left transition-all duration-200 overflow-hidden ${
                       methodology === 'KANBAN'
                         ? 'border-cyan-500 bg-cyan-50 shadow-lg shadow-cyan-100'
-                        : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/30'
+                        : 'border-border bg-card hover:border-cyan-300 hover:bg-cyan-50/30'
                     }`}
                   >
                     <img
@@ -450,10 +450,10 @@ export default function CreateProject() {
                     />
                     <div className="text-center">
                       <h4 className={`font-black text-base transition-colors ${
-                        methodology === 'KANBAN' ? 'text-cyan-800' : 'text-slate-700'
+                        methodology === 'KANBAN' ? 'text-cyan-800' : 'text-foreground'
                       }`}>Kanban</h4>
                       <p className={`text-[11px] font-semibold mt-0.5 transition-colors ${
-                        methodology === 'KANBAN' ? 'text-cyan-500' : 'text-slate-400'
+                        methodology === 'KANBAN' ? 'text-cyan-500' : 'text-muted-foreground'
                       }`}>Continuous flow</p>
                     </div>
                     {methodology === 'KANBAN' && (
@@ -488,7 +488,7 @@ export default function CreateProject() {
                   error={errors.code}
                 />
                 <div className="flex flex-col gap-2">
-                  <label className={`text-xs font-bold uppercase tracking-widest ml-1 ${errors.categoryId ? 'text-rose-500' : 'text-slate-400'}`}>Category</label>
+                  <label className={`text-xs font-bold uppercase tracking-widest ml-1 ${errors.categoryId ? 'text-rose-500' : 'text-muted-foreground'}`}>Category</label>
                   <div className="relative group">
                     <select
                       value={formData.categoryId}
@@ -497,8 +497,8 @@ export default function CreateProject() {
                         if (errors.categoryId) setErrors({ ...errors, categoryId: '' });
                       }}
                       className={`w-full p-4 rounded-2xl outline-none focus:ring-2 transition-all font-semibold appearance-none cursor-pointer pr-12
-                        ${errors.categoryId ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500 text-slate-800' : 'bg-slate-50 border border-slate-200 focus:ring-blue-500/10 focus:border-blue-500'}
-                        ${!formData.categoryId && !errors.categoryId ? "text-slate-400" : "text-slate-800"}`}
+                        ${errors.categoryId ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500 text-foreground' : 'bg-background border border-border focus:ring-blue-500/10 focus:border-blue-500'}
+                        ${!formData.categoryId && !errors.categoryId ? "text-muted-foreground" : "text-foreground"}`}
                     >
                       <option value="" disabled>Select project category...</option>
                       {categories.map(cat => (
@@ -507,7 +507,7 @@ export default function CreateProject() {
                         </option>
                       ))}
                     </select>
-                    <Icons.chevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors" />
+                    <Icons.chevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none group-hover:text-blue-500 transition-colors" />
                   </div>
                   {errors.categoryId && <span className="text-xs font-bold text-rose-500 mt-1 ml-1 flex items-center gap-1"><Icons.alertCircle size={12} /> {errors.categoryId}</span>}
                   {categories.length === 0 && (
@@ -518,10 +518,10 @@ export default function CreateProject() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Project Description</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Project Description</label>
                 <textarea
                   rows={4}
-                  className="bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700 resize-none"
+                  className="bg-background border border-border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-foreground resize-none"
                   placeholder="Describe your project goals..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -534,17 +534,17 @@ export default function CreateProject() {
             <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-300">
               <SectionHeader title="Invite Team & Members" description="Add members or teams by searching and assign them to roles later." />
               
-              <div className="flex border-b border-slate-100 mb-2">
+              <div className="flex border-b border-border mb-2">
                 <button
                   type="button"
-                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'user' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'user' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                   onClick={() => { setActiveSearchTab('user'); setSearchResults([]); setEmailInput(''); }}
                 >
                   Mời cá nhân
                 </button>
                 <button
                   type="button"
-                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'team' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'team' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                   onClick={() => { setActiveSearchTab('team'); setSearchResults([]); setEmailInput(''); }}
                 >
                   Thêm nhóm (Team)
@@ -553,12 +553,12 @@ export default function CreateProject() {
 
               <div className="flex flex-col gap-1 w-full">
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted-foreground">
                     <Icons.search size={20} />
                   </div>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 border border-slate-200 pl-11 pr-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold"
+                    className="w-full bg-background border border-border pl-11 pr-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold"
                     placeholder={activeSearchTab === 'user' ? "Search users by name or email..." : "Search teams by name..."}
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
@@ -577,29 +577,29 @@ export default function CreateProject() {
 
                   {/* Search Dropdown */}
                   {searchDropdownOpen && emailInput.trim() !== '' && (
-                    <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-60 overflow-y-auto overflow-hidden">
+                    <div className="absolute z-10 w-full mt-2 bg-card border border-border rounded-2xl shadow-xl max-h-60 overflow-y-auto overflow-hidden">
                       {searchResults.length > 0 ? (
                         <div className="p-2">
-                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-1">Kết quả tìm kiếm</div>
+                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-3 mb-1">Kết quả tìm kiếm</div>
                           {searchResults.map((item) => (
                             <button
                               key={item.id}
                               type="button"
                               onClick={() => addSelectedItem(item)}
-                              className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors text-left"
+                              className="w-full flex items-center gap-3 p-3 hover:bg-background rounded-xl transition-colors text-left"
                             >
                               {activeSearchTab === 'user' ? (
                                 <>
                                   {item.avatar ? (
-                                    <img src={item.avatar} alt={item.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100" />
+                                    <img src={item.avatar} alt={item.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
                                   ) : (
                                     <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                                       {item.fullName?.charAt(0) || item.email?.charAt(0)}
                                     </div>
                                   )}
                                   <div>
-                                    <div className="font-bold text-slate-800">{item.fullName || "User"}</div>
-                                    <div className="text-xs text-slate-500">{item.email}</div>
+                                    <div className="font-bold text-foreground">{item.fullName || "User"}</div>
+                                    <div className="text-xs text-muted-foreground">{item.email}</div>
                                   </div>
                                 </>
                               ) : (
@@ -608,8 +608,8 @@ export default function CreateProject() {
                                     <Icons.users size={20} />
                                   </div>
                                   <div>
-                                    <div className="font-bold text-slate-800">{item.name || "Team"}</div>
-                                    <div className="text-xs text-slate-500">{item.members?.length || 0} members</div>
+                                    <div className="font-bold text-foreground">{item.name || "Team"}</div>
+                                    <div className="text-xs text-muted-foreground">{item.members?.length || 0} members</div>
                                   </div>
                                 </>
                               )}
@@ -618,7 +618,7 @@ export default function CreateProject() {
                         </div>
                       ) : (
                         !isSearching && (
-                          <div className="p-6 text-center text-slate-500 text-sm font-medium">
+                          <div className="p-6 text-center text-muted-foreground text-sm font-medium">
                             Không tìm thấy kết quả nào phù hợp.
                           </div>
                         )
@@ -630,52 +630,52 @@ export default function CreateProject() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="flex flex-col gap-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Invited Members ({members.length})</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Invited Members ({members.length})</label>
                   <div className="flex flex-col gap-2">
                     {members.map(member => (
-                      <div key={member.email} className="flex items-center justify-between bg-white border border-slate-200 p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
+                      <div key={member.email} className="flex items-center justify-between bg-card border border-border p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
                         <div className="flex items-center gap-3">
                           {member.avatar ? (
-                            <img src={member.avatar} alt={member.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100 border border-slate-200" />
+                            <img src={member.avatar} alt={member.fullName} className="w-10 h-10 rounded-full object-cover bg-muted border border-border" />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                               {member.fullName?.charAt(0) || member.email?.charAt(0)}
                             </div>
                           )}
                           <div>
-                            <div className="font-bold text-slate-800 text-[14px]">{member.fullName || "User"}</div>
-                            <div className="text-xs text-slate-500">{member.email}</div>
+                            <div className="font-bold text-foreground text-[14px]">{member.fullName || "User"}</div>
+                            <div className="text-xs text-muted-foreground">{member.email}</div>
                           </div>
                         </div>
-                        <button onClick={() => removeMember(member.email)} className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors">
+                        <button onClick={() => removeMember(member.email)} className="w-8 h-8 flex items-center justify-center rounded-xl text-muted-foreground hover:text-rose-500 hover:bg-rose-50 transition-colors">
                           <Icons.trash2 size={16} />
                         </button>
                       </div>
                     ))}
-                    {members.length === 0 && <p className="text-sm text-slate-400 italic">No members invited yet.</p>}
+                    {members.length === 0 && <p className="text-sm text-muted-foreground italic">No members invited yet.</p>}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Selected Teams ({selectedTeams.length})</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Selected Teams ({selectedTeams.length})</label>
                   <div className="flex flex-col gap-2">
                     {selectedTeams.map(team => (
-                      <div key={team.id} className="flex items-center justify-between bg-white border border-slate-200 p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
+                      <div key={team.id} className="flex items-center justify-between bg-card border border-border p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold border border-purple-200">
                             <Icons.users size={20} />
                           </div>
                           <div>
-                            <div className="font-bold text-slate-800 text-[14px]">{team.name || "Team"}</div>
-                            <div className="text-xs text-slate-500">{team.members?.length || 0} members</div>
+                            <div className="font-bold text-foreground text-[14px]">{team.name || "Team"}</div>
+                            <div className="text-xs text-muted-foreground">{team.members?.length || 0} members</div>
                           </div>
                         </div>
-                        <button onClick={() => removeTeam(team.id)} className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors">
+                        <button onClick={() => removeTeam(team.id)} className="w-8 h-8 flex items-center justify-center rounded-xl text-muted-foreground hover:text-rose-500 hover:bg-rose-50 transition-colors">
                           <Icons.trash2 size={16} />
                         </button>
                       </div>
                     ))}
-                    {selectedTeams.length === 0 && <p className="text-sm text-slate-400 italic">No teams selected yet.</p>}
+                    {selectedTeams.length === 0 && <p className="text-sm text-muted-foreground italic">No teams selected yet.</p>}
                   </div>
                 </div>
               </div>
@@ -688,15 +688,15 @@ export default function CreateProject() {
 
               <div className="flex flex-col gap-6">
                 {/* Horizontal Role Tabs */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-100 hide-scrollbar">
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border hide-scrollbar">
                   {roles.map((role, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveRoleIndex(idx)}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                         activeRoleIndex === idx 
-                          ? 'bg-blue-600 text-white shadow-md shadow-blue-200' 
-                          : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 hover:text-slate-800'
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-none dark:shadow-none' 
+                          : 'bg-card text-muted-foreground border border-border hover:bg-background hover:text-foreground'
                       }`}
                     >
                       <Icons.lockKeyhole size={16} />
@@ -708,7 +708,7 @@ export default function CreateProject() {
                       setRoles([...roles, { name: 'New Role', permissions: [] }]);
                       setActiveRoleIndex(roles.length);
                     }}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 border border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:border-blue-400 hover:text-blue-500 transition-all whitespace-nowrap bg-slate-50"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 border border-dashed border-slate-300 rounded-xl text-muted-foreground font-bold hover:border-blue-400 hover:text-blue-500 transition-all whitespace-nowrap bg-background"
                   >
                     <Icons.plus size={16} />
                     Add Role
@@ -717,8 +717,8 @@ export default function CreateProject() {
 
                 {/* Active Role Content */}
                 {roles.length > 0 && activeRoleIndex >= 0 && activeRoleIndex < roles.length ? (
-                  <div className="bg-slate-50/50 border border-slate-200 rounded-3xl p-6">
-                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-200">
+                  <div className="bg-background/50 border border-border rounded-3xl p-6">
+                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
                           <Icons.pencil size={20} />
@@ -750,15 +750,15 @@ export default function CreateProject() {
                         const someIncluded = groupPermIds.some(p => roles[activeRoleIndex].permissions.includes(p));
 
                         return (
-                          <div key={group.name} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                              <h4 className="font-bold text-sm text-slate-800">{group.name}</h4>
+                          <div key={group.name} className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
+                              <h4 className="font-bold text-sm text-foreground">{group.name}</h4>
                               <button
                                 type="button"
                                 onClick={() => toggleGroupPermissions(activeRoleIndex, groupPermIds)}
                                 className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
                                   allIncluded ? 'bg-blue-100 text-blue-700' : 
-                                  someIncluded ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                  someIncluded ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground hover:bg-slate-200'
                                 }`}
                               >
                                 {allIncluded ? 'Bỏ chọn hết' : 'Chọn tất cả'}
@@ -770,11 +770,11 @@ export default function CreateProject() {
                                 return (
                                   <label key={perm.id} onClick={() => togglePermission(activeRoleIndex, perm.id)} className="flex items-center gap-3 cursor-pointer group">
                                     <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                                      isChecked ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300 group-hover:border-blue-400'
+                                      isChecked ? 'bg-blue-600 border-blue-600' : 'bg-card border-slate-300 group-hover:border-blue-400'
                                     }`}>
                                       {isChecked && <Icons.check size={12} className="text-white" />}
                                     </div>
-                                    <span className={`text-xs select-none transition-colors ${isChecked ? 'text-slate-800 font-bold' : 'text-slate-600'}`}>
+                                    <span className={`text-xs select-none transition-colors ${isChecked ? 'text-foreground font-bold' : 'text-muted-foreground'}`}>
                                       {perm.label}
                                     </span>
                                   </label>
@@ -787,12 +787,12 @@ export default function CreateProject() {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-10 bg-slate-50 border border-slate-200 border-dashed rounded-3xl">
-                    <div className="w-12 h-12 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <div className="text-center py-10 bg-background border border-border border-dashed rounded-3xl">
+                    <div className="w-12 h-12 bg-slate-200 text-muted-foreground rounded-full flex items-center justify-center mx-auto mb-3">
                       <Icons.lockKeyhole size={24} />
                     </div>
-                    <h3 className="text-slate-700 font-bold">Chưa có Role nào</h3>
-                    <p className="text-slate-500 text-sm mt-1">Hãy thêm role mới để cấu hình phân quyền cho dự án.</p>
+                    <h3 className="text-foreground font-bold">Chưa có Role nào</h3>
+                    <p className="text-muted-foreground text-sm mt-1">Hãy thêm role mới để cấu hình phân quyền cho dự án.</p>
                   </div>
                 )}
               </div>
@@ -803,13 +803,13 @@ export default function CreateProject() {
             <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-300">
               <SectionHeader title="Workflow Flow" description="Customize project statuses and column structure." />
               <div className="flex flex-col gap-4">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Statuses</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Active Statuses</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {statuses.map((status, idx) => (
-                    <div key={idx} className="flex items-center gap-3 bg-white border border-slate-200 p-4 rounded-2xl shadow-sm group">
+                    <div key={idx} className="flex items-center gap-3 bg-card border border-border p-4 rounded-2xl shadow-sm group">
                       <div className={`w-3 h-3 rounded-full ${status.color}`} />
                       <input
-                        className="flex-1 min-w-0 font-bold text-slate-700 bg-transparent outline-none"
+                        className="flex-1 min-w-0 font-bold text-foreground bg-transparent outline-none"
                         value={status.label}
                         onChange={(e) => {
                           const newStatus = [...statuses];
@@ -827,7 +827,7 @@ export default function CreateProject() {
                   ))}
                   <button 
                     onClick={() => setStatuses([...statuses, { statusId: crypto.randomUUID(), label: 'New Status', category: 'TO_DO', color: 'bg-slate-500' }])}
-                    className="flex items-center justify-center bg-slate-50 border border-dashed border-slate-300 p-4 rounded-2xl text-slate-400 hover:bg-slate-100 transition-all"
+                    className="flex items-center justify-center bg-background border border-dashed border-slate-300 p-4 rounded-2xl text-muted-foreground hover:bg-muted transition-all"
                   >
                     <Icons.plus size={20} />
                   </button>
@@ -835,9 +835,9 @@ export default function CreateProject() {
               </div>
 
               <div className="flex flex-col gap-4">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Unmapped Statuses (Drag to assign)</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Unmapped Statuses (Drag to assign)</label>
                 <div 
-                  className="min-h-[60px] p-4 bg-slate-100 border-2 border-dashed border-slate-300 rounded-2xl flex flex-wrap gap-2"
+                  className="min-h-[60px] p-4 bg-muted border-2 border-dashed border-slate-300 rounded-2xl flex flex-wrap gap-2"
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     e.preventDefault();
@@ -856,14 +856,14 @@ export default function CreateProject() {
                   }}
                 >
                   {statuses.filter(s => !boardColumns.some(c => c.mappedStatusIds?.includes(s.statusId))).length === 0 && (
-                    <span className="text-slate-400 text-sm font-semibold italic">All statuses are mapped</span>
+                    <span className="text-muted-foreground text-sm font-semibold italic">All statuses are mapped</span>
                   )}
                   {statuses.filter(s => !boardColumns.some(c => c.mappedStatusIds?.includes(s.statusId))).map(st => (
                     <div
                       key={st.statusId}
                       draggable
                       onDragStart={(e) => e.dataTransfer.setData('statusId', st.statusId)}
-                      className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-bold text-slate-700 cursor-grab active:cursor-grabbing hover:border-blue-400 hover:shadow-md transition-all flex items-center gap-2"
+                      className="px-3 py-1.5 bg-card border border-border shadow-sm rounded-lg text-xs font-bold text-foreground cursor-grab active:cursor-grabbing hover:border-blue-400 hover:shadow-md transition-all flex items-center gap-2"
                     >
                       <div className={`w-2 h-2 rounded-full ${st.color || 'bg-slate-500'}`} />
                       {st.label}
@@ -873,13 +873,13 @@ export default function CreateProject() {
               </div>
 
               <div className="flex flex-col gap-4">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Board Columns</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Board Columns</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {boardColumns.map((column, idx) => (
-                    <div key={idx} className="flex flex-col gap-2 bg-slate-50/50 border border-slate-200 p-4 rounded-2xl">
+                    <div key={idx} className="flex flex-col gap-2 bg-background/50 border border-border p-4 rounded-2xl">
                       <div className="flex items-center justify-between gap-2">
                         <input 
-                          className="flex-1 min-w-0 font-bold text-slate-900 bg-transparent outline-none"
+                          className="flex-1 min-w-0 font-bold text-foreground bg-transparent outline-none"
                           value={column.name}
                           onChange={(e) => {
                             const newCols = [...boardColumns];
@@ -889,13 +889,13 @@ export default function CreateProject() {
                         />
                         <button 
                           onClick={() => setBoardColumns(boardColumns.filter((_, i) => i !== idx))}
-                          className="text-slate-400 hover:text-rose-500 transition-colors shrink-0"
+                          className="text-muted-foreground hover:text-rose-500 transition-colors shrink-0"
                         >
                           <Icons.plus size={14} className="rotate-45" />
                         </button>
                       </div>
                       <div 
-                        className={`flex flex-col gap-2 mt-2 min-h-[60px] bg-white border border-dashed rounded-xl p-2 transition-colors ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300 hover:border-blue-400'}`}
+                        className={`flex flex-col gap-2 mt-2 min-h-[60px] bg-card border border-dashed rounded-xl p-2 transition-colors ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300 hover:border-blue-400'}`}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => {
                           e.preventDefault();
@@ -916,7 +916,7 @@ export default function CreateProject() {
                           setBoardColumns(newCols);
                         }}
                       >
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'text-rose-500' : 'text-slate-500'}`}>Mapped Statuses</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'text-rose-500' : 'text-muted-foreground'}`}>Mapped Statuses</span>
                         <div className="flex flex-wrap gap-1">
                           {column.mappedStatusIds?.map((sid: string) => {
                             const st = statuses.find(s => s.statusId === sid);
@@ -945,7 +945,7 @@ export default function CreateProject() {
                   ))}
                   <button 
                     onClick={() => setBoardColumns([...boardColumns, { name: 'New Column', mappedStatusIds: [], defaultStatusId: '', position: boardColumns.length }])}
-                    className="flex items-center justify-center bg-white border border-dashed border-slate-300 p-4 rounded-2xl text-slate-400 hover:bg-slate-50 transition-all"
+                    className="flex items-center justify-center bg-card border border-dashed border-slate-300 p-4 rounded-2xl text-muted-foreground hover:bg-background transition-all"
                   >
                     <Icons.plus size={20} />
                   </button>
@@ -971,7 +971,7 @@ export default function CreateProject() {
       {/* Custom Alert Modal */}
       {alertConfig.isOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center gap-5 max-w-sm w-full mx-4 border border-slate-100 animate-in zoom-in-95 duration-200 text-center">
+          <div className="bg-card p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center gap-5 max-w-sm w-full mx-4 border border-border animate-in zoom-in-95 duration-200 text-center">
             {alertConfig.type === 'error' && (
               <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center animate-bounce">
                 <XCircle size={32} />
@@ -988,15 +988,15 @@ export default function CreateProject() {
               </div>
             )}
             <div>
-              <h3 className="text-lg font-black text-slate-900">{alertConfig.title}</h3>
-              <p className="text-slate-500 font-semibold text-sm mt-2 leading-relaxed">{alertConfig.message}</p>
+              <h3 className="text-lg font-black text-foreground">{alertConfig.title}</h3>
+              <p className="text-muted-foreground font-semibold text-sm mt-2 leading-relaxed">{alertConfig.message}</p>
             </div>
             <button
               onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })}
               className={`w-full py-3.5 rounded-2xl font-bold transition-all text-white shadow-lg active:scale-95 ${
                 alertConfig.type === 'error' ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-200' :
                 alertConfig.type === 'warning' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-200' :
-                'bg-blue-600 hover:bg-blue-700 shadow-blue-200'
+                'bg-blue-600 hover:bg-blue-700 shadow-blue-200 dark:shadow-none dark:shadow-none'
               }`}
             >
               Đã hiểu
@@ -1014,8 +1014,8 @@ function NavItem({ active, onClick, icon, label }: { active: boolean; onClick: (
     <button
       onClick={onClick}
       className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all text-sm ${active
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 scale-[1.02]'
-        : 'bg-white/50 text-slate-500 hover:bg-white hover:text-slate-900 border border-transparent hover:border-slate-200'
+        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none dark:shadow-none scale-[1.02]'
+        : 'bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground border border-transparent hover:border-border'
         }`}
     >
       {icon}
@@ -1027,9 +1027,9 @@ function NavItem({ active, onClick, icon, label }: { active: boolean; onClick: (
 
 function SectionHeader({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-slate-100 pb-6">
-      <h2 className="text-2xl font-black text-slate-900 tracking-tight">{title}</h2>
-      <p className="text-slate-500 font-medium">{description}</p>
+    <div className="flex flex-col gap-1 border-b border-border pb-6">
+      <h2 className="text-2xl font-black text-foreground tracking-tight">{title}</h2>
+      <p className="text-muted-foreground font-medium">{description}</p>
     </div>
   );
 }
@@ -1037,10 +1037,10 @@ function SectionHeader({ title, description }: { title: string; description: str
 function InputGroup({ label, value, onChange, placeholder, error }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; error?: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <label className={`text-xs font-bold uppercase tracking-widest ml-1 ${error ? 'text-rose-500' : 'text-slate-400'}`}>{label}</label>
+      <label className={`text-xs font-bold uppercase tracking-widest ml-1 ${error ? 'text-rose-500' : 'text-muted-foreground'}`}>{label}</label>
       <input
         type="text"
-        className={`p-4 rounded-2xl outline-none focus:ring-2 transition-all font-semibold text-slate-800 placeholder:text-slate-300 ${error ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500' : 'bg-slate-50 border border-slate-200 focus:ring-blue-500/10 focus:border-blue-500'}`}
+        className={`p-4 rounded-2xl outline-none focus:ring-2 transition-all font-semibold text-foreground placeholder:text-slate-300 ${error ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500' : 'bg-background border border-border focus:ring-blue-500/10 focus:border-blue-500'}`}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}

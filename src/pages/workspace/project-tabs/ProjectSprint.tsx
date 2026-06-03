@@ -29,7 +29,7 @@ import { DroppableColumn } from './components/DroppableColumn';
 import { Icons } from '../../../assets/icons';
 import { useTasksQuery, useUpdateTaskStatusMutation, useDeleteTaskMutation, useCreateTaskMutation } from '../../../hooks/api/useTasks';
 import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
-
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function ProjectSprint({ projectId, currentProject }: ProjectSprintProps) {
@@ -42,6 +42,8 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
   const [error, setError] = useState('');
 
   const [showAddTask, setShowAddTask] = useState<string | null>(null);
+
+  const { t } = useLanguage();
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
@@ -58,7 +60,7 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
         setTasks(sprintTaskData);
       }
     } catch (e) {
-      setError('Không thể tải dữ liệu sprint');
+      setError(t('sprint.load_error'));
     } finally {
       if (!silent) setIsLoading(false);
     }
@@ -158,9 +160,9 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
   const getRemainingDays = (endDate?: string) => {
     if (!endDate) return null;
     const diff = Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000);
-    if (diff < 0) return { text: 'Quá hạn', color: 'text-rose-600' };
-    if (diff === 0) return { text: 'Hôm nay', color: 'text-orange-600' };
-    return { text: `${diff} ngày còn lại`, color: 'text-slate-500' };
+    if (diff < 0) return { text: t('sprint.overdue'), color: 'text-rose-600' };
+    if (diff === 0) return { text: t('sprint.today'), color: 'text-orange-600' };
+    return { text: t('sprint.days_remaining').replace('{days}', String(diff)), color: 'text-muted-foreground' };
   };
 
   // ─── Loading ─────────────────────────────────────────────────────────────
@@ -168,7 +170,7 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
     return (
       <div className="flex flex-col h-full">
         {/* Header Skeleton */}
-        <div className="px-6 pt-5 pb-4 border-b border-slate-100 bg-gradient-to-r from-violet-50/60 to-white">
+        <div className="px-6 pt-5 pb-4 border-b border-border bg-gradient-to-r from-violet-50/60 to-white">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
@@ -192,7 +194,7 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
         {/* Board Columns Skeleton */}
         <div className="flex gap-5 overflow-x-auto p-6 items-start flex-1">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-slate-50 p-4 rounded-3xl border border-slate-200/60 w-[320px] shrink-0 flex flex-col gap-3">
+            <div key={i} className="bg-background p-4 rounded-3xl border border-border/60 w-[320px] shrink-0 flex flex-col gap-3">
               <div className="flex items-center justify-between px-2 mb-1">
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-5 w-24 rounded-md" />
@@ -220,9 +222,9 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
           <Zap size={36} className="text-violet-400" />
         </div>
         <div className="text-center">
-          <h3 className="text-lg font-black text-slate-700">Không có Sprint đang chạy</h3>
-          <p className="text-sm text-slate-400 font-semibold mt-1">
-            Vào tab Backlog để tạo và bắt đầu một sprint.
+          <h3 className="text-lg font-black text-foreground">{t('sprint.no_active_sprint')}</h3>
+          <p className="text-sm text-muted-foreground font-semibold mt-1">
+            {t('sprint.go_to_backlog')}
           </p>
         </div>
       </div>
@@ -237,18 +239,18 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
   return (
     <div className="flex flex-col h-full">
       {/* Sprint Header */}
-      <div className="px-6 pt-5 pb-4 border-b border-slate-100 bg-gradient-to-r from-violet-50/60 to-white">
+      <div className="px-6 pt-5 pb-4 border-b border-border bg-gradient-to-r from-violet-50/60 to-white">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-[10px] font-extrabold bg-emerald-500 text-white px-2 py-0.5 rounded-full uppercase">Active</span>
-              <h2 className="text-xl font-black text-slate-800">{activeSprint.name}</h2>
+              <span className="text-[10px] font-extrabold bg-emerald-500 text-white px-2 py-0.5 rounded-full uppercase">{t('sprint.active')}</span>
+              <h2 className="text-xl font-black text-foreground">{activeSprint.name}</h2>
               {activeSprint.goal && (
-                <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                <span className="text-xs text-muted-foreground font-semibold flex items-center gap-1">
                   <Target size={12} /> {activeSprint.goal}
                 </span>
               )}
-              <span className="text-xs text-slate-400 font-semibold ml-2">
+              <span className="text-xs text-muted-foreground font-semibold ml-2">
                 {activeSprint.startDate ? new Date(activeSprint.startDate).toLocaleDateString('vi-VN') : '—'}
                 {' → '}
                 {activeSprint.endDate ? new Date(activeSprint.endDate).toLocaleDateString('vi-VN') : '—'}
@@ -265,10 +267,10 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
 
         {/* Progress bar */}
         <div className="mt-3">
-          <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1.5">
-            <span>Sprint Progress</span>
+          <div className="flex justify-between text-[10px] font-bold text-muted-foreground mb-1.5">
+            <span>{t('sprint.progress')}</span>
             <span>
-              {activeSprint.completedTasks}/{activeSprint.totalTasks} tasks · {progressPct}%
+              {t('sprint.tasks_completed').replace('{completed}', String(activeSprint.completedTasks)).replace('{total}', String(activeSprint.totalTasks)).replace('{progress}', String(progressPct))}
             </span>
           </div>
           <Progress value={progressPct} className="mt-1" />
@@ -277,8 +279,8 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
 
       {/* Board */}
       {boardColumns.length === 0 ? (
-        <div className="flex items-center justify-center py-12 text-sm text-slate-400 font-semibold">
-          Cấu hình board columns trong Project Settings trước.
+        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground font-semibold">
+          {t('sprint.configure_board')}
         </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -303,12 +305,12 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
                         projectMembers={currentProject?.members || []}
                       />
                   ) : (
-                    <button
+                      <button
                       onClick={() => setShowAddTask(columnId)}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/20 rounded-2xl text-slate-400 hover:text-blue-600 text-xs font-bold transition-all mt-2"
+                      className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/20 rounded-2xl text-muted-foreground hover:text-blue-600 text-xs font-bold transition-all mt-2"
                     >
                       <Icons.plus size={14} />
-                      <span>Add Issue</span>
+                      <span>{t('board.add_issue')}</span>
                       </button>
                     )}
                   </div>

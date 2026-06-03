@@ -51,7 +51,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
       <div className="relative bg-[#2C2D33] rounded-lg shadow-2xl w-full max-w-[440px] p-6 animate-in zoom-in-95 duration-200 border border-white/10">
         <h2 className="text-[16px] font-bold text-white mb-5">Edit fields</h2>
         
-        <p className="text-slate-400 text-xs mb-4">Any selected field will be applied to all checked tasks. Leave empty to keep unchanged.</p>
+        <p className="text-muted-foreground text-xs mb-4">Any selected field will be applied to all checked tasks. Leave empty to keep unchanged.</p>
 
         <div className="space-y-4 mb-6">
           {/* Assignee */}
@@ -70,7 +70,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
                   <option key={m.id} value={m.id}>{m.name}</option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-muted-foreground">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
@@ -91,7 +91,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-muted-foreground">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
@@ -111,7 +111,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
               <button
                 type="button"
                 onClick={() => setDueDate(dueDate === 'clear' ? '' : 'clear')}
-                className={`px-2 py-2 border rounded-md text-[12px] font-semibold transition-colors ${dueDate === 'clear' ? 'bg-rose-500/20 text-rose-400 border-rose-500/50' : 'border-slate-500/50 text-slate-400 hover:bg-slate-700'}`}
+                className={`px-2 py-2 border rounded-md text-[12px] font-semibold transition-colors ${dueDate === 'clear' ? 'bg-rose-500/20 text-rose-400 border-rose-500/50' : 'border-slate-500/50 text-muted-foreground hover:bg-slate-700'}`}
                 title="Clear due date on selected tasks"
               >
                 Clear
@@ -124,7 +124,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
           <button 
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-3 py-1.5 text-[13px] font-medium text-slate-300 hover:bg-white/10 rounded-md transition-colors"
+            className="px-3 py-1.5 text-[13px] font-medium text-slate-300 hover:bg-card/10 rounded-md transition-colors"
           >
             Cancel
           </button>

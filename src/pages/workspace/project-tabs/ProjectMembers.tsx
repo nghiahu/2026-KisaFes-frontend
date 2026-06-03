@@ -6,6 +6,7 @@ import CreateRoleModal from '../../../components/workspace/CreateRoleModal';
 import ConfirmModal from '../../../components/common/ConfirmModal';
 import { useAppSelector } from '../../../store/hooks';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ProjectMembersProps {
   currentProject: any;
@@ -22,6 +23,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
   const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ACTIVE');
 
   const { user } = useAppSelector(state => state.auth);
+  const { t } = useLanguage();
 
   const hasRoleManagePermission = () => {
     if (!user) return false;
@@ -40,7 +42,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
   const handleOpenCreateRole = () => {
     if (!hasRoleManagePermission()) {
       import('../../../utils/permission-denied-event').then(({ permissionDeniedEvent }) => {
-        permissionDeniedEvent.emit("Bạn không có quyền quản lý vai trò trong dự án này.");
+        permissionDeniedEvent.emit(t('members.no_permission'));
       });
       return;
     }
@@ -50,7 +52,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
   const handleOpenEditRole = (role: any) => {
     if (!hasRoleManagePermission()) {
       import('../../../utils/permission-denied-event').then(({ permissionDeniedEvent }) => {
-        permissionDeniedEvent.emit("Bạn không có quyền quản lý vai trò trong dự án này.");
+        permissionDeniedEvent.emit(t('members.no_permission'));
       });
       return;
     }
@@ -104,8 +106,8 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       setMemberToRemove(null);
     } catch (err: any) {
       setAlertInfo({
-        title: "Lỗi",
-        message: err.response?.data?.message || "Có lỗi xảy ra"
+        title: t('members.error_title'),
+        message: err.response?.data?.message || t('members.error_default')
       });
     } finally {
       setLoadingAction(null);
@@ -122,8 +124,8 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       setMemberToRestore(null);
     } catch (err: any) {
       setAlertInfo({
-        title: "Lỗi",
-        message: err.response?.data?.message || "Có lỗi xảy ra"
+        title: t('members.error_title'),
+        message: err.response?.data?.message || t('members.error_default')
       });
     } finally {
       setLoadingAction(null);
@@ -132,7 +134,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
 
   const handleChangeRole = async (userId: string, roleId: string) => {
     if (isOwner(userId)) {
-      setAlertInfo({ title: "Thông báo", message: "Không thể đổi quyền của chủ sở hữu." });
+      setAlertInfo({ title: t('members.notification_title'), message: t('members.cannot_change_owner') });
       return;
     }
     setLoadingAction(`role_${userId}`);
@@ -141,8 +143,8 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       onUpdate();
     } catch (err: any) {
       setAlertInfo({
-        title: "Lỗi",
-        message: err.response?.data?.message || "Có lỗi xảy ra"
+        title: t('members.error_title'),
+        message: err.response?.data?.message || t('members.error_default')
       });
     } finally {
       setLoadingAction(null);
@@ -151,9 +153,9 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
   };
 
   const getRoleName = (member: any) => {
-    if (isOwner(member.id)) return 'Owner';
+    if (isOwner(member.id)) return t('members.owner_role');
     if (member.roleName) return member.roleName;
-    return 'Member';
+    return t('members.member_role');
   };
 
   const filteredMembers = currentProject.members.filter((member: any) => {
@@ -177,8 +179,8 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       setTeamToRemove(null);
     } catch (err: any) {
       setAlertInfo({
-        title: "Lỗi",
-        message: err.response?.data?.message || "Có lỗi xảy ra khi xóa nhóm"
+        title: t('members.error_title'),
+        message: err.response?.data?.message || t('members.error_remove_team')
       });
     } finally {
       setLoadingAction(null);
@@ -189,28 +191,28 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
     <div className="flex-1 p-6 flex flex-col gap-6 animate-in fade-in duration-300">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Thành viên dự án</h2>
-          <p className="text-sm text-slate-500 mt-1">Quản lý thành viên và phân quyền trong dự án</p>
+          <h2 className="text-xl font-bold text-foreground">{t('members.title')}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t('members.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex bg-slate-100 p-1 rounded-lg">
+          <div className="flex bg-muted p-1 rounded-lg">
             <button
               onClick={() => setFilter('ALL')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${filter === 'ALL' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${filter === 'ALL' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Tất cả
+              {t('members.filter_all')}
             </button>
             <button
               onClick={() => setFilter('ACTIVE')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${filter === 'ACTIVE' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${filter === 'ACTIVE' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Đang hoạt động
+              {t('members.filter_active')}
             </button>
             <button
               onClick={() => setFilter('INACTIVE')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${filter === 'INACTIVE' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${filter === 'INACTIVE' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Đã xóa
+              {t('members.filter_inactive')}
             </button>
           </div>
           <button 
@@ -218,26 +220,26 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors"
           >
             <Icons.settings size={16} />
-            <span>Thêm Custom Role</span>
+            <span>{t('members.add_custom_role')}</span>
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredMembers.map((member: any) => (
-          <div key={member.id} className={`bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm transition-all ${member.active === false ? 'opacity-60 grayscale hover:opacity-80' : 'hover:shadow-md'}`}>
+          <div key={member.id} className={`bg-card border border-border rounded-xl p-4 flex items-center justify-between shadow-sm transition-all ${member.active === false ? 'opacity-60 grayscale hover:opacity-80' : 'hover:shadow-md'}`}>
             <div className="flex items-center gap-3">
-              <img src={member.avatar || defaultMan} alt={member.name} className="w-12 h-12 rounded-full border-2 border-slate-100 object-cover" />
+              <img src={member.avatar || defaultMan} alt={member.name} className="w-12 h-12 rounded-full border-2 border-border object-cover" />
               <div>
-                <h3 className={`font-bold text-sm flex items-center gap-2 ${member.active === false ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
+                <h3 className={`font-bold text-sm flex items-center gap-2 ${member.active === false ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                   {member.name}
                   {member.active === false && (
                     <span className="text-[10px] font-normal text-red-500 bg-red-50 px-1.5 py-0.5 rounded no-underline">
-                      Đã rời đi
+                      {t('members.left_project')}
                     </span>
                   )}
                 </h3>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block ${isOwner(member.id) ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block ${isOwner(member.id) ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground'}`}>
                   {getRoleName(member)}
                 </span>
               </div>
@@ -246,11 +248,11 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
             <div className="relative">
               <button 
                 onClick={() => setShowRoleMenu(showRoleMenu === member.id ? null : member.id)}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                className="p-2 text-muted-foreground hover:text-muted-foreground hover:bg-background rounded-lg transition-colors"
                 disabled={loadingAction === `remove_${member.id}` || loadingAction === `role_${member.id}` || loadingAction === `restore_${member.id}`}
               >
                 {loadingAction === `remove_${member.id}` || loadingAction === `role_${member.id}` || loadingAction === `restore_${member.id}` ? (
-                  <div className="w-4 h-4 rounded-full border-2 border-slate-200 border-t-slate-500 animate-spin" />
+                  <div className="w-4 h-4 rounded-full border-2 border-border border-t-slate-500 animate-spin" />
                 ) : (
                   <Icons.moreVertical size={16} />
                 )}
@@ -259,30 +261,30 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
               {showRoleMenu === member.id && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowRoleMenu(null)} />
-                  <div className="absolute right-0 mt-1 w-48 bg-white border border-slate-200 shadow-lg rounded-xl z-20 py-1 overflow-hidden">
+                  <div className="absolute right-0 mt-1 w-48 bg-card border border-border shadow-lg rounded-xl z-20 py-1 overflow-hidden">
                     {member.active !== false ? (
                       <>
-                        <div className="px-3 py-2 border-b border-slate-100">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đổi quyền</span>
+                        <div className="px-3 py-2 border-b border-border">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('members.change_role')}</span>
                         </div>
                         {currentProject.customRoles?.map((role: any) => (
                           <button 
                             key={role.id}
                             onClick={() => handleChangeRole(member.id, role.id)}
-                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition-colors flex items-center justify-between ${member.roleId === role.id ? 'text-blue-600 font-bold' : 'text-slate-700'}`}
+                            className={`w-full text-left px-4 py-2 text-sm hover:bg-background transition-colors flex items-center justify-between ${member.roleId === role.id ? 'text-blue-600 font-bold' : 'text-foreground'}`}
                           >
                             {role.name}
                             {member.roleId === role.id && <Icons.check size={14} />}
                           </button>
                         ))}
                         {!currentProject.customRoles?.length && (
-                          <div className="px-4 py-2 text-xs text-slate-400 text-center">Không có role custom</div>
+                          <div className="px-4 py-2 text-xs text-muted-foreground text-center">{t('members.no_custom_role')}</div>
                         )}
-                        <div className="border-t border-slate-100 mt-1 pt-1">
+                        <div className="border-t border-border mt-1 pt-1">
                           <button 
                             onClick={() => {
                               if (isOwner(member.id)) {
-                                setAlertInfo({ title: "Thông báo", message: "Không thể xóa chủ sở hữu khỏi dự án." });
+                                setAlertInfo({ title: t('members.notification_title'), message: t('members.cannot_remove_owner') });
                               } else {
                                 setMemberToRemove(member);
                                 setShowRoleMenu(null);
@@ -290,12 +292,12 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
                             }}
                             className={`w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors ${
                               isOwner(member.id) 
-                                ? 'text-slate-400 cursor-not-allowed' 
+                                ? 'text-muted-foreground cursor-not-allowed' 
                                 : 'text-red-600 hover:bg-red-50'
                             }`}
                             disabled={isOwner(member.id)}
                           >
-                            <Icons.trash2 size={14} /> Xóa khỏi dự án
+                            <Icons.trash2 size={14} /> {t('members.remove_from_project')}
                           </button>
                         </div>
                       </>
@@ -307,7 +309,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
                         }}
                         className="w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors text-blue-600 hover:bg-blue-50"
                       >
-                        <Icons.refreshCw size={14} /> Khôi phục thành viên
+                        <Icons.refreshCw size={14} /> {t('members.restore_member')}
                       </button>
                     )}
                   </div>
@@ -319,14 +321,14 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       </div>
 
       {/* Danh sách Nhóm (Teams) */}
-      <div className="border-t border-slate-200 pt-6 mt-6">
+      <div className="border-t border-border pt-6 mt-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
               <Icons.users size={20} className="text-emerald-600" />
-              Nhóm tham gia dự án (Teams)
+              {t('members.teams_title')}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Các nhóm đã được thêm vào dự án</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('members.teams_subtitle')}</p>
           </div>
           {onOpenInviteModal && (
             <button 
@@ -334,25 +336,25 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
               className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg text-sm font-bold transition-colors"
             >
               <Icons.plus size={16} />
-              <span>Thêm Nhóm</span>
+              <span>{t('members.add_team')}</span>
             </button>
           )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {projectTeams.map((team: any) => (
-            <div key={team.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+            <div key={team.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center gap-3">
                 {team.avatar ? (
-                  <img src={team.avatar} alt={team.name} className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0" />
+                  <img src={team.avatar} alt={team.name} className="w-12 h-12 rounded-xl object-cover border border-border shrink-0" />
                 ) : (
                   <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0">
                     <Icons.users size={24} />
                   </div>
                 )}
                 <div className="min-w-0">
-                  <h3 className="font-bold text-sm text-slate-800 truncate">{team.name}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5 truncate">{team.description || 'Không có mô tả'}</p>
+                  <h3 className="font-bold text-sm text-foreground truncate">{team.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">{team.description || t('members.no_description')}</p>
                 </div>
               </div>
 
@@ -361,10 +363,10 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
                   onClick={() => setTeamToRemove(team)}
                   className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                   disabled={loadingAction === `remove_team_${team.id}`}
-                  title="Xóa nhóm khỏi dự án"
+                  title={t('members.remove_team_title')}
                 >
                   {loadingAction === `remove_team_${team.id}` ? (
-                    <div className="w-4 h-4 rounded-full border-2 border-slate-200 border-t-rose-500 animate-spin" />
+                    <div className="w-4 h-4 rounded-full border-2 border-border border-t-rose-500 animate-spin" />
                   ) : (
                     <Icons.trash2 size={16} />
                   )}
@@ -373,71 +375,71 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
             </div>
           ))}
           {(!projectTeams || projectTeams.length === 0) && (
-            <div className="col-span-full py-8 text-center text-slate-400 text-sm italic">
-              Chưa có nhóm nào được thêm vào dự án
+            <div className="col-span-full py-8 text-center text-muted-foreground text-sm italic">
+              {t('members.no_teams')}
             </div>
           )}
         </div>
       </div>
 
       {/* Danh sách vai trò custom */}
-      <div className="border-t border-slate-200 pt-6 mt-6">
+      <div className="border-t border-border pt-6 mt-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
               <Icons.shield size={20} className="text-blue-600" />
-              Danh sách Vai trò & Quyền hạn (Custom Roles)
+              {t('members.roles_title')}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Tùy chỉnh chi tiết quyền hạn cho từng vai trò trong dự án</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('members.roles_subtitle')}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {currentProject.customRoles?.map((role: any) => (
-            <div key={role.id} className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+            <div key={role.id} className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-sm text-slate-800 flex items-center gap-1.5">
+                  <span className="font-bold text-sm text-foreground flex items-center gap-1.5">
                     <Icons.shield size={16} className="text-blue-500" />
                     {role.name}
                   </span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
-                    {role.permissions?.length || 0} quyền
+                    {t('members.permissions_count').replace('{count}', String(role.permissions?.length || 0))}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-2">
                   {role.permissions?.slice(0, 3).map((p: string) => (
-                    <span key={p} className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">
+                    <span key={p} className="text-[10px] px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
                       {getFriendlyPermissionName(p)}
                     </span>
                   ))}
                   {role.permissions?.length > 3 && (
-                    <span className="text-[10px] px-1.5 py-0.5 bg-slate-50 text-slate-400 font-bold">
-                      +{role.permissions.length - 3} quyền khác
+                    <span className="text-[10px] px-1.5 py-0.5 bg-background text-muted-foreground font-bold">
+                      {t('members.more_permissions').replace('{count}', String(role.permissions.length - 3))}
                     </span>
                   )}
                   {(!role.permissions || role.permissions.length === 0) && (
-                    <span className="text-[10px] text-slate-400 italic">Không có quyền hạn</span>
+                    <span className="text-[10px] text-muted-foreground italic">{t('members.no_permissions')}</span>
                   )}
                 </div>
               </div>
               
-              <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+              <div className="mt-4 pt-3 border-t border-border flex justify-end">
                 {role.name?.toLowerCase().includes("owner") ? null : (
                   <button
                     onClick={() => handleOpenEditRole(role)}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
                     <Icons.pencil size={12} />
-                    Chỉnh sửa quyền
+                    {t('members.edit_permissions')}
                   </button>
                 )}
               </div>
             </div>
           ))}
           {!currentProject.customRoles?.length && (
-            <div className="col-span-full py-8 text-center text-slate-400 text-sm italic">
-              Chưa có vai trò tùy chỉnh nào được tạo
+            <div className="col-span-full py-8 text-center text-muted-foreground text-sm italic">
+              {t('members.no_custom_roles')}
             </div>
           )}
         </div>
@@ -464,10 +466,10 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
         isOpen={!!memberToRemove}
         onClose={() => setMemberToRemove(null)}
         onConfirm={handleRemoveMember}
-        title="Xóa thành viên"
-        message={`Bạn có chắc chắn muốn xóa thành viên ${memberToRemove?.name} khỏi dự án? Hành động này không thể hoàn tác.`}
-        confirmText="Xóa thành viên"
-        cancelText="Hủy"
+        title={t('members.remove_member_title')}
+        message={t('members.remove_member_msg').replace('{name}', memberToRemove?.name)}
+        confirmText={t('members.remove_member_btn')}
+        cancelText={t('members.cancel')}
         isDestructive={true}
         isLoading={loadingAction === `remove_${memberToRemove?.id}`}
       />
@@ -477,10 +479,10 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
         isOpen={!!memberToRestore}
         onClose={() => setMemberToRestore(null)}
         onConfirm={handleRestoreMember}
-        title="Khôi phục thành viên"
-        message={`Bạn có muốn khôi phục thành viên ${memberToRestore?.name} tham gia lại vào dự án?`}
-        confirmText="Khôi phục"
-        cancelText="Hủy"
+        title={t('members.restore_title')}
+        message={t('members.restore_msg').replace('{name}', memberToRestore?.name)}
+        confirmText={t('members.restore_btn')}
+        cancelText={t('members.cancel')}
         isDestructive={false}
         isLoading={loadingAction === `restore_${memberToRestore?.id}`}
       />
@@ -490,10 +492,10 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
         isOpen={!!teamToRemove}
         onClose={() => setTeamToRemove(null)}
         onConfirm={handleRemoveTeam}
-        title="Xóa nhóm khỏi dự án"
-        message={`Bạn có chắc chắn muốn xóa nhóm ${teamToRemove?.name} khỏi dự án? Tất cả thành viên trong nhóm này sẽ không còn quyền truy cập dựa trên nhóm nữa.`}
-        confirmText="Xóa nhóm"
-        cancelText="Hủy"
+        title={t('members.remove_team_title')}
+        message={t('members.remove_team_msg').replace('{name}', teamToRemove?.name)}
+        confirmText={t('members.remove_team_btn')}
+        cancelText={t('members.cancel')}
         isDestructive={true}
         isLoading={loadingAction === `remove_team_${teamToRemove?.id}`}
       />
@@ -505,7 +507,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
         onConfirm={() => setAlertInfo(null)}
         title={alertInfo?.title || ''}
         message={alertInfo?.message}
-        confirmText="Đóng"
+        confirmText={t('members.close')}
         cancelText="" // Ẩn nút hủy
       />
     </div>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { User } from '../types/user.interface';
 import defaultAvatar from "../assets/avatar_def_man.png"
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function WelcomeBack() {
   const [user, setUser] = useState<User | null>(null)
+  const { t } = useLanguage()
 
   useEffect(() => {
     const userData = localStorage.getItem("user")
@@ -36,18 +38,18 @@ export default function WelcomeBack() {
             {/* Welcome */}
             <div className="space-y-4">
               <p className="text-sm font-medium uppercase tracking-[0.35em] text-blue-600">
-                Welcome back
+                {t('welcome_back.welcome_back')}
               </p>
 
               <h1 className="text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl">
-                Welcome back,{" "}
+                {t('welcome_back.welcome_back_name')}{" "}
                 <span className="text-blue-600">
                   {firstName}.
                 </span>
               </h1>
 
               <p className="max-w-2xl text-lg text-slate-600">
-                Pick up where you left off in{" "}
+                {t('welcome_back.pick_up')}{" "}
                 <span className="font-semibold text-slate-900">
                   KisaFres
                 </span>
@@ -90,7 +92,7 @@ export default function WelcomeBack() {
                   href="/workspace"
                   className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-amber-400"
                 >
-                  Go to KisaFres
+                  {t('welcome_back.go_to_app')}
                 </a>
               </div>
             </div>
@@ -98,14 +100,14 @@ export default function WelcomeBack() {
             {/* Bottom */}
             <div className="mt-16 flex flex-col items-center gap-4 text-center">
               <p className="text-base text-slate-700">
-                Want to find out more about KisaFres?
+                {t('welcome_back.find_out_more')}
               </p>
 
               <a
                 href="#"
                 className="inline-flex items-center justify-center rounded-full border border-slate-900 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
               >
-                Explore features
+                {t('welcome_back.explore')}
               </a>
             </div>
           </div>

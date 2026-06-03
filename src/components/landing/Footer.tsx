@@ -1,13 +1,15 @@
 import { Icons } from "../../assets/icons"
+import { useLanguage } from "../../contexts/LanguageContext"
 export default function Footer() {
+  const { t } = useLanguage()
   return (
-    <footer className="bg-gray-900 text-gray-300 py-16 px-4">
+    <footer className="bg-slate-900 dark:bg-slate-950 text-gray-300 py-16 px-4 border-t dark:border-slate-800">
       <div className="container-custom">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-white">Kisafres</h3>
             <p className="text-sm text-gray-400 max-w-xs">
-              The definitive work management platform for teams that value precision and performance.
+              {t('landing.footer.desc')}
             </p>
             <div className="flex gap-4">
               <a href="#" className="text-gray-400 hover:text-white transition" aria-label="Share">
@@ -20,49 +22,49 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-4">Product</h4>
+            <h4 className="font-semibold text-white mb-4">{t('landing.footer.product')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Features</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Solutions</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Pricing</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Roadmap</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.p_features')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.p_solutions')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.p_pricing')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.p_roadmap')}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-4">Resources</h4>
+            <h4 className="font-semibold text-white mb-4">{t('landing.footer.resources')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Documentation</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">API Reference</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Community</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Support</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.r_docs')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.r_api')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.r_community')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.r_support')}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-4">Company</h4>
+            <h4 className="font-semibold text-white mb-4">{t('landing.footer.company')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-400 hover:text-white transition">About Us</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Careers</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Privacy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Terms</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.c_about')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.c_careers')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.c_privacy')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition">{t('landing.footer.c_terms')}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-4">Subscribe</h4>
-            <p className="text-sm text-gray-400 mb-4">Stay updated with our latest features and updates.</p>
+            <h4 className="font-semibold text-white mb-4">{t('landing.footer.subscribe')}</h4>
+            <p className="text-sm text-gray-400 mb-4">{t('landing.footer.sub_desc')}</p>
             <input
               type="email"
-              placeholder="Enter your email"
-              className="w-full px-4 py-2 bg-gray-800 text-white placeholder-gray-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              placeholder={t('landing.footer.sub_placeholder')}
+              className="w-full px-4 py-2 bg-slate-800 dark:bg-slate-900 border border-transparent dark:border-slate-800 text-white placeholder-gray-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p>© 2024 Kisafres Systems Inc.</p>
-          <p>Status: All Systems Operational • Region: US-EAST-1</p>
+        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+          <p>{t('landing.footer.copyright')}</p>
+          <p>{t('landing.footer.status')}</p>
         </div>
       </div>
     </footer>

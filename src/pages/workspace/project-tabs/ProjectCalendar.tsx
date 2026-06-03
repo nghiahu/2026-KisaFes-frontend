@@ -6,8 +6,7 @@ import TaskDetailView from '../../../components/workspace/TaskDetailView';
 import { useUpdateTaskDueDateMutation, useCreateTaskMutation } from '../../../hooks/api/useTasks';
 import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
 import { createPortal } from 'react-dom';
-
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ProjectCalendarProps {
   currentProject: any;
@@ -15,6 +14,9 @@ interface ProjectCalendarProps {
 }
 
 export default function ProjectCalendar({ currentProject, projectId }: ProjectCalendarProps) {
+  const { t } = useLanguage();
+  const DAYS_OF_WEEK = [t('calendar.sun'), t('calendar.mon'), t('calendar.tue'), t('calendar.wed'), t('calendar.thu'), t('calendar.fri'), t('calendar.sat')];
+  
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
   
@@ -272,7 +274,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
           ${isBeingDragged ? 'opacity-40 scale-95' : ''}
           ${isDone 
             ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100' 
-            : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:shadow-md'}
+            : 'bg-card text-foreground border-border hover:border-blue-300 hover:shadow-md'}
         `}
         title={task.title}
       >
@@ -284,58 +286,58 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
   };
 
   return (
-    <div className="flex flex-1 bg-slate-50 relative rounded-3xl overflow-hidden border border-slate-200 shadow-sm min-h-0">
+    <div className="flex flex-1 bg-background relative rounded-3xl overflow-hidden border border-border shadow-sm min-h-0">
       
       {/* MAIN CALENDAR AREA */}
       <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
         {/* Header & Filters */}
-        <div className="px-5 py-4 bg-white border-b border-slate-200 shrink-0 z-10 relative">
+        <div className="px-5 py-4 bg-card border-b border-border shrink-0 z-10 relative">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             
             <div className="flex items-center gap-3">
               <div className="relative">
-                <select className="appearance-none bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={assigneeFilter} onChange={e => setAssigneeFilter(e.target.value)}>
-                  <option value="">Assignee</option>
+                  <option value="">{t('calendar.assignee')}</option>
                   {members.map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}
                 </select>
-                <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               </div>
               <div className="relative">
-                <select className="appearance-none bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-                  <option value="">Type</option>
+                  <option value="">{t('calendar.type')}</option>
                   {types.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
-                <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               </div>
               <div className="relative">
-                <select className="appearance-none bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-                  <option value="">Status</option>
+                  <option value="">{t('calendar.status')}</option>
                   {statuses.map((s: any) => <option key={s.statusId} value={s.statusId}>{s.label}</option>)}
                 </select>
-                <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <button onClick={handleToday} className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors shadow-sm">
-                Today
+              <button onClick={handleToday} className="px-3 py-1.5 text-xs font-bold text-foreground bg-card border border-border hover:bg-background rounded-lg transition-colors shadow-sm">
+                {t('calendar.today')}
               </button>
               
-              <div className="flex items-center bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden shrink-0">
-                <button onClick={handlePrevMonth} className="p-1.5 hover:bg-slate-50 text-slate-600 transition-colors border-r border-slate-200"><Icons.chevronLeft size={16} /></button>
-                <span className="px-3 text-xs font-bold text-slate-800 w-[110px] text-center">
+              <div className="flex items-center bg-card border border-border rounded-lg shadow-sm overflow-hidden shrink-0">
+                <button onClick={handlePrevMonth} className="p-1.5 hover:bg-background text-muted-foreground transition-colors border-r border-border"><Icons.chevronLeft size={16} /></button>
+                <span className="px-3 text-xs font-bold text-foreground w-[110px] text-center">
                   {currentDate.toLocaleString('default', { month: 'short', year: 'numeric' })}
                 </span>
-                <button onClick={handleNextMonth} className="p-1.5 hover:bg-slate-50 text-slate-600 transition-colors border-l border-slate-200"><Icons.chevronRight size={16} /></button>
+                <button onClick={handleNextMonth} className="p-1.5 hover:bg-background text-muted-foreground transition-colors border-l border-border"><Icons.chevronRight size={16} /></button>
               </div>
 
               <button 
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className={`p-1.5 rounded-lg border transition-colors shadow-sm flex items-center justify-center ${isSidebarOpen ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
-                title="Toggle Unscheduled Work"
+                className={`p-1.5 rounded-lg border transition-colors shadow-sm flex items-center justify-center ${isSidebarOpen ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-card border-border text-muted-foreground hover:bg-background'}`}
+                title={t('calendar.toggle_unscheduled')}
               >
                 {isSidebarOpen ? <Icons.panelRightClose size={18} /> : <Icons.panelRightOpen size={18} />}
               </button>
@@ -344,14 +346,14 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
         </div>
 
         {/* Grid */}
-        <div className="flex-1 overflow-hidden p-4 md:p-6 flex flex-col bg-slate-50">
+        <div className="flex-1 overflow-hidden p-4 md:p-6 flex flex-col bg-background">
           {isLoading ? (
-            <div className="h-full bg-white animate-pulse rounded-2xl border border-slate-200 shadow-sm"></div>
+            <div className="h-full bg-card animate-pulse rounded-2xl border border-border shadow-sm"></div>
           ) : (
-            <div className="flex-1 flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-              <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50/80 shrink-0">
+            <div className="flex-1 flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+              <div className="grid grid-cols-7 border-b border-border bg-background/80 shrink-0">
                 {DAYS_OF_WEEK.map(day => (
-                  <div key={day} className="py-2.5 text-center text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                  <div key={day} className="py-2.5 text-center text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider">
                     {day}
                   </div>
                 ))}
@@ -369,10 +371,10 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                   return (
                     <div 
                       key={idx} 
-                    className={`group relative min-h-[140px] border-r border-b border-slate-100 p-2 flex flex-col transition-colors
-                        ${!cell.isCurrentMonth ? 'bg-slate-50/50' : 'bg-white'}
+                    className={`group relative min-h-[140px] border-r border-b border-border p-2 flex flex-col transition-colors
+                        ${!cell.isCurrentMonth ? 'bg-background/50' : 'bg-card'}
                         ${dragOverCell === dateStr ? '!bg-blue-50 ring-2 ring-inset ring-blue-400' : ''}
-                        ${cell.isCurrentMonth && dragOverCell !== dateStr ? 'hover:bg-slate-50/30' : ''}
+                        ${cell.isCurrentMonth && dragOverCell !== dateStr ? 'hover:bg-background/30' : ''}
                         ${(idx + 1) % 7 === 0 ? 'border-r-0' : ''}
                         ${idx >= grid.length - 7 ? 'border-b-0' : ''}
                       `}
@@ -383,18 +385,18 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold 
-                            ${isToday ? 'bg-blue-600 text-white shadow-sm' : cell.isCurrentMonth ? 'text-slate-700' : 'text-slate-400'}
+                            ${isToday ? 'bg-blue-600 text-white shadow-sm' : cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
                           `}
                         >
                           {cell.date.getDate()}
                         </div>
                         <button 
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-200 rounded text-slate-500"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-200 rounded text-muted-foreground"
                           onClick={(e) => {
                             e.stopPropagation();
                             setInlineCreateDate(dateStr);
                           }}
-                          title="Create work item"
+                          title={t('calendar.create_work_item')}
                         >
                           <Icons.plus size={14} />
                         </button>
@@ -405,7 +407,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                         
                         {overflowCount > 0 && (
                           <button 
-                            className="text-[11px] font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 text-left px-2 py-1 rounded transition-colors w-full mt-0.5"
+                            className="text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted text-left px-2 py-1 rounded transition-colors w-full mt-0.5"
                             onClick={(e) => {
                               const rect = e.currentTarget.getBoundingClientRect();
                               setMorePopoverData({
@@ -416,7 +418,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                               });
                             }}
                           >
-                            {overflowCount} more
+                            {overflowCount} {t('calendar.more')}
                           </button>
                         )}
                       </div>
@@ -447,25 +449,25 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
 
       {/* UNSCHEDULED WORK SIDEBAR */}
       {isSidebarOpen && (
-        <div className="w-[320px] bg-white border-l border-slate-200 flex flex-col shrink-0 animate-in slide-in-from-right-8 duration-300 z-20 shadow-xl">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="font-bold text-slate-800 text-lg">Unscheduled work</h3>
-            <button onClick={() => setIsSidebarOpen(false)} className="p-1 hover:bg-slate-100 rounded-md text-slate-400 transition-colors">
+        <div className="w-[320px] bg-card border-l border-border flex flex-col shrink-0 animate-in slide-in-from-right-8 duration-300 z-20 shadow-xl">
+          <div className="p-5 border-b border-border flex items-center justify-between">
+            <h3 className="font-bold text-foreground text-lg">{t('calendar.unscheduled_work')}</h3>
+            <button onClick={() => setIsSidebarOpen(false)} className="p-1 hover:bg-muted rounded-md text-muted-foreground transition-colors">
               <Icons.x size={18} />
             </button>
           </div>
           
-          <div className="p-4 flex-1 flex flex-col overflow-hidden bg-slate-50/50">
-            <p className="text-xs text-slate-500 mb-4 font-medium leading-relaxed">
-              Drag each work item onto the calendar to set a due date for the work.
+          <div className="p-4 flex-1 flex flex-col overflow-hidden bg-background/50">
+            <p className="text-xs text-muted-foreground mb-4 font-medium leading-relaxed">
+              {t('calendar.drag_instruction')}
             </p>
             
             <div className="relative mb-4">
-              <Icons.search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Icons.search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input 
                 type="text" 
-                placeholder="Search unscheduled items" 
-                className="w-full border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white"
+                placeholder={t('calendar.search_unscheduled')} 
+                className="w-full border border-border rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-card"
                 value={unscheduledSearch}
                 onChange={(e) => setUnscheduledSearch(e.target.value)}
               />
@@ -480,11 +482,11 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
               {unscheduledTasks.length === 0 ? (
                 <div 
                   className={`border border-dashed rounded-xl p-6 text-center transition-colors ${
-                    dragOverSidebar ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-300' : 'bg-slate-100/50 border-slate-300'
+                    dragOverSidebar ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-300' : 'bg-muted/50 border-slate-300'
                   }`}
                 >
-                  <p className="font-bold text-sm text-slate-700 mb-2">All work has been scheduled</p>
-                  <p className="text-xs text-slate-500">To remove a work item from the calendar, drag it back into the unscheduled work panel.</p>
+                  <p className="font-bold text-sm text-foreground mb-2">{t('calendar.all_scheduled')}</p>
+                  <p className="text-xs text-muted-foreground">{t('calendar.remove_instruction')}</p>
                 </div>
               ) : (
                 <div 
@@ -504,12 +506,12 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
       {morePopoverData && createPortal(
         <div 
           ref={popoverRef}
-          className="fixed bg-white border border-slate-200 shadow-xl rounded-xl p-3 z-[9999] w-[260px] animate-in zoom-in-95 duration-150"
+          className="fixed bg-card border border-border shadow-xl rounded-xl p-3 z-[9999] w-[260px] animate-in zoom-in-95 duration-150"
           style={{ top: Math.min(morePopoverData.top, window.innerHeight - 300), left: morePopoverData.left }}
         >
-          <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
-            <h4 className="font-bold text-slate-800 text-sm">{morePopoverData.dateStr}</h4>
-            <button onClick={() => setMorePopoverData(null)} className="text-slate-400 hover:text-slate-600"><Icons.x size={14} /></button>
+          <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+            <h4 className="font-bold text-foreground text-sm">{morePopoverData.dateStr}</h4>
+            <button onClick={() => setMorePopoverData(null)} className="text-muted-foreground hover:text-muted-foreground"><Icons.x size={14} /></button>
           </div>
           <div className="flex flex-col max-h-[250px] overflow-y-auto custom-scrollbar pr-1">
             {morePopoverData.tasks.map(t => <div key={t.id}>{renderTaskCard(t)}</div>)}
@@ -524,7 +526,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
             className="absolute inset-0"
             onClick={() => setSelectedTask(null)}
           />
-          <div className="relative bg-white w-full max-w-[1000px] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+          <div className="relative bg-card w-full max-w-[1000px] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             <div className="flex-1 flex overflow-hidden">
               <TaskDetailView
                 task={selectedTask}

@@ -81,13 +81,13 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
   };
 
   return (
-    <div className="flex flex-col h-full bg-white relative">
-      <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-20">
+    <div className="flex flex-col h-full bg-card relative">
+      <div className="px-8 py-6 border-b border-border flex items-center justify-between sticky top-0 bg-card/80 backdrop-blur-md z-20">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Team Settings</h2>
-          <p className="text-sm text-slate-500 mt-1">Manage team profile, preferences, and identity.</p>
+          <h2 className="text-xl font-bold text-foreground">Team Settings</h2>
+          <p className="text-sm text-muted-foreground mt-1">Manage team profile, preferences, and identity.</p>
         </div>
-        <button onClick={onClose} className="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors">
+        <button onClick={onClose} className="w-10 h-10 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground transition-colors">
           <Icons.x size={20} />
         </button>
       </div>
@@ -98,7 +98,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             {/* Images Section */}
             <div className="relative mb-16">
           {/* Cover */}
-          <label className="block w-full h-32 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer overflow-hidden group relative">
+          <label className="block w-full h-32 bg-background rounded-xl border-2 border-dashed border-border hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer overflow-hidden group relative">
             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
@@ -114,7 +114,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             {coverPreview ? (
               <img src={coverPreview} className="w-full h-full object-cover group-hover:opacity-75 transition-opacity" />
             ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-500">
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground group-hover:text-blue-500">
                 <Icons.image size={24} className="mb-2" />
                 <span className="text-xs font-semibold">Upload Cover Image</span>
               </div>
@@ -129,7 +129,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
           </label>
 
           {/* Avatar */}
-          <label className="absolute -bottom-6 left-6 w-20 h-20 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer overflow-hidden group z-10 flex items-center justify-center">
+          <label className="absolute -bottom-6 left-6 w-20 h-20 bg-card rounded-xl shadow-sm border border-border hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer overflow-hidden group z-10 flex items-center justify-center">
             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
@@ -145,7 +145,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             {avatarPreview ? (
               <img src={avatarPreview} className="w-full h-full object-cover group-hover:opacity-75 transition-opacity" />
             ) : (
-              <Icons.camera size={24} className="text-slate-400 group-hover:text-blue-500" />
+              <Icons.camera size={24} className="text-muted-foreground group-hover:text-blue-500" />
             )}
             {avatarPreview && (
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -158,20 +158,20 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Team Name</label>
+          <label className="block text-sm font-semibold text-foreground mb-1.5">Team Name</label>
           <input
             type="text"
-            className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${errors.name ? 'border-rose-500 focus:ring-rose-500/20' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/20'}`}
+            className={`w-full px-4 py-2.5 bg-background border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${errors.name ? 'border-rose-500 focus:ring-rose-500/20' : 'border-border focus:border-blue-500 focus:ring-blue-500/20'}`}
             {...register('name')}
           />
           {errors.name && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.name.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
+          <label className="block text-sm font-semibold text-foreground mb-1.5">Description</label>
           <textarea
             rows={4}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
+            className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
             {...register('description')}
           />
         </div>
@@ -190,11 +190,11 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             </div>
           )}
 
-          <div className="pt-6 border-t border-slate-100 flex items-center justify-between mt-8">
+          <div className="pt-6 border-t border-border flex items-center justify-between mt-8">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition-colors"
+              className="px-6 py-2.5 text-muted-foreground font-semibold hover:bg-muted rounded-xl transition-colors"
             >
               Cancel
             </button>

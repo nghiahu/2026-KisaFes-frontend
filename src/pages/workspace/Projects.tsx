@@ -13,6 +13,7 @@ import { useProjects } from '../../hooks/api/useProjects';
 import { useCategories } from '../../hooks/api/useCategories';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { projectService } from '../../services/project.service';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const editProjectSchema = z.object({
   name: z.string().min(1, 'Tên dự án không được để trống'),
@@ -46,6 +47,7 @@ export default function Projects() {
   const [sortBy, setSortBy] = useState<string>('updatedAt-desc');
 
   const user = useSelector((state: any) => state.auth.user);
+  const { t } = useLanguage();
 
   const { data: backendProjects, isLoading: isProjectsLoading, refetch: refetchProjects } = useProjects();
   const { data: backendCategories = [], isLoading: isCategoriesLoading } = useCategories();
@@ -156,10 +158,10 @@ export default function Projects() {
     switch (status) {
       case 'ACTIVE': return 'bg-emerald-100 text-emerald-600 border-emerald-200';
       case 'ON HOLD': return 'bg-amber-100 text-amber-600 border-amber-200';
-      case 'COMPLETED': return 'bg-slate-100 text-slate-600 border-slate-200';
+      case 'COMPLETED': return 'bg-muted text-muted-foreground border-border';
       case 'AT RISK': return 'bg-rose-100 text-rose-600 border-rose-200';
       case 'PLANNING': return 'bg-blue-100 text-blue-600 border-blue-200';
-      default: return 'bg-slate-100 text-slate-600 border-slate-200';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -216,48 +218,48 @@ export default function Projects() {
       {/* Header Area */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Projects</h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage and track your active initiatives</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">{t('projects.title')}</h1>
+          <p className="text-muted-foreground mt-1 font-medium">{t('projects.desc')}</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex bg-slate-100/80 p-1 rounded-xl border border-slate-200/50 backdrop-blur-sm">
+          <div className="flex bg-muted/80 p-1 rounded-xl border border-border/50 backdrop-blur-sm">
             <button
               onClick={() => setViewType('grid')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${viewType === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${viewType === 'grid' ? 'bg-card text-blue-600 shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 }`}
             >
               <Icons.layoutDashboard size={16} />
-              <span>Grid</span>
+              <span>{t('projects.view_grid')}</span>
             </button>
             <button
               onClick={() => setViewType('list')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${viewType === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${viewType === 'list' ? 'bg-card text-blue-600 shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 }`}
             >
               <Icons.listChecks size={16} />
-              <span>List</span>
+              <span>{t('projects.view_list')}</span>
             </button>
           </div>
 
           <button
             onClick={() => navigate('/workspace/projects/new')}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-95"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 dark:shadow-none dark:shadow-none hover:scale-[1.02] active:scale-95"
           >
             <Icons.plus size={18} />
-            Create Project
+            {t('projects.create_project')}
           </button>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center gap-4 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+      <div className="flex flex-wrap items-center gap-4 bg-card/60 backdrop-blur-md p-4 rounded-2xl border border-border/80 shadow-sm">
         <div className="flex-1 min-w-[240px] relative">
-          <Icons.search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <Icons.search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <input
             type="text"
-            placeholder="Search by name, code or description..."
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700 placeholder:text-slate-400"
+            placeholder={t('projects.search_placeholder')}
+            className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-foreground placeholder:text-muted-foreground"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -267,37 +269,37 @@ export default function Projects() {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+            className="bg-background border border-border px-3 py-2.5 rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
           >
-            <option value="All Statuses">All Statuses</option>
-            <option value="Active">Active</option>
-            <option value="On Hold">On Hold</option>
-            <option value="Completed">Completed</option>
+            <option value="All Statuses">{t('projects.all_statuses')}</option>
+            <option value="Active">{t('projects.status_active')}</option>
+            <option value="On Hold">{t('projects.status_onhold')}</option>
+            <option value="Completed">{t('projects.status_completed')}</option>
           </select>
 
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+            className="bg-background border border-border px-3 py-2.5 rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
           >
-            <option value="All Categories">All Categories</option>
+            <option value="All Categories">{t('projects.all_categories')}</option>
             {categories.map(cat => (
               <option key={cat.id} value={cat.name}>{cat.name}</option>
             ))}
           </select>
 
           <div className="flex items-center gap-2">
-            <span className="text-[0.75rem] font-bold text-slate-400 uppercase tracking-wider">Sort by:</span>
+            <span className="text-[0.75rem] font-bold text-muted-foreground uppercase tracking-wider">{t('projects.sort_by')}</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-slate-50 border border-slate-200 px-3 py-2 text-sm font-bold text-blue-600 outline-none cursor-pointer"
+              className="bg-background border border-border px-3 py-2 text-sm font-bold text-blue-600 outline-none cursor-pointer"
             >
-              <option value="updatedAt-desc">Recently Updated</option>
-              <option value="updatedAt-asc">Oldest Updated</option>
-              <option value="name-asc">Name A-Z</option>
-              <option value="name-desc">Name Z-A</option>
-              <option value="code-asc">Project Code</option>
+              <option value="updatedAt-desc">{t('projects.sort_updated_desc')}</option>
+              <option value="updatedAt-asc">{t('projects.sort_updated_asc')}</option>
+              <option value="name-asc">{t('projects.sort_name_asc')}</option>
+              <option value="name-desc">{t('projects.sort_name_desc')}</option>
+              <option value="code-asc">{t('projects.sort_code_asc')}</option>
             </select>
           </div>
         </div>
@@ -313,49 +315,49 @@ export default function Projects() {
               <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
                 {Array.from({ length: 6 }).map((_, i) =>
                   viewType === 'grid' ? (
-                    <div key={i} className="bg-white rounded-2xl p-5 border border-slate-200/80 flex flex-col gap-4 h-full min-h-[300px]">
+                    <div key={i} className="bg-card rounded-2xl p-5 border border-border/80 flex flex-col gap-4 h-full min-h-[300px]">
                       {/* Badge row */}
                       <div className="flex items-center justify-between">
-                        <Skeleton className="h-5 w-16 rounded-full bg-slate-100" />
-                        <Skeleton className="w-7 h-7 rounded-lg bg-slate-100" />
+                        <Skeleton className="h-5 w-16 rounded-full bg-muted" />
+                        <Skeleton className="w-7 h-7 rounded-lg bg-muted" />
                       </div>
                       {/* Title + description */}
                       <div className="flex flex-col gap-2 flex-1">
                         <Skeleton className="h-5 w-3/4 bg-slate-200" />
-                        <Skeleton className="h-3 w-full bg-slate-100" />
-                        <Skeleton className="h-3 w-5/6 bg-slate-100" />
+                        <Skeleton className="h-3 w-full bg-muted" />
+                        <Skeleton className="h-3 w-5/6 bg-muted" />
                       </div>
                       {/* Progress */}
                       <div className="flex flex-col gap-1.5">
                         <div className="flex justify-between">
-                          <Skeleton className="h-3 w-16 bg-slate-100" />
-                          <Skeleton className="h-3 w-8 bg-slate-100" />
+                          <Skeleton className="h-3 w-16 bg-muted" />
+                          <Skeleton className="h-3 w-8 bg-muted" />
                         </div>
-                        <Skeleton className="h-[5px] w-full rounded-full bg-slate-100" />
+                        <Skeleton className="h-[5px] w-full rounded-full bg-muted" />
                       </div>
                       {/* Stat chips */}
                       <div className="grid grid-cols-2 gap-2">
-                        <Skeleton className="h-12 rounded-xl bg-slate-100" />
-                        <Skeleton className="h-12 rounded-xl bg-slate-100" />
+                        <Skeleton className="h-12 rounded-xl bg-muted" />
+                        <Skeleton className="h-12 rounded-xl bg-muted" />
                       </div>
                       {/* Footer */}
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                      <div className="flex items-center justify-between pt-3 border-t border-border">
                         <div className="flex -space-x-2">
                           {[0,1,2].map(j => <Skeleton key={j} className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white" />)}
                         </div>
-                        <Skeleton className="h-3 w-16 bg-slate-100" />
+                        <Skeleton className="h-3 w-16 bg-muted" />
                       </div>
                     </div>
                   ) : (
-                    <div key={i} className="bg-white rounded-2xl px-6 py-4 border border-slate-100 flex items-center justify-between gap-8">
-                      <Skeleton className="h-10 w-20 rounded-xl bg-slate-100" />
+                    <div key={i} className="bg-card rounded-2xl px-6 py-4 border border-border flex items-center justify-between gap-8">
+                      <Skeleton className="h-10 w-20 rounded-xl bg-muted" />
                       <div className="flex flex-col flex-1 gap-2">
                         <Skeleton className="h-4 w-48 bg-slate-200" />
-                        <Skeleton className="h-3 w-32 bg-slate-100" />
+                        <Skeleton className="h-3 w-32 bg-muted" />
                       </div>
-                      <Skeleton className="h-10 w-20 bg-slate-100" />
-                      <Skeleton className="h-10 w-36 bg-slate-100" />
-                      <Skeleton className="h-10 w-24 bg-slate-100" />
+                      <Skeleton className="h-10 w-20 bg-muted" />
+                      <Skeleton className="h-10 w-36 bg-muted" />
+                      <Skeleton className="h-10 w-24 bg-muted" />
                       <div className="flex -space-x-2">
                         {[0,1].map(j => <Skeleton key={j} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white" />)}
                       </div>
@@ -371,15 +373,15 @@ export default function Projects() {
             {favoriteProjects.length > 0 && (
               <section className="flex flex-col gap-5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-bold text-slate-400 tracking-[0.2em] uppercase">Favorites</h2>
-                  <button className="text-sm font-bold text-blue-600 hover:underline">View all</button>
+                  <h2 className="text-sm font-bold text-muted-foreground tracking-[0.2em] uppercase">{t('projects.favorites')}</h2>
+                  <button className="text-sm font-bold text-blue-600 hover:underline">{t('projects.view_all')}</button>
                 </div>
 
                 <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
                   {favoriteProjects.map(project => (
                     viewType === 'grid'
-                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
-                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
+                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
+                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
                   ))}
                 </div>
               </section>
@@ -388,17 +390,17 @@ export default function Projects() {
             {/* All Projects Section */}
             <section className="flex flex-col gap-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold text-slate-400 tracking-[0.2em] uppercase">All Projects</h2>
+                <h2 className="text-sm font-bold text-muted-foreground tracking-[0.2em] uppercase">{t('projects.all_projects')}</h2>
               </div>
 
               {filteredAndSortedProjects.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 bg-white/50 backdrop-blur-sm rounded-[2rem] border border-slate-200/50 shadow-sm text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 mb-4 shadow-inner">
+                <div className="flex flex-col items-center justify-center py-16 px-4 bg-card/50 backdrop-blur-sm rounded-[2rem] border border-border/50 shadow-sm text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-background flex items-center justify-center text-muted-foreground mb-4 shadow-inner">
                     <Icons.folderKanban size={32} />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">No projects found</h3>
-                  <p className="text-sm text-slate-500 max-w-sm mb-6">
-                    No projects matched your search criteria. Try modifying your filters or search keywords.
+                  <h3 className="text-lg font-bold text-foreground mb-1">{t('projects.no_projects')}</h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mb-6">
+                    {t('projects.no_projects_desc')}
                   </p>
                   <button
                     onClick={() => {
@@ -408,27 +410,27 @@ export default function Projects() {
                     }}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-100 transition-all hover:scale-[1.02] active:scale-95"
                   >
-                    Reset Filters
+                    {t('projects.reset_filters')}
                   </button>
                 </div>
               ) : (
                 <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
                   {otherProjects.map(project => (
                     viewType === 'grid'
-                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
-                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} />
+                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
+                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
                   ))}
 
                   {/* New Project Card (Only in Grid View) */}
                   {viewType === 'grid' && (
                     <button
                       onClick={() => navigate('/workspace/projects/new')}
-                      className="group flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all duration-200 h-full min-h-[300px]"
+                      className="group flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-slate-300 hover:border-slate-400 hover:bg-background transition-all duration-200 h-full min-h-[300px]"
                     >
-                      <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 group-hover:scale-105 transition-transform duration-200">
+                      <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:scale-105 transition-transform duration-200">
                         <Icons.plus size={24} strokeWidth={2.5} />
                       </div>
-                      <h3 className="font-medium text-slate-600 group-hover:text-slate-800 text-lg">New Project</h3>
+                      <h3 className="font-medium text-muted-foreground group-hover:text-foreground text-lg">{t('projects.new_project')}</h3>
                     </button>
                   )}
                 </div>
@@ -441,33 +443,33 @@ export default function Projects() {
       {/* Edit Project Modal */}
       {editingProject && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-slate-900 mb-4">Edit Project</h3>
+          <div className="bg-card rounded-2xl shadow-xl w-full max-w-md p-6 border border-border animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-foreground mb-4">{t('projects.edit_project')}</h3>
             <form onSubmit={handleEditSubmitWrapper(onEditSubmit)} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-700">Project Name</label>
-                <input type="text" className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.name ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-slate-200 focus:ring-blue-500/20 focus:border-blue-500'}`}
+                <label className="text-sm font-semibold text-foreground">{t('projects.project_name')}</label>
+                <input type="text" className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.name ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-blue-500/20 focus:border-blue-500'}`}
                   {...registerEdit('name')} />
                 {editErrors.name && <p className="text-rose-500 text-xs font-medium">{editErrors.name.message}</p>}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-700">Category</label>
-                <select className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.categoryId ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-slate-200 focus:ring-blue-500/20 focus:border-blue-500'}`}
+                <label className="text-sm font-semibold text-foreground">{t('projects.category')}</label>
+                <select className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.categoryId ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-blue-500/20 focus:border-blue-500'}`}
                   {...registerEdit('categoryId')}>
-                  <option value="" disabled>Select category</option>
+                  <option value="" disabled>{t('projects.select_category')}</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
                 {editErrors.categoryId && <p className="text-rose-500 text-xs font-medium">{editErrors.categoryId.message}</p>}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-700">Description</label>
-                <textarea className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" rows={3}
+                <label className="text-sm font-semibold text-foreground">{t('projects.description')}</label>
+                <textarea className="border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" rows={3}
                   {...registerEdit('description')} />
               </div>
               <div className="flex items-center justify-end gap-3 mt-4">
-                <button type="button" onClick={() => setEditingProject(null)} className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                <button type="button" onClick={() => setEditingProject(null)} className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">{t('common.cancel')}</button>
                 <button type="submit" disabled={isUpdating} className="px-4 py-2 text-sm font-bold bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
-                  {isUpdating ? 'Saving...' : 'Save Changes'}
+                  {isUpdating ? t('projects.saving') : t('common.save')}
                 </button>
               </div>
             </form>
@@ -478,21 +480,24 @@ export default function Projects() {
       {/* Delete Project Modal */}
       {deletingProject && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in zoom-in-95 duration-200">
+          <div className="bg-card rounded-2xl shadow-xl w-full max-w-md p-6 border border-border animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3 mb-4 text-rose-600">
               <Icons.alertCircle size={24} />
-              <h3 className="text-xl font-bold text-slate-900">Delete Project</h3>
+              <h3 className="text-xl font-bold text-foreground">{t('projects.delete_project')}</h3>
             </div>
-            <p className="text-sm text-slate-600 mb-6">
-              Bạn sắp xóa dự án <strong>{deletingProject.name}</strong>. Hành động này không thể hoàn tác. Để xác nhận, vui lòng nhập <code className="bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded border border-rose-100 font-bold">delete {deletingProject.code}</code> vào ô bên dưới.
+            <p className="text-sm text-muted-foreground mb-6" dangerouslySetInnerHTML={{
+              __html: t('projects.delete_confirm_desc')
+                .replace('{projectName}', deletingProject.name)
+                .replace('{projectCode}', deletingProject.code)
+            }}>
             </p>
             <form onSubmit={handleDeleteSubmit} className="flex flex-col gap-4">
-              <input required type="text" className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+              <input required type="text" className="border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
                 placeholder={`delete ${deletingProject.code}`} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} />
               <div className="flex items-center justify-end gap-3 mt-2">
-                <button type="button" onClick={() => { setDeletingProject(null); setDeleteInput(''); }} className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                <button type="button" onClick={() => { setDeletingProject(null); setDeleteInput(''); }} className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">{t('common.cancel')}</button>
                 <button type="submit" disabled={deleteInput !== `delete ${deletingProject.code}`} className="px-4 py-2 text-sm font-bold bg-rose-600 text-white rounded-xl hover:bg-rose-700 disabled:opacity-50 transition-colors">
-                  Confirm Delete
+                  {t('projects.confirm_delete')}
                 </button>
               </div>
             </form>
@@ -513,6 +518,7 @@ interface ProjectViewProps {
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
   setEditingProject: (project: Project) => void;
   setDeletingProject: (project: Project) => void;
+  t: any;
 }
 
 function ProjectCard({
@@ -524,7 +530,8 @@ function ProjectCard({
   setActiveDropdownProjectId,
   setProjects,
   setEditingProject,
-  setDeletingProject
+  setDeletingProject,
+  t
 }: ProjectViewProps) {
   const navigate = useNavigate();
 
@@ -542,7 +549,7 @@ function ProjectCard({
   return (
     <div
       onClick={() => navigate(`/workspace/projects/${project.id}`)}
-      className="group bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col gap-4 h-full"
+      className="group bg-card rounded-2xl p-5 border border-border/80 shadow-sm hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col gap-4 h-full"
     >
       {/* Row 1 — Methodology badge + ··· */}
       <div className="flex items-center justify-between">
@@ -557,31 +564,31 @@ function ProjectCard({
         <div className="relative" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setActiveDropdownProjectId(activeDropdownProjectId === project.id ? null : project.id)}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <Icons.moreHorizontal size={16} />
           </button>
           {activeDropdownProjectId === project.id && (
             <>
-              <div className="absolute right-0 top-full mt-1.5 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 top-full mt-1.5 w-52 bg-card rounded-xl shadow-xl border border-border py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <button onClick={() => { onToggleFavorite(project.id); setActiveDropdownProjectId(null); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
-                  <Icons.star size={13} className={project.isFavorite ? 'text-amber-400' : 'text-slate-400'} fill={project.isFavorite ? 'currentColor' : 'none'} />
-                  <span>{project.isFavorite ? 'Remove from starred' : 'Add to starred'}</span>
+                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5 transition-colors">
+                  <Icons.star size={13} className={project.isFavorite ? 'text-amber-400' : 'text-muted-foreground'} fill={project.isFavorite ? 'currentColor' : 'none'} />
+                  <span>{project.isFavorite ? t('projects.remove_starred') : t('projects.add_starred')}</span>
                 </button>
                 <button onClick={() => { setActiveDropdownProjectId(null); setEditingProject(project); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
-                  <Icons.settings size={13} className="text-slate-400" />
-                  <span>Edit project</span>
+                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5 transition-colors">
+                  <Icons.settings size={13} className="text-muted-foreground" />
+                  <span>{t('projects.edit_project')}</span>
                 </button>
-                <div className="h-px bg-slate-100 my-1" />
+                <div className="h-px bg-muted my-1" />
                 <button onClick={() => {
                   setActiveDropdownProjectId(null);
                   setDeletingProject(project);
                 }}
                   className="w-full px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors">
                   <Icons.alertCircle size={13} className="text-rose-500" />
-                  <span>Delete project</span>
+                  <span>{t('projects.delete_project')}</span>
                 </button>
               </div>
             </>
@@ -591,61 +598,61 @@ function ProjectCard({
 
       {/* Row 2 — Title + description */}
       <div className="flex-1">
-        <h3 className="text-[17px] font-bold text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-1 leading-snug">
+        <h3 className="text-[17px] font-bold text-foreground group-hover:text-foreground transition-colors line-clamp-1 leading-snug">
           {project.name}
         </h3>
-        <p className="text-[12.5px] text-slate-500 font-normal mt-0.5 line-clamp-2 leading-relaxed">
-          {project.description || 'No description provided.'}
+        <p className="text-[12.5px] text-muted-foreground font-normal mt-0.5 line-clamp-2 leading-relaxed">
+          {project.description || t('projects.no_description')}
         </p>
       </div>
 
       {/* Row 3 — Progress bar */}
       <div>
         <div className="flex justify-between items-center mb-1.5">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.12em]">
+          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.12em]">
             {isScrum ? sprintName : 'Active Board'}
           </span>
-          <span className="text-[11px] font-bold text-slate-600">{percentage}%</span>
+          <span className="text-[11px] font-bold text-muted-foreground">{percentage}%</span>
         </div>
-        <div className="h-[5px] bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-[5px] bg-muted rounded-full overflow-hidden">
           <div className={`h-full rounded-full transition-all duration-700 ${getProgressColor(project.status)}`} style={{ width: `${percentage}%` }} />
         </div>
       </div>
 
       {/* Row 4 — Stat chips */}
       <div className="grid grid-cols-2 gap-2">
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/70 rounded-xl px-3 py-2">
-          <Icons.listChecks size={13} className="text-slate-400 shrink-0" />
+        <div className="flex items-center gap-2 bg-background border border-border/70 rounded-xl px-3 py-2">
+          <Icons.listChecks size={13} className="text-muted-foreground shrink-0" />
           <div>
-            <p className="text-[11px] font-bold text-slate-700 leading-none">{totalTasks} Total</p>
-            <p className="text-[10px] text-slate-400 leading-none mt-0.5">Tasks</p>
+            <p className="text-[11px] font-bold text-foreground leading-none">{totalTasks} {t('projects.total')}</p>
+            <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{t('projects.tasks')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2">
           <Icons.checkCircle2 size={13} className="text-emerald-500 shrink-0" />
           <div>
-            <p className="text-[11px] font-bold text-emerald-600 leading-none">{completedTasks} Done</p>
-            <p className="text-[10px] text-emerald-400 leading-none mt-0.5">Tasks</p>
+            <p className="text-[11px] font-bold text-emerald-600 leading-none">{completedTasks} {t('projects.done')}</p>
+            <p className="text-[10px] text-emerald-400 leading-none mt-0.5">{t('projects.tasks')}</p>
           </div>
         </div>
       </div>
 
       {/* Row 5 — Footer: avatars + deadline / CONTINUOUS DELIVERY */}
-      <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
+      <div className="flex items-center justify-between pt-3 border-t border-border mt-auto">
         <div className="flex items-center -space-x-2">
           {project.members.slice(0, 3).map((member) => (
             <img key={member.id} src={member.avatar} alt={member.name}
               className="w-7 h-7 rounded-full border-2 border-white object-cover" title={member.name} />
           ))}
           {project.members.length > 3 && (
-            <div className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[9px] font-bold text-slate-500">
+            <div className="w-7 h-7 rounded-full bg-muted border-2 border-white flex items-center justify-center text-[9px] font-bold text-muted-foreground">
               +{project.members.length - 3}
             </div>
           )}
         </div>
         {isScrum && (
-          <div className="flex items-center gap-1 text-slate-500">
-            <Icons.clock size={12} className="text-slate-400" />
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Icons.clock size={12} className="text-muted-foreground" />
             <span className="text-[11px] font-semibold">{deadlineDisplay}</span>
           </div>
         )}
@@ -663,7 +670,8 @@ function ProjectListItem({
   setActiveDropdownProjectId,
   setProjects,
   setEditingProject,
-  setDeletingProject
+  setDeletingProject,
+  t
 }: ProjectViewProps) {
   const navigate = useNavigate();
   if (typeof getProgressColor === 'function') { }
@@ -692,7 +700,7 @@ function ProjectListItem({
   return (
     <div
       onClick={() => navigate(`/workspace/projects/${project.id}`)}
-      className="group bg-white rounded-2xl px-6 py-4 border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200 flex items-center justify-between gap-8 cursor-pointer"
+      className="group bg-card rounded-2xl px-6 py-4 border border-border hover:border-border hover:shadow-sm transition-all duration-200 flex items-center justify-between gap-8 cursor-pointer"
     >
       {/* 1. Badges */}
       <div className="flex flex-col items-start gap-2 shrink-0 w-[80px]">
@@ -710,35 +718,35 @@ function ProjectListItem({
       {/* 2. Main Info (Title, Code, Category, Sprint) */}
       <div className="flex flex-col flex-1 min-w-[200px]">
         <div className="flex items-baseline gap-2 mb-1">
-          <h3 className="text-base font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">
+          <h3 className="text-base font-bold text-foreground group-hover:text-blue-600 transition-colors truncate">
             {project.name}
           </h3>
-          <span className="text-[11px] font-bold text-slate-400">
+          <span className="text-[11px] font-bold text-muted-foreground">
             {project.code}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-[12px] font-medium text-slate-400">
+        <div className="flex items-center gap-2 text-[12px] font-medium text-muted-foreground">
           <span className="truncate">{project.category || 'Software Development'}</span>
           <span className="w-1 h-1 rounded-full bg-slate-300" />
-          <span className={isScrum ? 'text-slate-600' : ''}>
+          <span className={isScrum ? 'text-muted-foreground' : ''}>
             {isScrum ? sprintName : 'Active Board'}
           </span>
         </div>
       </div>
 
       {/* 3. Task Stats (Vertical text) */}
-      <div className="flex flex-col justify-center items-start shrink-0 w-[80px] border-l border-slate-100 pl-6 h-10">
-        <span className="text-[13px] font-bold text-slate-700 leading-tight">{totalTasks} Total</span>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Tasks</span>
+      <div className="flex flex-col justify-center items-start shrink-0 w-[80px] border-l border-border pl-6 h-10">
+        <span className="text-[13px] font-bold text-foreground leading-tight">{totalTasks} {t('projects.total')}</span>
+        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{t('projects.tasks')}</span>
       </div>
 
       {/* 4. Progress / Blocked */}
       <div className="flex flex-col shrink-0 w-[140px] pl-4">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[11px] font-bold text-emerald-500">{completedTasks} Done</span>
-          <span className="text-[10px] font-bold text-slate-400">{percentage}%</span>
+          <span className="text-[11px] font-bold text-emerald-500">{completedTasks} {t('projects.done')}</span>
+          <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
         </div>
-        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-700 ${isScrum ? 'bg-slate-800' : 'bg-teal-500'}`}
             style={{ width: `${percentage}%` }}
@@ -747,8 +755,8 @@ function ProjectListItem({
       </div>
 
       {/* 5. Clock & Deadline */}
-      <div className="flex items-center gap-2 shrink-0 w-[120px] pl-6 text-slate-500">
-        <Icons.clock size={14} className="text-slate-400 shrink-0" />
+      <div className="flex items-center gap-2 shrink-0 w-[120px] pl-6 text-muted-foreground">
+        <Icons.clock size={14} className="text-muted-foreground shrink-0" />
         <span className="text-[12px] font-medium leading-tight">
           {deadlineDisplay.includes('Ends in') ? (
             <>
@@ -776,7 +784,7 @@ function ProjectListItem({
           />
         ))}
         {project.members.length > 2 && (
-          <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[9px] font-bold text-slate-500 shadow-sm">
+          <div className="w-8 h-8 rounded-full bg-muted border-2 border-white flex items-center justify-center text-[9px] font-bold text-muted-foreground shadow-sm">
             +{project.members.length - 2}
           </div>
         )}
@@ -786,32 +794,32 @@ function ProjectListItem({
       <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => onToggleFavorite(project.id)}
-          className={`p-2 rounded-xl transition-colors ${project.isFavorite ? 'text-amber-400' : 'text-slate-300 hover:text-slate-400 hover:bg-slate-50'}`}
+          className={`p-2 rounded-xl transition-colors ${project.isFavorite ? 'text-amber-400' : 'text-slate-300 hover:text-muted-foreground hover:bg-background'}`}
         >
           <Icons.star size={18} fill={project.isFavorite ? 'currentColor' : 'none'} />
         </button>
         <div className="relative">
           <button
             onClick={() => setActiveDropdownProjectId(activeDropdownProjectId === project.id ? null : project.id)}
-            className={`p-2 rounded-xl transition-colors ${activeDropdownProjectId === project.id ? 'text-blue-600 bg-slate-100' : 'text-slate-300 hover:text-slate-600 hover:bg-slate-50'}`}
+            className={`p-2 rounded-xl transition-colors ${activeDropdownProjectId === project.id ? 'text-blue-600 bg-muted' : 'text-slate-300 hover:text-muted-foreground hover:bg-background'}`}
           >
             <Icons.moreVertical size={18} />
           </button>
 
           {activeDropdownProjectId === project.id && (
             <>
-              <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-1 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 top-full mt-2 w-52 bg-card rounded-xl shadow-xl border border-border py-1 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-150">
                 <button onClick={() => { onToggleFavorite(project.id); setActiveDropdownProjectId(null); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5">
-                  <Icons.star size={13} className={project.isFavorite ? 'text-amber-400' : 'text-slate-400'} fill={project.isFavorite ? 'currentColor' : 'none'} />
+                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5">
+                  <Icons.star size={13} className={project.isFavorite ? 'text-amber-400' : 'text-muted-foreground'} fill={project.isFavorite ? 'currentColor' : 'none'} />
                   <span>{project.isFavorite ? 'Remove from starred' : 'Add to starred'}</span>
                 </button>
                 <button onClick={() => { setActiveDropdownProjectId(null); setEditingProject(project); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5">
-                  <Icons.settings size={13} className="text-slate-400" />
+                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5">
+                  <Icons.settings size={13} className="text-muted-foreground" />
                   <span>Edit project</span>
                 </button>
-                <div className="h-px bg-slate-100 my-1" />
+                <div className="h-px bg-muted my-1" />
                 <button onClick={() => {
                   setActiveDropdownProjectId(null);
                   setDeletingProject(project);

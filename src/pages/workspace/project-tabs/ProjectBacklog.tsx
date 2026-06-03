@@ -38,11 +38,14 @@ import { BacklogToolbar } from './components/BacklogToolbar';
 import { MassActionBar } from './components/MassActionBar';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function ProjectBacklog({ projectId, currentProject }: ProjectBacklogProps) {
   const queryClient = useQueryClient();
   const cachedData = queryClient.getQueryData(['projectBacklog', projectId]) as any;
+
+  const { t } = useLanguage();
 
   const [sprints, setSprints] = useState<Sprint[]>(cachedData?.sprints || []);
   const [backlogTasks, setBacklogTasks] = useState<any[]>(cachedData?.backlogTasks || []);
@@ -246,7 +249,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
       const updated = await sprintService.startSprint(projectId, sprintId);
       setSprints(prev => prev.map(s => s.id === sprintId ? updated : s));
     } catch (e: any) { 
-      setErrorAlertMessage(e?.response?.data?.message || 'Không thể bắt đầu sprint'); 
+      setErrorAlertMessage(e?.response?.data?.message || t('backlog.cannot_start_sprint')); 
     }
   };
 
@@ -262,7 +265,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
       setDeleteSprintConfirm(null);
     } catch (e: any) { 
       setDeleteSprintConfirm(null);
-      setErrorAlertMessage(e?.response?.data?.message || 'Không thể xóa sprint'); 
+      setErrorAlertMessage(e?.response?.data?.message || t('backlog.cannot_delete_sprint')); 
     }
   };
 
@@ -432,10 +435,10 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           >
             {/* Header */}
             <div
-              className={`flex items-center gap-2 px-2 py-1.5 bg-slate-50 cursor-pointer select-none transition-colors group border border-slate-200 rounded-sm ${expandedBacklog ? 'border-b-0 rounded-b-none' : ''}`}
+              className={`flex items-center gap-2 px-2 py-1.5 bg-background cursor-pointer select-none transition-colors group border border-border rounded-sm ${expandedBacklog ? 'border-b-0 rounded-b-none' : ''}`}
               onClick={() => setExpandedBacklog(p => !p)}
             >
-              <button className="text-slate-500 hover:bg-slate-200 p-0.5 rounded transition-colors shrink-0 w-5 flex items-center justify-center">
+              <button className="text-muted-foreground hover:bg-slate-200 p-0.5 rounded transition-colors shrink-0 w-5 flex items-center justify-center">
                 {expandedBacklog ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               </button>
 
@@ -454,10 +457,10 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
                 className="w-3.5 h-3.5 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
               />
 
-              <h3 className="font-bold text-slate-800 text-[13px] truncate">Backlog</h3>
+              <h3 className="font-bold text-foreground text-[13px] truncate">{t('backlog.backlog_label')}</h3>
 
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
-                <span>({filteredBacklogTasks.length} work {filteredBacklogTasks.length === 1 ? 'item' : 'items'})</span>
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
+                <span>{filteredBacklogTasks.length === 1 ? t('backlog.work_item').replace('{count}', String(filteredBacklogTasks.length)) : t('backlog.work_items').replace('{count}', String(filteredBacklogTasks.length))}</span>
               </div>
 
               <div className="flex-1" />
@@ -465,8 +468,8 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
               <div className="flex items-center gap-2 shrink-0 text-[11px] font-bold">
                 <div onClick={e => e.stopPropagation()} className="flex items-center gap-1 ml-2">
                   <button onClick={() => setSprintModal({ open: true, sprint: null })}
-                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded font-semibold transition-colors">
-                    Create sprint
+                    className="bg-muted hover:bg-slate-200 text-foreground px-3 py-1 rounded font-semibold transition-colors">
+                    {t('backlog.create_sprint')}
                   </button>
                 </div>
               </div>
@@ -474,11 +477,11 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
 
             {/* Tasks */}
             {expandedBacklog && (
-              <div className="flex flex-col border border-slate-200 border-t-0 bg-white rounded-b-sm min-h-[100px] pointer-events-auto">
+              <div className="flex flex-col border border-border border-t-0 bg-card rounded-b-sm min-h-[100px] pointer-events-auto">
                 <SortableContext id="backlog-context" items={filteredBacklogTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                   {filteredBacklogTasks.length === 0 && (
-                    <div className="border border-dashed border-slate-300 bg-slate-50/50 text-slate-500 text-[13px] text-center py-6 mx-2 my-2 rounded-sm select-none">
-                      {searchKeyword || totalActiveFilters > 0 ? "Không có task nào thỏa mãn điều kiện lọc." : "Backlog của bạn đang trống."}
+                    <div className="border border-dashed border-slate-300 bg-background/50 text-muted-foreground text-[13px] text-center py-6 mx-2 my-2 rounded-sm select-none">
+                      {searchKeyword || totalActiveFilters > 0 ? t('backlog.no_tasks_filtered') : t('backlog.backlog_empty')}
                     </div>
                   )}
                   {filteredBacklogTasks.map(task => (
@@ -499,9 +502,9 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
                 {!isCreatingTask ? (
                   <div
                     onClick={() => setIsCreatingTask(true)}
-                    className="px-8 py-2 hover:bg-slate-50 cursor-pointer text-slate-600 flex items-center gap-1.5 text-[13px] font-semibold transition-colors"
+                    className="px-8 py-2 hover:bg-background cursor-pointer text-muted-foreground flex items-center gap-1.5 text-[13px] font-semibold transition-colors"
                   >
-                    <Plus size={14} /> Create
+                    <Plus size={14} /> {t('backlog.create')}
                   </div>
                 ) : (
                   <div className="px-2 pb-2">
@@ -522,7 +525,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
         }}>
           {activeTask && (
-            <div className="bg-white rounded-md shadow-2xl border border-blue-200 opacity-95 scale-[1.02] rotate-1 w-full pointer-events-none">
+            <div className="bg-card rounded-md shadow-2xl border border-blue-200 opacity-95 scale-[1.02] rotate-1 w-full pointer-events-none">
               <DraggableTaskRow
                 task={activeTask}
                 project={currentProject}
@@ -623,10 +626,10 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
 
       {showMassMoveModal && createPortal(
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-[2px]" onClick={() => setShowMassMoveModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-[400px] overflow-hidden border border-slate-200" onClick={e => e.stopPropagation()}>
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <h3 className="font-extrabold text-slate-800 text-sm">Di chuyển {selectedTaskIds.size} Task</h3>
-              <button onClick={() => setShowMassMoveModal(false)} className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors"><X size={14} /></button>
+          <div className="bg-card rounded-2xl shadow-2xl w-[400px] overflow-hidden border border-border" onClick={e => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-background/50">
+              <h3 className="font-extrabold text-foreground text-sm">{t('backlog.move_tasks').replace('{count}', String(selectedTaskIds.size))}</h3>
+              <button onClick={() => setShowMassMoveModal(false)} className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-slate-200 hover:text-foreground transition-colors"><X size={14} /></button>
             </div>
             <div className="p-3 max-h-[350px] overflow-y-auto flex flex-col gap-1.5">
               <button
@@ -640,17 +643,17 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
                   setIsChangingStatus(false);
                   load(true);
                 }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all text-slate-700 hover:bg-slate-100`}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all text-foreground hover:bg-muted`}
               >
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0 border border-slate-200/60">
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border/60">
                   <CheckSquare size={14} />
                 </div>
-                Backlog
+                {t('backlog.backlog_label')}
               </button>
 
               {sprints?.length ? (
                 <div className="px-3 py-2 mt-2">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sprints</span>
+                  <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('backlog.sprints_label')}</span>
                 </div>
               ) : null}
 
@@ -667,7 +670,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
                     setIsChangingStatus(false);
                     load(true);
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all text-slate-700 hover:bg-slate-100`}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all text-foreground hover:bg-muted`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center text-violet-500 shrink-0 border border-violet-200/60">
                     <Zap size={14} className="fill-current" />
@@ -709,7 +712,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
             className="absolute inset-0"
             onClick={() => setSelectedTaskDetail(null)}
           />
-          <div className="relative bg-white w-full max-w-[1000px] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+          <div className="relative bg-card w-full max-w-[1000px] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             <div className="flex-1 flex overflow-hidden">
               <TaskDetailView
                 task={selectedTaskDetail}
@@ -728,28 +731,28 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
       {/* Delete Sprint Confirm Modal */}
       {deleteSprintConfirm && createPortal(
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-[400px] overflow-hidden border border-slate-200 scale-in-center">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3 bg-rose-50/50">
+          <div className="bg-card rounded-2xl shadow-2xl w-[400px] overflow-hidden border border-border scale-in-center">
+            <div className="px-5 py-4 border-b border-border flex items-center gap-3 bg-rose-50/50">
               <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
                 <AlertCircle className="w-4 h-4 text-rose-600" />
               </div>
-              <h3 className="font-extrabold text-slate-800 text-sm">Xóa Sprint</h3>
+              <h3 className="font-extrabold text-foreground text-sm">{t('backlog.delete_sprint_title')}</h3>
             </div>
-            <div className="px-5 py-4 text-[13px] text-slate-600 font-medium">
-              Bạn có chắc chắn muốn xóa sprint này không? Tất cả các công việc (tasks) trong sprint sẽ được chuyển về Backlog. Hành động này không thể hoàn tác.
+            <div className="px-5 py-4 text-[13px] text-muted-foreground font-medium">
+              {t('backlog.delete_sprint_desc')}
             </div>
-            <div className="px-5 py-4 border-t border-slate-100 flex justify-end gap-2 bg-slate-50/50">
+            <div className="px-5 py-4 border-t border-border flex justify-end gap-2 bg-background/50">
               <button 
                 onClick={() => setDeleteSprintConfirm(null)} 
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+                className="px-4 py-2 text-xs font-bold text-muted-foreground hover:bg-slate-200 rounded-lg transition-colors"
               >
-                Hủy
+                {t('backlog.cancel')}
               </button>
               <button 
                 onClick={executeDeleteSprint} 
                 className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition-colors"
               >
-                Xóa Sprint
+                {t('backlog.delete_sprint')}
               </button>
             </div>
           </div>
@@ -760,22 +763,22 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
       {/* Error Alert Modal */}
       {errorAlertMessage && createPortal(
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-[360px] overflow-hidden border border-slate-200 scale-in-center">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
+          <div className="bg-card rounded-2xl shadow-2xl w-[360px] overflow-hidden border border-border scale-in-center">
+            <div className="px-5 py-4 border-b border-border flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
                 <AlertCircle className="w-4 h-4 text-orange-600" />
               </div>
-              <h3 className="font-extrabold text-slate-800 text-sm">Thông báo</h3>
+              <h3 className="font-extrabold text-foreground text-sm">{t('backlog.notification_title')}</h3>
             </div>
-            <div className="px-5 py-5 text-[13px] text-slate-600 font-medium text-center">
+            <div className="px-5 py-5 text-[13px] text-muted-foreground font-medium text-center">
               {errorAlertMessage}
             </div>
-            <div className="px-5 py-3 border-t border-slate-100 flex justify-center bg-slate-50/50">
+            <div className="px-5 py-3 border-t border-border flex justify-center bg-background/50">
               <button 
                 onClick={() => setErrorAlertMessage(null)} 
                 className="px-6 py-2 w-full text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
               >
-                Đóng
+                {t('backlog.close')}
               </button>
             </div>
           </div>

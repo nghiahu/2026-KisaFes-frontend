@@ -1,8 +1,10 @@
 import dashboardImage from "../../assets/dashboard.png"
 import boardImage from "../../assets/board.png"
 import reportImage from "../../assets/report.png"
+import { useLanguage } from "../../contexts/LanguageContext"
 
 export default function Hero() {
+  const { t } = useLanguage()
   return (
     <section className="py-20 px-4">
       <div className="container-custom">
@@ -10,24 +12,24 @@ export default function Hero() {
           <div className="space-y-8 animate-slide-up">
             <div>
               <span className="inline-block text-xs font-semibold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full mb-6">
-                Next-Gen Task Management
+                {t('landing.hero.badge')}
               </span>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                Manage your team's <span className="gradient-text">work</span>, projects, & <span className="text-orange-600">tasks</span> online
+                {t('landing.hero.title_1')} <span className="gradient-text">{t('landing.hero.title_work')}</span>{t('landing.hero.title_2')} <span className="text-orange-600">{t('landing.hero.title_tasks')}</span> {t('landing.hero.title_3')}
               </h1>
             </div>
             <p className="text-xl text-gray-600 max-w-2xl leading-relaxed">
-              Kisafres brings precision and speed to your professional workflows. Organize complex projects, track bugs, and hit deadlines with an industrial-strength interface designed for high-performance teams.
+              {t('landing.hero.desc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <button className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
-                Get Started Free
+                {t('landing.hero.btn_start')}
               </button>
               <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:border-gray-400 hover:bg-gray-50 transition duration-200">
-                View Demo
+                {t('landing.hero.btn_demo')}
               </button>
             </div>
-            <p className="text-sm text-gray-500">Trusted by teams at <span className="font-semibold">QUANTUM • VERTEX • NEXUS</span></p>
+            <p className="text-sm text-gray-500">{t('landing.hero.trusted_by')} <span className="font-semibold">QUANTUM • VERTEX • NEXUS</span></p>
           </div>
           <div className="relative animate-fade-in flex justify-center lg:justify-end">
             <div className="relative w-full max-w-[680px]">

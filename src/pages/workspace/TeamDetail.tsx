@@ -93,7 +93,7 @@ export default function TeamDetail() {
       <div className="h-full flex flex-col relative w-full overflow-hidden">
         <Skeleton className="h-48 w-full bg-slate-200" />
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 relative -mt-12">
-          <Skeleton className="w-24 h-24 rounded-2xl bg-white border-4 border-slate-50" />
+          <Skeleton className="w-24 h-24 rounded-2xl bg-card border-4 border-slate-50" />
           <Skeleton className="h-8 w-64 bg-slate-200 mt-4" />
           <Skeleton className="h-4 w-96 bg-slate-200 mt-2" />
         </div>
@@ -105,14 +105,14 @@ export default function TeamDetail() {
 
   if (isEditing) {
     return (
-      <div className="h-full flex flex-col relative w-full overflow-hidden bg-white">
+      <div className="h-full flex flex-col relative w-full overflow-hidden bg-card">
         <TeamSettings team={team} onUpdate={setTeam} onClose={() => setIsEditing(false)} />
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col relative w-full overflow-hidden bg-slate-50">
+    <div className="h-full flex flex-col relative w-full overflow-hidden bg-background">
       <div className="flex-1 overflow-y-auto">
         {/* Cover Image */}
         <div className="h-48 w-full bg-slate-200 relative shrink-0">
@@ -124,7 +124,7 @@ export default function TeamDetail() {
           <div className="absolute top-4 left-4">
             <button 
               onClick={() => navigate('/workspace/teams')}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+              className="w-10 h-10 rounded-full bg-card/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-card/30 transition-colors"
             >
               <Icons.chevronLeft size={20} />
             </button>
@@ -134,21 +134,21 @@ export default function TeamDetail() {
           {/* Header Info */}
           <div className="relative -mt-12 mb-6 flex items-end justify-between">
             <div className="flex flex-col">
-              <div className="w-24 h-24 rounded-2xl bg-white shadow-sm border-4 border-slate-50 flex items-center justify-center overflow-hidden mb-4 relative z-10">
+              <div className="w-24 h-24 rounded-2xl bg-card shadow-sm border-4 border-slate-50 flex items-center justify-center overflow-hidden mb-4 relative z-10">
                 {isValidImageUrl(team.avatar) ? (
                   <img src={team.avatar} alt={team.name} className="w-full h-full object-cover" />
                 ) : (
                   <Icons.users size={40} className="text-blue-500" />
                 )}
               </div>
-              <h1 className="text-3xl font-bold text-slate-900">{team.name}</h1>
-              <p className="text-slate-500 mt-1 max-w-2xl">{team.description || 'No description provided.'}</p>
+              <h1 className="text-3xl font-bold text-foreground">{team.name}</h1>
+              <p className="text-muted-foreground mt-1 max-w-2xl">{team.description || 'No description provided.'}</p>
             </div>
             
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors text-sm flex items-center gap-2 shadow-sm"
+                className="px-4 py-2 bg-card border border-border text-foreground font-semibold rounded-xl hover:bg-background transition-colors text-sm flex items-center gap-2 shadow-sm"
               >
                 <Icons.settings size={16} />
                 Settings
@@ -157,10 +157,10 @@ export default function TeamDetail() {
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center gap-6 border-b border-slate-200 mb-6">
+          <div className="flex items-center gap-6 border-b border-border mb-6">
             <button
               onClick={() => setActiveTab('members')}
-              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'members' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'members' ? 'text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
             >
               Members
               {activeTab === 'members' && (
@@ -169,7 +169,7 @@ export default function TeamDetail() {
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'projects' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'projects' ? 'text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
             >
               Projects
               {activeTab === 'projects' && (
@@ -178,7 +178,7 @@ export default function TeamDetail() {
             </button>
             <button
               onClick={() => setActiveTab('tasks')}
-              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'tasks' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'tasks' ? 'text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
             >
               Work
               {activeTab === 'tasks' && (
@@ -188,18 +188,18 @@ export default function TeamDetail() {
           </div>
 
           {/* Tab Content */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <div className="bg-card rounded-2xl border border-border shadow-sm">
             {activeTab === 'members' && (
               <div className="flex flex-col">
-                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white rounded-t-2xl">
+                <div className="p-4 border-b border-border flex items-center justify-between bg-card rounded-t-2xl">
                   <div className="relative w-64">
-                    <Icons.search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Icons.search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input 
                       type="text" 
                       placeholder="Find members..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-all" 
+                      className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-all" 
                     />
                   </div>
                   <button 
@@ -213,7 +213,7 @@ export default function TeamDetail() {
                 
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-slate-500 font-bold">
+                    <tr className="bg-background border-b border-border text-xs uppercase tracking-wider text-muted-foreground font-bold">
                       <th className="px-6 py-3 font-semibold">User</th>
                       <th className="px-6 py-3 font-semibold">Role</th>
                       <th className="px-6 py-3 font-semibold">Joined</th>
@@ -224,27 +224,27 @@ export default function TeamDetail() {
                     {team.members
                       .filter(member => member.name.toLowerCase().includes(searchQuery.toLowerCase()))
                       .map(member => (
-                      <tr key={member.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">
+                      <tr key={member.id} className="border-b border-slate-50 hover:bg-background/50 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
                               {isValidImageUrl(member.avatar) ? <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" /> : member.name.charAt(0)}
                             </div>
-                            <span className="font-semibold text-slate-800 text-sm">{member.name}</span>
+                            <span className="font-semibold text-foreground text-sm">{member.name}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold ${member.role === 'ADMIN' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold ${member.role === 'ADMIN' ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground'}`}>
                             {member.role}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-500">
+                        <td className="px-6 py-4 text-sm text-muted-foreground">
                           {new Date(member.joinedAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 text-right relative">
                           <button 
                             onClick={() => setOpenDropdownId(openDropdownId === member.id ? null : member.id)}
-                            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            className="text-muted-foreground hover:text-muted-foreground p-1.5 rounded-lg hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                           >
                             <Icons.moreHorizontal size={16} />
                           </button>
@@ -252,7 +252,7 @@ export default function TeamDetail() {
                           {openDropdownId === member.id && (
                             <>
                               <div className="fixed inset-0 z-10" onClick={() => setOpenDropdownId(null)}></div>
-                              <div className="absolute right-6 top-10 mt-1 w-32 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-20 text-left">
+                              <div className="absolute right-6 top-10 mt-1 w-32 bg-card rounded-xl shadow-lg border border-border py-1 z-20 text-left">
                                 <button
                                   onClick={() => {
                                     setMemberToKick(member);
@@ -299,20 +299,20 @@ export default function TeamDetail() {
       {/* Confirmation Modal */}
       {memberToKick && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden relative">
+          <div className="bg-card rounded-2xl w-full max-w-md shadow-xl overflow-hidden relative">
             <div className="p-6">
               <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
                 <Icons.alertTriangle size={24} />
               </div>
-              <h2 className="text-xl font-bold text-slate-800 mb-2">Remove Member</h2>
-              <p className="text-slate-600">
-                Are you sure you want to remove <span className="font-semibold text-slate-900">{memberToKick.name}</span> from the team? They will lose access to team resources.
+              <h2 className="text-xl font-bold text-foreground mb-2">Remove Member</h2>
+              <p className="text-muted-foreground">
+                Are you sure you want to remove <span className="font-semibold text-foreground">{memberToKick.name}</span> from the team? They will lose access to team resources.
               </p>
             </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+            <div className="px-6 py-4 bg-background border-t border-border flex justify-end gap-3">
               <button
                 onClick={() => setMemberToKick(null)}
-                className="px-4 py-2 font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
+                className="px-4 py-2 font-semibold text-muted-foreground hover:bg-slate-200 rounded-xl transition-colors"
               >
                 Cancel
               </button>

@@ -31,6 +31,7 @@ import { createPortal } from 'react-dom';
 import { SortableTaskCard } from './components/SortableTaskCard';
 import { DroppableColumn } from './components/DroppableColumn';
 import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 export default function ProjectBoard({ currentProject }: ProjectBoardProps) {
   const { data: tasksData } = useTasksQuery(currentProject?.id, { size: 1000 });
@@ -39,6 +40,8 @@ export default function ProjectBoard({ currentProject }: ProjectBoardProps) {
   
   const updateStatusMutation = useUpdateTaskStatusMutation(currentProject?.id);
   const createTaskMutation = useCreateTaskMutation(currentProject?.id);
+
+  const { t } = useLanguage();
 
   useEffect(() => {
     setBoardTasks(tasksList);
@@ -180,10 +183,10 @@ export default function ProjectBoard({ currentProject }: ProjectBoardProps) {
               ) : (
                 <button
                   onClick={() => setShowAddTask(columnId)}
-                  className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/20 rounded-2xl text-slate-400 hover:text-blue-600 text-xs font-bold transition-all mt-2"
+                  className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/20 rounded-2xl text-muted-foreground hover:text-blue-600 text-xs font-bold transition-all mt-2"
                 >
                   <Icons.plus size={14} />
-                  <span>Add Issue</span>
+                  <span>{t('board.add_issue')}</span>
                   </button>
                 )}
               </div>

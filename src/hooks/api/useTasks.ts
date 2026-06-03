@@ -4,6 +4,7 @@ import { taskService, type TaskCreateRequest } from '../../services/task.service
 export const TASK_KEYS = {
   all: (projectId: string) => ['tasks', projectId] as const,
   list: (projectId: string, params?: any) => ['tasks', projectId, 'list', params] as const,
+  myTasks: (params?: any) => ['my-tasks', params] as const,
   detail: (taskId: string) => ['task', taskId] as const,
 };
 
@@ -24,6 +25,19 @@ export function useTasksQuery(projectId: string, params?: any) {
       };
     },
     enabled: !!projectId,
+  });
+}
+
+export function useMyTasksQuery(params?: any) {
+  return useQuery({
+    queryKey: TASK_KEYS.myTasks(params),
+    queryFn: async () => {
+      const response = await taskService.getMyTasks(params);
+      if (response && Array.isArray(response.content)) {
+        return response.content;
+      }
+      return Array.isArray(response) ? response : [];
+    }
   });
 }
 

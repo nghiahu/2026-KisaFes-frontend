@@ -3,6 +3,7 @@ import { Icons } from '../../../../../assets/icons';
 import { useProjectList } from './ProjectListContext';
 import { ProjectListRow } from './ProjectListRow';
 import { ProjectListNewRow } from './ProjectListNewRow';
+import { useLanguage } from '../../../../../contexts/LanguageContext';
 
 export function ProjectListTable() {
   const {
@@ -13,6 +14,7 @@ export function ProjectListTable() {
     handleMasterCheckboxToggle
   } = useProjectList();
 
+  const { t } = useLanguage();
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   const toggleGroup = (key: string) => {
@@ -23,11 +25,11 @@ export function ProjectListTable() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-white p-6">
-      <div className="border border-slate-200/80 rounded-2xl shadow-sm overflow-x-auto bg-white">
+    <div className="flex-1 overflow-y-auto bg-card p-6">
+      <div className="border border-border/80 rounded-2xl shadow-sm overflow-x-auto bg-card">
         <table className="min-w-max w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-bold text-[11px] uppercase tracking-wider divide-x divide-slate-200/60">
+            <tr className="bg-background/75 border-b border-border text-muted-foreground font-bold text-[11px] uppercase tracking-wider divide-x divide-slate-200/60">
               {columns.map((col: any) => (
                 <th
                   key={col.id}
@@ -36,7 +38,7 @@ export function ProjectListTable() {
                   onDragOver={(e) => !col.unmovable && handleDragOver(e, col.id)}
                   onDrop={(e) => !col.unmovable && handleDrop(e, col.id)}
                   style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }}
-                  className={`py-3 px-4 relative ${col.unmovable ? '' : 'cursor-move hover:bg-slate-100/80'} ${dragOverColId === col.id ? 'bg-blue-50/50 border-l-2 border-l-blue-400' : ''}`}
+                  className={`py-3 px-4 relative ${col.unmovable ? '' : 'cursor-move hover:bg-muted/80'} ${dragOverColId === col.id ? 'bg-blue-50/50 border-l-2 border-l-blue-400' : ''}`}
                 >
                   <div className="flex items-center h-full w-full">
                     {col.id === 'checkbox' ? (
@@ -49,7 +51,7 @@ export function ProjectListTable() {
                         />
                       </div>
                     ) : col.id === 'actions' ? (
-                      <div className="w-4 h-4 rounded hover:bg-slate-200 flex items-center justify-center cursor-pointer text-slate-500 mx-auto">
+                      <div className="w-4 h-4 rounded hover:bg-slate-200 flex items-center justify-center cursor-pointer text-muted-foreground mx-auto">
                         <Icons.plus size={12} />
                       </div>
                     ) : (
@@ -73,14 +75,14 @@ export function ProjectListTable() {
                 const isCollapsed = collapsedGroups.has(key);
                 return (
                   <React.Fragment key={key}>
-                    <tr className="bg-slate-50/50 border-b border-slate-200">
-                      <td colSpan={columns.length} className="py-2.5 px-4 font-bold text-slate-700 text-[13px]">
+                    <tr className="bg-background/50 border-b border-border">
+                      <td colSpan={columns.length} className="py-2.5 px-4 font-bold text-foreground text-[13px]">
                         <div className="flex items-center gap-2 cursor-pointer w-fit" onClick={() => toggleGroup(key)}>
                           <span className={`transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}>
-                            <Icons.chevronDown size={14} className="text-slate-400" />
+                            <Icons.chevronDown size={14} className="text-muted-foreground" />
                           </span>
                           <span>{key}</span>
-                          <span className="text-slate-400 font-medium text-[11px] bg-white px-1.5 rounded-full border border-slate-200 shadow-sm ml-1">
+                          <span className="text-muted-foreground font-medium text-[11px] bg-card px-1.5 rounded-full border border-border shadow-sm ml-1">
                             {groupTasks.length}
                           </span>
                         </div>
@@ -95,11 +97,11 @@ export function ProjectListTable() {
             ) : (
               filteredTasks.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="bg-slate-50/30 p-0 border-0 text-left">
+                  <td colSpan={columns.length} className="bg-background/30 p-0 border-0 text-left">
                     <div className="sticky left-1/2 -translate-x-1/2 w-max inline-flex flex-col items-center justify-center py-12">
                       <Icons.search size={32} className="mb-3 text-slate-300" />
-                      <p className="font-medium text-[13px] text-slate-500">Không tìm thấy công việc nào</p>
-                      <p className="text-[12px] text-slate-400 mt-1">Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
+                      <p className="font-medium text-[13px] text-muted-foreground">{t('list.no_tasks_found')}</p>
+                      <p className="text-[12px] text-muted-foreground mt-1">{t('list.try_changing_filters')}</p>
                     </div>
                   </td>
                 </tr>

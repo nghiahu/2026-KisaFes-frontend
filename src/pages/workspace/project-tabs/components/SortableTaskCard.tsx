@@ -6,18 +6,19 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { createPortal } from 'react-dom';
 import { useUpdateTaskTitleMutation, useUpdateTaskAssigneeMutation, useUpdateTaskPriorityMutation, useUpdateTaskDueDateMutation } from '../../../../hooks/api/useTasks';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 const PRIORITIES = [
   { label: 'Highest', icon: <Icons.chevronsUp size={12} className="text-rose-500" />, color: 'text-rose-600' },
   { label: 'High', icon: <Icons.chevronUp size={12} className="text-orange-500" />, color: 'text-orange-500' },
   { label: 'Medium', icon: <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />, color: 'text-amber-500' },
   { label: 'Low', icon: <Icons.chevronDown size={12} className="text-blue-400" />, color: 'text-blue-400' },
-  { label: 'Lowest', icon: <Icons.chevronsDown size={12} className="text-slate-400" />, color: 'text-slate-400' },
+  { label: 'Lowest', icon: <Icons.chevronsDown size={12} className="text-muted-foreground" />, color: 'text-muted-foreground' },
 ];
 
 export const getPriorityColor = (priority: string) => {
   const p = PRIORITIES.find(x => x.label?.toLowerCase() === (priority || '').toLowerCase());
-  return p ? p.color : 'text-slate-500';
+  return p ? p.color : 'text-muted-foreground';
 };
 
 export const getPriorityIcon = (priority: string) => {
@@ -34,6 +35,8 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
   const updatePriorityMutation = useUpdateTaskPriorityMutation(projectId);
   const updateDueDateMutation = useUpdateTaskDueDateMutation(projectId);
   
+  const { t } = useLanguage();
+
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(task.title);
 
@@ -135,15 +138,15 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
       style={style}
       {...attributes}
       {...listeners}
-      className={`bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors group cursor-grab active:cursor-grabbing ${isOverlay ? 'shadow-2xl scale-105 rotate-2' : ''}`}
+      className={`bg-card p-3.5 rounded-2xl border border-border shadow-sm hover:border-blue-300 transition-colors group cursor-grab active:cursor-grabbing ${isOverlay ? 'shadow-2xl scale-105 rotate-2' : ''}`}
     >
       <div className="flex justify-between items-start mb-1.5">
-        <span className="text-[10px] text-slate-400 font-bold block">{task.taskKey || task.id}</span>
+        <span className="text-[10px] text-muted-foreground font-bold block">{task.taskKey || task.id}</span>
         
         {/* Due Date */}
         <div className="relative group/date">
           <div 
-            className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+            className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-blue-600 bg-background hover:bg-blue-50 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
             onClick={(e) => {
               const input = e.currentTarget.parentElement?.querySelector('input[type="date"]') as HTMLInputElement;
               if (input) { try { input.showPicker(); } catch (err) { input.focus(); } }
@@ -151,7 +154,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
             onPointerDown={e => e.stopPropagation()}
           >
             <Icons.calendar size={10} />
-            <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Set date'}</span>
+            <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : t('board.set_date')}</span>
           </div>
           <input
             type="date"
@@ -170,7 +173,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
               setActionsPos({ top: rect.bottom + 4, left: rect.left - 100 });
               setShowActions(true);
             }}
-            className="p-1 text-slate-300 hover:text-slate-600 hover:bg-slate-50 rounded transition-colors"
+            className="p-1 text-slate-300 hover:text-muted-foreground hover:bg-background rounded transition-colors"
           >
             <Icons.moreHorizontal size={14} />
           </button>
@@ -189,16 +192,16 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
             }}
             onBlur={handleTitleSubmit}
             autoFocus
-            className="flex-1 border border-blue-400 bg-white px-2 py-1 rounded-[3px] text-xs outline-none focus:ring-1 focus:ring-blue-400 min-w-0 font-bold"
+            className="flex-1 border border-blue-400 bg-card px-2 py-1 rounded-[3px] text-xs outline-none focus:ring-1 focus:ring-blue-400 min-w-0 font-bold"
           />
-          <button onClick={handleTitleSubmit} className="p-1 border border-slate-200 bg-white rounded shadow-sm hover:bg-slate-50 shrink-0"><Icons.check size={14} className="text-slate-700" /></button>
-          <button onClick={() => { setIsEditingTitle(false); setTitleValue(task.title); }} className="p-1 border border-slate-200 bg-white rounded shadow-sm hover:bg-slate-50 shrink-0"><Icons.x size={14} className="text-slate-700" /></button>
+          <button onClick={handleTitleSubmit} className="p-1 border border-border bg-card rounded shadow-sm hover:bg-background shrink-0"><Icons.check size={14} className="text-foreground" /></button>
+          <button onClick={() => { setIsEditingTitle(false); setTitleValue(task.title); }} className="p-1 border border-border bg-card rounded shadow-sm hover:bg-background shrink-0"><Icons.x size={14} className="text-foreground" /></button>
         </div>
       ) : (
         <h5 
           onClick={() => { setIsEditingTitle(true); setTitleValue(task.title); }}
           onPointerDown={e => e.stopPropagation()}
-          className="font-bold text-slate-800 text-sm leading-snug hover:text-blue-600 transition-colors cursor-pointer mb-2"
+          className="font-bold text-foreground text-sm leading-snug hover:text-blue-600 transition-colors cursor-pointer mb-2"
         >
           {task.title}
         </h5>
@@ -212,7 +215,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
             setPriorityPos({ top: rect.bottom + 4, left: rect.left });
             setShowPriority(true);
           }}
-          className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider border hover:bg-slate-100 transition-colors ${getPriorityColor(task.priority)}`}
+          className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider border hover:bg-muted transition-colors ${getPriorityColor(task.priority)}`}
         >
           {getPriorityIcon(task.priority)}
           <span>{task.priority || 'Medium'}</span>
@@ -228,25 +231,25 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
           }}
           className="flex items-center gap-1.5 hover:ring-2 hover:ring-blue-200 rounded-full transition-all"
         >
-          <img src={task.assigneeAvatar || defaultMan} alt="Assignee" className="w-6 h-6 rounded-full border border-slate-200 shadow-sm object-cover" title={task.assigneeName || 'Unassigned'} />
+          <img src={task.assigneeAvatar || defaultMan} alt="Assignee" className="w-6 h-6 rounded-full border border-border shadow-sm object-cover" title={task.assigneeName || t('board.unassigned')} />
         </button>
       </div>
 
       {showPriority && createPortal(
         <div
-          className="fixed w-[140px] bg-white border border-slate-200 shadow-2xl rounded-xl py-1 z-[9999] overflow-hidden"
+          className="fixed w-[140px] bg-card border border-border shadow-2xl rounded-xl py-1 z-[9999] overflow-hidden"
           style={{ top: priorityPos.top, left: priorityPos.left }}
           onPointerDown={(e) => e.stopPropagation()}
         >
-          <div className="flex justify-between items-center px-3 py-1 mb-1 border-b border-slate-100">
-             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Priority</span>
-             <button onClick={() => setShowPriority(false)}><Icons.x size={12} className="text-slate-400 hover:text-slate-700"/></button>
+          <div className="flex justify-between items-center px-3 py-1 mb-1 border-b border-border">
+             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('board.priority')}</span>
+             <button onClick={() => setShowPriority(false)}><Icons.x size={12} className="text-muted-foreground hover:text-foreground"/></button>
           </div>
           {PRIORITIES.map((p) => (
             <button
               key={p.label}
               onClick={() => handlePrioritySelect(p.label)}
-              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-slate-50 transition-colors text-left text-slate-700"
+              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-background transition-colors text-left text-foreground"
             >
               {p.icon} <span>{p.label}</span>
             </button>
@@ -257,30 +260,30 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
 
       {showAssignee && createPortal(
         <div
-          className="fixed w-[200px] bg-white border border-slate-200 shadow-2xl rounded-xl py-2 z-[9999] overflow-hidden"
+          className="fixed w-[200px] bg-card border border-border shadow-2xl rounded-xl py-2 z-[9999] overflow-hidden"
           style={{ top: assigneePos.top, left: assigneePos.left }}
           onPointerDown={(e) => e.stopPropagation()}
         >
           <div className="flex justify-between items-center px-3 mb-2">
-             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Assignee</span>
-             <button onClick={() => setShowAssignee(false)}><Icons.x size={12} className="text-slate-400 hover:text-slate-700"/></button>
+             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('board.assignee')}</span>
+             <button onClick={() => setShowAssignee(false)}><Icons.x size={12} className="text-muted-foreground hover:text-foreground"/></button>
           </div>
-          <div className="px-3 pb-2 border-b border-slate-100">
+          <div className="px-3 pb-2 border-b border-border">
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder={t('board.search_users')}
               value={assigneeSearch}
               onChange={(e) => setAssigneeSearch(e.target.value)}
-              className="w-full text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded px-2 py-1 outline-none focus:border-blue-400"
+              className="w-full text-xs text-foreground bg-background border border-border rounded px-2 py-1 outline-none focus:border-blue-400"
             />
           </div>
           <div className="max-h-[150px] overflow-y-auto py-1">
-            <button onClick={() => handleAssigneeSelect(null)} className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-slate-50 text-left text-slate-600">
-              <div className="w-5 h-5 rounded-full bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-400"><Icons.user size={10} /></div>
-              <span>Unassigned</span>
+            <button onClick={() => handleAssigneeSelect(null)} className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-background text-left text-muted-foreground">
+              <div className="w-5 h-5 rounded-full bg-muted border border-dashed border-slate-300 flex items-center justify-center text-muted-foreground"><Icons.user size={10} /></div>
+              <span>{t('board.unassigned')}</span>
             </button>
             {filteredMembers.map((m: any) => (
-              <button key={m.id} onClick={() => handleAssigneeSelect(m)} className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-slate-50 text-left text-slate-700">
+              <button key={m.id} onClick={() => handleAssigneeSelect(m)} className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-background text-left text-foreground">
                 <img src={m.avatar || defaultMan} alt={m.name} className="w-5 h-5 rounded-full object-cover" />
                 <span className="truncate">{m.name}</span>
               </button>
@@ -293,7 +296,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
       {/* Actions Dropdown */}
       {showActions && createPortal(
         <div
-          className="fixed w-[120px] bg-white border border-slate-200 shadow-xl rounded-md py-1 z-[9999]"
+          className="fixed w-[120px] bg-card border border-border shadow-xl rounded-md py-1 z-[9999]"
           style={{ top: actionsPos.top, left: actionsPos.left }}
           onPointerDown={(e) => e.stopPropagation()}
         >
@@ -305,7 +308,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
             }}
             className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium text-rose-600 hover:bg-rose-50 transition-colors"
           >
-            <Icons.trash2 size={14} className="text-rose-500" /> Delete
+            <Icons.trash2 size={14} className="text-rose-500" /> {t('board.delete')}
           </button>
         </div>,
         document.body

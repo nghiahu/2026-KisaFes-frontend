@@ -7,6 +7,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 import { useTasksQuery } from '../../../hooks/api/useTasks';
 import { useParams } from 'react-router-dom';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ProjectOverviewProps {
   currentProject: any;
@@ -17,6 +18,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
   const { projectId } = useParams();
   const { data: tasksData } = useTasksQuery(projectId || '', { page: 0, size: 100 });
   const tasks = tasksData?.content || [];
+  const { t } = useLanguage();
 
   // Dynamic stats calculation for Summary Dashboard
   const totalCount = tasks.length;
@@ -95,7 +97,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
     { label: 'High', count: priorityCounts.High, icon: <Icons.chevronUp size={14} className="text-orange-500" />, color: 'linear-gradient(to top, #f97316, #fb923c)' },
     { label: 'Medium', count: priorityCounts.Medium, icon: <Icons.equal size={14} strokeWidth={3} className="text-amber-500" />, color: 'linear-gradient(to top, #f59e0b, #fbbf24)' },
     { label: 'Low', count: priorityCounts.Low, icon: <Icons.chevronDown size={14} className="text-blue-500" />, color: 'linear-gradient(to top, #3b82f6, #60a5fa)' },
-    { label: 'Lowest', count: priorityCounts.Lowest, icon: <Icons.chevronsDown size={14} className="text-slate-400" />, color: 'linear-gradient(to top, #94a3b8, #cbd5e1)' }
+    { label: 'Lowest', count: priorityCounts.Lowest, icon: <Icons.chevronsDown size={14} className="text-muted-foreground" />, color: 'linear-gradient(to top, #94a3b8, #cbd5e1)' }
   ];
 
   // Types of work
@@ -146,15 +148,15 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
   });
 
   // Recent activity
-  const activityLog = tasks.slice(0, 5).map((t, idx) => {
+  const activityLog = tasks.slice(0, 5).map((task, idx) => {
     const timeAgos = ['2 minutes ago', '14 minutes ago', '1 hour ago', '3 hours ago', 'Yesterday'];
     return {
-      userName: t.reporter || 'nghĩa Ngô',
-      action: idx % 2 === 0 ? 'created' : 'updated',
-      taskKey: t.id,
-      taskTitle: t.title,
-      taskType: t.type,
-      status: t.status,
+      userName: task.reporter || 'nghĩa Ngô',
+      action: idx % 2 === 0 ? t('overview.created_action') : t('overview.updated_field'),
+      taskKey: task.id,
+      taskTitle: task.title,
+      taskType: task.type,
+      status: task.status,
       timeAgo: timeAgos[idx % timeAgos.length]
     };
   });
@@ -163,63 +165,63 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
     <div className="p-6 bg-[#F4F5F7] flex flex-col gap-6 overflow-y-auto h-full flex-1">
       {/* Filter Bar Row */}
       <div className="flex items-center justify-between shrink-0">
-        <button className="flex items-center gap-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-3.5 py-1.5 rounded-[4px] text-[13px] font-bold transition-colors shadow-sm">
-          <Icons.filter size={13} className="text-slate-500" />
-          <span>Filter</span>
+        <button className="flex items-center gap-1.5 bg-card border border-slate-300 hover:bg-background text-foreground px-3.5 py-1.5 rounded-[4px] text-[13px] font-bold transition-colors shadow-sm">
+          <Icons.filter size={13} className="text-muted-foreground" />
+          <span>{t('overview.filter')}</span>
         </button>
       </div>
 
       {/* Metrics cards row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
         {/* Completed */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
+        <div className="bg-card border border-border/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
           <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 shrink-0">
             <Icons.checkCircle2 size={18} className="stroke-[2.5]" />
           </div>
           <div>
-            <h4 className="text-[15px] font-bold text-slate-800 leading-tight">
-              {completedCount} completed
+            <h4 className="text-[15px] font-bold text-foreground leading-tight">
+              {completedCount} {t('overview.completed')}
             </h4>
-            <p className="text-[11px] text-slate-400 font-bold mt-0.5">in the last 7 days</p>
+            <p className="text-[11px] text-muted-foreground font-bold mt-0.5">{t('overview.last_7_days')}</p>
           </div>
         </div>
 
         {/* Updated */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
-          <div className="w-10 h-10 bg-slate-50 rounded-[4px] flex items-center justify-center text-slate-600 shrink-0 border border-slate-200">
+        <div className="bg-card border border-border/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
+          <div className="w-10 h-10 bg-background rounded-[4px] flex items-center justify-center text-muted-foreground shrink-0 border border-border">
             <Icons.pencil size={16} />
           </div>
           <div>
-            <h4 className="text-[15px] font-bold text-slate-800 leading-tight">
-              {updatedCount} updated
+            <h4 className="text-[15px] font-bold text-foreground leading-tight">
+              {updatedCount} {t('overview.updated')}
             </h4>
-            <p className="text-[11px] text-slate-400 font-bold mt-0.5">in the last 7 days</p>
+            <p className="text-[11px] text-muted-foreground font-bold mt-0.5">{t('overview.last_7_days')}</p>
           </div>
         </div>
 
         {/* Created */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
-          <div className="w-10 h-10 bg-slate-50 rounded-[4px] flex items-center justify-center text-slate-600 shrink-0 border border-slate-200">
+        <div className="bg-card border border-border/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
+          <div className="w-10 h-10 bg-background rounded-[4px] flex items-center justify-center text-muted-foreground shrink-0 border border-border">
             <Icons.clipboardList size={16} />
           </div>
           <div>
-            <h4 className="text-[15px] font-bold text-slate-800 leading-tight">
-              {createdCount} created
+            <h4 className="text-[15px] font-bold text-foreground leading-tight">
+              {createdCount} {t('overview.created')}
             </h4>
-            <p className="text-[11px] text-slate-400 font-bold mt-0.5">in the last 7 days</p>
+            <p className="text-[11px] text-muted-foreground font-bold mt-0.5">{t('overview.last_7_days')}</p>
           </div>
         </div>
 
         {/* Due soon */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
-          <div className="w-10 h-10 bg-slate-50 rounded-[4px] flex items-center justify-center text-slate-600 shrink-0 border border-slate-200">
+        <div className="bg-card border border-border/80 rounded-[4px] p-4 flex items-center gap-3.5 shadow-sm">
+          <div className="w-10 h-10 bg-background rounded-[4px] flex items-center justify-center text-muted-foreground shrink-0 border border-border">
             <Icons.calendar size={16} />
           </div>
           <div>
-            <h4 className="text-[15px] font-bold text-slate-800 leading-tight">
-              {dueSoonCount} due soon
+            <h4 className="text-[15px] font-bold text-foreground leading-tight">
+              {dueSoonCount} {t('overview.due_soon')}
             </h4>
-            <p className="text-[11px] text-slate-400 font-bold mt-0.5">in the next 7 days</p>
+            <p className="text-[11px] text-muted-foreground font-bold mt-0.5">{t('overview.next_7_days')}</p>
           </div>
         </div>
       </div>
@@ -227,13 +229,13 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
       {/* Row 2: Status overview & Recent activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Status overview */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
+        <div className="bg-card border border-border/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
           <div>
-            <h3 className="text-[15px] font-bold text-slate-800">Status overview</h3>
-            <p className="text-[12px] text-slate-500 font-medium mt-1">
-              Get a snapshot of the status of your work items.{" "}
+            <h3 className="text-[15px] font-bold text-foreground">{t('overview.status_overview')}</h3>
+            <p className="text-[12px] text-muted-foreground font-medium mt-1">
+              {t('overview.status_desc')} {" "}
               <button onClick={() => setActiveTab('list')} className="text-blue-600 hover:underline font-bold">
-                View all work items
+                {t('overview.view_all_items')}
               </button>
             </p>
           </div>
@@ -246,14 +248,14 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
                   <Doughnut data={chartData} options={chartOptions} />
                 </div>
               ) : (
-                <div className="w-full h-full rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300 font-bold text-xs">
-                  No tasks
+                <div className="w-full h-full rounded-full border border-border bg-background flex items-center justify-center text-slate-300 font-bold text-xs">
+                  {t('overview.no_tasks')}
                 </div>
               )}
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-[26px] font-black text-slate-800 leading-none">{totalCount}</span>
-                <span className="text-[10px] text-slate-400 font-bold tracking-tight mt-1 text-center max-w-[80px]">
-                  Total work item...
+                <span className="text-[26px] font-black text-foreground leading-none">{totalCount}</span>
+                <span className="text-[10px] text-muted-foreground font-bold tracking-tight mt-1 text-center max-w-[80px]">
+                  {t('overview.total_work_item')}
                 </span>
               </div>
             </div>
@@ -261,7 +263,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             {/* Legend list */}
             <div className="flex flex-col gap-2.5 min-w-[120px]">
               {statusGroups.map((group: any, idx: number) => (
-                <div key={idx} className="flex items-center gap-2.5 text-[12px] font-bold text-slate-600">
+                <div key={idx} className="flex items-center gap-2.5 text-[12px] font-bold text-muted-foreground">
                   <span className="w-3 h-3 rounded-[2px] shrink-0" style={{ backgroundColor: group.color }} />
                   <span>{group.label}: {group.count}</span>
                 </div>
@@ -271,15 +273,15 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
         </div>
 
         {/* Recent activity */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
+        <div className="bg-card border border-border/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-[15px] font-bold text-slate-800">Recent activity</h3>
-              <p className="text-[12px] text-slate-500 font-medium mt-1">
-                Stay up to date with what's happening across the space.
+              <h3 className="text-[15px] font-bold text-foreground">{t('overview.recent_activity')}</h3>
+              <p className="text-[12px] text-muted-foreground font-medium mt-1">
+                {t('overview.recent_desc')}
               </p>
             </div>
-            <button className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded transition-colors shrink-0">
+            <button className="p-1 text-muted-foreground hover:text-muted-foreground hover:bg-background rounded transition-colors shrink-0">
               <Icons.maximize2 size={14} />
             </button>
           </div>
@@ -292,28 +294,28 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
                     {act.userName?.substring(0, 2) || 'NN'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-medium text-slate-700 leading-snug">
+                    <p className="text-[12px] font-medium text-foreground leading-snug">
                       <span className="font-bold text-slate-850 hover:underline cursor-pointer">{act.userName}</span>{" "}
-                      {act.action === 'created' ? 'created' : `updated field "Rank" on`}{" "}
+                      {act.action}{" "}
                       <button 
                         onClick={() => setActiveTab('list')}
-                        className="font-bold text-blue-600 hover:underline inline-flex items-center gap-1 bg-slate-50 border border-slate-200/60 rounded px-1 py-0.5 text-[10px] align-baseline uppercase"
+                        className="font-bold text-blue-600 hover:underline inline-flex items-center gap-1 bg-background border border-border/60 rounded px-1 py-0.5 text-[10px] align-baseline uppercase"
                       >
                         {act.taskKey}
                       </button>
-                      <span className="ml-1 text-slate-600 font-bold">: {act.taskTitle}</span>
-                      <span className="ml-1.5 text-[9px] font-black bg-slate-100 text-slate-500 px-1 py-0.5 rounded uppercase inline-block scale-90 origin-left">
+                      <span className="ml-1 text-muted-foreground font-bold">: {act.taskTitle}</span>
+                      <span className="ml-1.5 text-[9px] font-black bg-muted text-muted-foreground px-1 py-0.5 rounded uppercase inline-block scale-90 origin-left">
                         {act.status}
                       </span>
                     </p>
-                    <span className="text-[10px] text-slate-400 font-semibold block mt-1">{act.timeAgo}</span>
+                    <span className="text-[10px] text-muted-foreground font-semibold block mt-1">{act.timeAgo}</span>
                   </div>
                 </div>
               ))
             ) : (
               <div className="flex flex-col items-center justify-center py-10 text-slate-300 gap-2">
                 <Icons.activity size={20} className="stroke-[1.5]" />
-                <span className="text-xs font-bold">No recent activities</span>
+                <span className="text-xs font-bold">{t('overview.no_recent')}</span>
               </div>
             )}
           </div>
@@ -323,26 +325,26 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
       {/* Row 3: Priority breakdown & Types of work */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Priority breakdown */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
+        <div className="bg-card border border-border/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
           <div>
-            <h3 className="text-[15px] font-bold text-slate-800">Priority breakdown</h3>
-            <p className="text-[12px] text-slate-500 font-medium mt-1">
-              Get a holistic view of how work is being prioritized.{" "}
+            <h3 className="text-[15px] font-bold text-foreground">{t('overview.priority_breakdown')}</h3>
+            <p className="text-[12px] text-muted-foreground font-medium mt-1">
+              {t('overview.priority_desc')}{" "}
               <a href="#spaces" className="text-blue-600 hover:underline font-bold">
-                How to manage priorities for spaces
+                {t('overview.how_to_manage')}
               </a>
             </p>
           </div>
 
           <div className="flex-1 flex flex-col justify-end min-h-[160px] pt-4">
-            <div className="flex justify-between items-end px-4 border-b border-slate-200 pb-2 flex-1 gap-2">
+            <div className="flex justify-between items-end px-4 border-b border-border pb-2 flex-1 gap-2">
               {priorityStats.map((item, idx) => {
                 const maxCount = Math.max(...priorityStats.map(p => p.count), 1);
                 const percentHeight = (item.count / maxCount) * 100;
                 return (
                   <div key={idx} className="flex flex-col items-center gap-2 w-12 group relative">
                     <div className="absolute -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow pointer-events-none">
-                      {item.count} items
+                      {item.count} {t('overview.items')}
                     </div>
                     <div 
                       className="w-7 rounded-t-lg transition-all duration-500 ease-out hover:scale-x-115 hover:shadow-md cursor-pointer"
@@ -361,7 +363,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             <div className="flex justify-between items-center px-2 pt-2">
               {priorityStats.map((item, idx) => (
                 <div key={idx} className="flex flex-col items-center w-12">
-                  <div className="flex items-center gap-0.5 text-[10px] font-bold text-slate-500 capitalize">
+                  <div className="flex items-center gap-0.5 text-[10px] font-bold text-muted-foreground capitalize">
                     <span className="scale-90">{item.icon}</span>
                     <span className="hidden sm:inline">{item.label}</span>
                   </div>
@@ -372,13 +374,13 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
         </div>
 
         {/* Types of work */}
-        <div className="bg-white border border-slate-200/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
+        <div className="bg-card border border-border/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
           <div>
-            <h3 className="text-[15px] font-bold text-slate-800">Types of work</h3>
-            <p className="text-[12px] text-slate-500 font-medium mt-1">
-              Get a breakdown of work items by their types.{" "}
+            <h3 className="text-[15px] font-bold text-foreground">{t('overview.types_of_work')}</h3>
+            <p className="text-[12px] text-muted-foreground font-medium mt-1">
+              {t('overview.types_desc')}{" "}
               <button onClick={() => setActiveTab('list')} className="text-blue-600 hover:underline font-bold">
-                View all items
+                {t('overview.view_all_items')}
               </button>
             </p>
           </div>
@@ -386,19 +388,19 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
           <div className="flex-1 flex flex-col gap-3 pt-2 justify-center">
             {typeStats.map((item, idx) => (
               <div key={idx} className="flex items-center gap-4">
-                <div className="flex items-center gap-2.5 text-[12px] font-bold text-slate-600 w-28 shrink-0">
+                <div className="flex items-center gap-2.5 text-[12px] font-bold text-muted-foreground w-28 shrink-0">
                   <span className="scale-100">{item.icon}</span>
                   <span className="truncate">{item.label}</span>
                 </div>
-                <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div 
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
                   />
                 </div>
                 <div className="w-12 text-right">
-                  <span className="text-[12px] font-bold text-slate-800">{item.count}</span>
-                  <span className="text-[10px] text-slate-400 ml-1 font-semibold">{item.percentage}%</span>
+                  <span className="text-[12px] font-bold text-foreground">{item.count}</span>
+                  <span className="text-[10px] text-muted-foreground ml-1 font-semibold">{item.percentage}%</span>
                 </div>
               </div>
             ))}
@@ -407,16 +409,16 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
       </div>
 
       {/* Row 4: Team workload */}
-      <div className="bg-white border border-slate-200/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
+      <div className="bg-card border border-border/80 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-[15px] font-bold text-slate-800">Team workload</h3>
-            <p className="text-[12px] text-slate-500 font-medium mt-1">
-              Keep an eye on who is doing what.
+            <h3 className="text-[15px] font-bold text-foreground">{t('overview.team_workload')}</h3>
+            <p className="text-[12px] text-muted-foreground font-medium mt-1">
+              {t('overview.team_desc')}
             </p>
           </div>
           <button className="text-blue-600 hover:underline font-bold text-[12px]">
-            View workload report
+            {t('overview.view_workload')}
           </button>
         </div>
 
@@ -425,22 +427,22 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             <div key={idx} className="flex items-center gap-4">
               <div className="flex items-center gap-2.5 w-40 shrink-0">
                 {item.avatar ? (
-                  <img src={item.avatar} alt={item.name} className="w-6 h-6 rounded-full border border-slate-200 object-cover" />
+                  <img src={item.avatar} alt={item.name} className="w-6 h-6 rounded-full border border-border object-cover" />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-[10px] font-bold">
+                  <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground text-[10px] font-bold">
                     ?
                   </div>
                 )}
-                <span className="text-[12px] font-bold text-slate-700 truncate">{item.name}</span>
+                <span className="text-[12px] font-bold text-foreground truncate">{item.name}</span>
               </div>
-              <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-blue-500 rounded-full transition-all duration-500"
                   style={{ width: `${item.percentage}%` }}
                 />
               </div>
               <div className="w-12 text-right">
-                <span className="text-[12px] font-bold text-slate-800">{item.count}</span>
+                <span className="text-[12px] font-bold text-foreground">{item.count}</span>
               </div>
             </div>
           ))}

@@ -3,33 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
 import { useAppDispatch } from '../../store/hooks';
 import { useProjects } from '../../hooks/api/useProjects';
-const navSections = [
-  {
-    id: "main",
-    label: "MAIN",
-    items: [
-      { id: "inbox", label: "Inbox", icon: Icons.inbox, path: "/workspace/inbox" },
-      { id: "my_tasks", label: "My Tasks", icon: Icons.checkSquare, path: "/workspace/my-tasks" },
-      { id: "projects", label: "Projects", icon: Icons.folderKanban, path: "/workspace/projects" },
-      { id: "teams", label: "Teams", icon: Icons.users, path: "/workspace/teams" },
-      { id: "calendar", label: "Calendar", icon: Icons.calendar, path: "/workspace/calendar" }
-    ]
-  },
-  {
-    id: "insights",
-    label: "INSIGHTS",
-    items: [
-      { id: "reports", label: "Reports", icon: Icons.barChart3, path: "/workspace/reports" }
-    ]
-  },
-  {
-    id: "config",
-    label: "CONFIG",
-    items: [
-      { id: "settings", label: "Settings", icon: Icons.settings, path: "/workspace/settings" }
-    ]
-  }
-];
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const getProjectColor = (name: string) => {
   const colors = ['#3B82F6', '#22C55E', '#F97316', '#A855F7', '#EC4899', '#06B6D4', '#EAB308'];
@@ -57,6 +31,35 @@ export default function WorkspaceSidebar({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data: projects = [] } = useProjects();
+  const { t } = useLanguage();
+
+  const navSections = [
+    {
+      id: "main",
+      label: t('sidebar.main'),
+      items: [
+        { id: "inbox", label: t('sidebar.inbox'), icon: Icons.inbox, path: "/workspace/inbox" },
+        { id: "my_tasks", label: t('sidebar.my_tasks'), icon: Icons.checkSquare, path: "/workspace/my-tasks" },
+        { id: "projects", label: t('sidebar.projects'), icon: Icons.folderKanban, path: "/workspace/projects" },
+        { id: "teams", label: t('sidebar.teams'), icon: Icons.users, path: "/workspace/teams" },
+        { id: "calendar", label: t('sidebar.calendar'), icon: Icons.calendar, path: "/workspace/calendar" }
+      ]
+    },
+    {
+      id: "insights",
+      label: t('sidebar.insights'),
+      items: [
+        { id: "reports", label: t('sidebar.reports'), icon: Icons.barChart3, path: "/workspace/reports" }
+      ]
+    },
+    {
+      id: "config",
+      label: t('sidebar.config'),
+      items: [
+        { id: "settings", label: t('sidebar.settings'), icon: Icons.settings, path: "/workspace/settings" }
+      ]
+    }
+  ];
 
   const isActive = (path: string) => {
     if (path === '/workspace') return location.pathname === '/workspace';
@@ -78,13 +81,13 @@ export default function WorkspaceSidebar({
       `}</style>
       <aside 
         style={{ fontFamily: 'Inter, sans-serif' }}
-        className={`flex flex-col bg-white border-r border-slate-200 h-screen transition-all duration-300 z-40 
+        className={`flex flex-col bg-card border-r border-border h-screen transition-all duration-300 z-40 
           ${mobileOpen ? 'fixed left-0 top-0 translate-x-0' : 'fixed left-0 top-0 -translate-x-full md:relative md:translate-x-0'}
           ${collapsed && !mobileOpen ? 'w-[68px]' : 'w-[280px]'}
         `}
       >
         {/* Header */}
-        <div className={`flex items-center px-[16px] py-[16px] shrink-0 border-b border-slate-200 ${
+        <div className={`flex items-center px-[16px] py-[16px] shrink-0 border-b border-border ${
           collapsed ? 'justify-center px-0' : 'justify-between'
         }`}>
           <div className="flex items-center gap-[12px] min-w-0">
@@ -93,15 +96,15 @@ export default function WorkspaceSidebar({
             </div>
             {!collapsed && (
               <div className="min-w-0 flex-1">
-                <span className="text-[14px] font-bold text-slate-900 tracking-tight block truncate">KisaFres</span>
-                <span className="text-[11px] font-medium text-slate-500 block">Workspace</span>
+                <span className="text-[14px] font-bold text-foreground dark:text-white tracking-tight block truncate">KisaFres</span>
+                <span className="text-[11px] font-medium text-muted-foreground dark:text-muted-foreground block">{t('sidebar.workspace')}</span>
               </div>
             )}
             {/* Close button for mobile */}
             {mobileOpen && (
               <button 
                 onClick={onCloseMobile}
-                className="md:hidden p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+                className="md:hidden p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:bg-slate-700 dark:hover:text-slate-200 rounded-md transition-colors"
               >
                 <Icons.x size={16} />
               </button>
@@ -111,7 +114,7 @@ export default function WorkspaceSidebar({
 
         {/* Collapse Toggle Button (Hidden on mobile) */}
         <button
-          className="hidden md:flex absolute -right-3 top-6 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-400 hover:text-slate-600 shadow-sm transition-all z-50 hover:border-slate-300"
+          className="hidden md:flex absolute -right-3 top-6 w-6 h-6 bg-card border border-border rounded-full items-center justify-center text-muted-foreground hover:text-foreground shadow-sm transition-all z-50 hover:border-slate-300"
           onClick={onToggle}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -126,7 +129,7 @@ export default function WorkspaceSidebar({
           {navSections.map((section) => (
             <div key={section.id}>
               {!collapsed && (
-                <span className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-widest block mb-[4px]">
+                <span className="px-3 text-[10px] font-semibold text-muted-foreground dark:text-muted-foreground uppercase tracking-widest block mb-[4px]">
                   {section.label}
                 </span>
               )}
@@ -139,8 +142,8 @@ export default function WorkspaceSidebar({
                         to={item.path}
                         className={`relative flex items-center gap-[12px] h-[34px] px-3 rounded-[8px] font-medium text-[13px] transition-all duration-200 group ${
                           isItemActive
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white'
                         } ${collapsed ? 'justify-center px-0' : ''}`}
                         title={collapsed ? item.label : undefined}
                       >
@@ -152,7 +155,7 @@ export default function WorkspaceSidebar({
                         <item.icon 
                           size={16} 
                           className={`shrink-0 ${
-                            isItemActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'
+                            isItemActive ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground group-hover:text-muted-foreground dark:group-hover:text-slate-300'
                           }`} 
                         />
                         
@@ -178,15 +181,15 @@ export default function WorkspaceSidebar({
           <div>
             <div className="flex items-center justify-between px-3 mb-[4px]">
               {!collapsed && (
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
-                  PROJECTS
+                <span className="text-[10px] font-semibold text-muted-foreground dark:text-muted-foreground uppercase tracking-widest">
+                  {t('sidebar.projects')}
                 </span>
               )}
               {!collapsed && (
                 <button 
                   onClick={() => navigate('/workspace/projects/new')}
-                  className="text-slate-400 hover:text-slate-600 transition-colors"
-                  title="Create Project"
+                  className="text-muted-foreground hover:text-muted-foreground dark:hover:text-slate-200 transition-colors"
+                  title={t('sidebar.create_project')}
                 >
                   <Icons.plus size={12} />
                 </button>
@@ -203,9 +206,9 @@ export default function WorkspaceSidebar({
                   <li key={project.id}>
                     <NavLink 
                       to={projectPath}
-                      className={`relative w-full flex items-center gap-[12px] h-[36px] px-3 rounded-[8px] hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 group ${
+                      className={`relative w-full flex items-center gap-[12px] h-[36px] px-3 rounded-[8px] hover:bg-muted hover:text-foreground dark:hover:bg-slate-700/50 dark:hover:text-white transition-all duration-200 group ${
                         collapsed ? 'justify-center px-0' : ''
-                      } ${isProjActive ? 'bg-blue-50 !text-blue-700' : 'text-slate-600'}`}
+                      } ${isProjActive ? 'bg-blue-50 !text-blue-700 dark:bg-blue-900/40 dark:!text-blue-400' : 'text-muted-foreground dark:text-slate-300'}`}
                       title={collapsed ? project.name : undefined}
                     >
                       {/* Active Left Border Indicator */}
@@ -221,7 +224,7 @@ export default function WorkspaceSidebar({
                         {displayInitials}
                       </div>
                       {!collapsed && (
-                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-blue-700' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-blue-700 dark:!text-blue-400' : 'text-muted-foreground group-hover:text-foreground dark:text-slate-300 dark:group-hover:text-white'}`}>
                           {project.name}
                         </span>
                       )}

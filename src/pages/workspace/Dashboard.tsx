@@ -31,7 +31,7 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col gap-2">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-[0.82rem] font-medium text-slate-400">
+      <div className="flex items-center gap-2 text-[0.82rem] font-medium text-muted-foreground">
         <span>Workspaces</span>
         <span className="text-slate-300">›</span>
         <span>Dashboard</span>
@@ -39,10 +39,10 @@ export default function Dashboard() {
 
       {/* Greeting */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl sm:text-[1.4rem] font-bold text-slate-900 leading-tight">
+        <h1 className="text-2xl sm:text-[1.4rem] font-bold text-foreground leading-tight">
           {getGreeting()}, {firstName}
         </h1>
-        <p className="text-[0.9rem] text-slate-500 max-w-2xl leading-relaxed">
+        <p className="text-[0.9rem] text-muted-foreground max-w-2xl leading-relaxed">
           You have 4 focus tasks today and 2 project updates since you last
           checked in. Breathe deep, let's start.
         </p>
@@ -55,7 +55,7 @@ export default function Dashboard() {
           {/* Recent Projects */}
           <section className="flex flex-col gap-4 mb-8">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-800">Recent Projects</h2>
+              <h2 className="text-lg font-bold text-foreground">Recent Projects</h2>
               <a href="#" className="text-[0.82rem] font-semibold text-blue-500 hover:underline">
                 View All
               </a>
@@ -63,7 +63,7 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Project Card 1 */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group">
+              <div className="bg-card p-5 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow group">
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 text-blue-500">
                     <Icons.leaf size={20} strokeWidth={2} />
@@ -72,18 +72,18 @@ export default function Dashboard() {
                     Active
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-blue-600 transition-colors">
                   Garden App Redesign
                 </h3>
-                <p className="text-[0.82rem] text-slate-500 mb-5 line-clamp-2">
+                <p className="text-[0.82rem] text-muted-foreground mb-5 line-clamp-2">
                   A soft interface for organic gardeners and hobbyists.
                 </p>
                 <div className="mb-5">
-                  <div className="flex justify-between text-[0.7rem] font-bold text-slate-400 mb-1.5 uppercase">
+                  <div className="flex justify-between text-[0.7rem] font-bold text-muted-foreground mb-1.5 uppercase">
                     <span>Progress</span>
-                    <span className="text-slate-600">75%</span>
+                    <span className="text-muted-foreground">75%</span>
                   </div>
-                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full"
                       style={{ width: '75%' }}
@@ -92,16 +92,16 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center">
                   <div className="flex -space-x-2 mr-3">
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-slate-50" />
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-slate-50" />
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-slate-50" />
+                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
                   </div>
-                  <span className="text-[0.7rem] font-bold text-slate-400">+2</span>
+                  <span className="text-[0.7rem] font-bold text-muted-foreground">+2</span>
                 </div>
               </div>
 
               {/* Project Card 2 */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group">
+              <div className="bg-card p-5 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow group">
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-purple-50 text-purple-500">
                     <Icons.star size={20} strokeWidth={2} />
@@ -110,18 +110,18 @@ export default function Dashboard() {
                     Planning
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-purple-600 transition-colors">
+                <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-purple-600 transition-colors">
                   Nebula Branding
                 </h3>
-                <p className="text-[0.82rem] text-slate-500 mb-5 line-clamp-2">
+                <p className="text-[0.82rem] text-muted-foreground mb-5 line-clamp-2">
                   Visual identity for a space-themed mindfulness app.
                 </p>
                 <div className="mb-5">
-                  <div className="flex justify-between text-[0.7rem] font-bold text-slate-400 mb-1.5 uppercase">
+                  <div className="flex justify-between text-[0.7rem] font-bold text-muted-foreground mb-1.5 uppercase">
                     <span>Progress</span>
-                    <span className="text-slate-600">12%</span>
+                    <span className="text-muted-foreground">12%</span>
                   </div>
-                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-orange-500 rounded-full"
                       style={{ width: '12%' }}
@@ -130,8 +130,8 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center">
                   <div className="flex -space-x-2">
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-slate-50" />
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-slate-50" />
+                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
                   </div>
                 </div>
               </div>
@@ -141,12 +141,12 @@ export default function Dashboard() {
           {/* Tasks Section */}
           <section className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-800">Assigned to You</h2>
+              <h2 className="text-lg font-bold text-foreground">Assigned to You</h2>
               <div className="flex items-center gap-1">
-                <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title="Filter">
+                <button className="p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors" title="Filter">
                   <Icons.slidersHorizontal size={16} />
                 </button>
-                <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title="More">
+                <button className="p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors" title="More">
                   <Icons.moreHorizontal size={16} />
                 </button>
               </div>
@@ -154,13 +154,13 @@ export default function Dashboard() {
 
             <div className="flex flex-col gap-3">
               {/* Task Item 1 */}
-              <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:border-slate-200 transition-colors group">
-                <div className="w-5 h-5 rounded-md border-2 border-slate-200 cursor-pointer group-hover:border-blue-400 transition-colors" />
+              <div className="flex items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm hover:border-border transition-colors group">
+                <div className="w-5 h-5 rounded-md border-2 border-border cursor-pointer group-hover:border-blue-400 transition-colors" />
                 <div className="flex-1 flex flex-col">
-                  <span className="text-[0.9rem] font-semibold text-slate-800 group-hover:text-slate-900">
+                  <span className="text-[0.9rem] font-semibold text-foreground group-hover:text-foreground">
                     Refine color palette for 'Nebula'
                   </span>
-                  <span className="text-[0.75rem] text-slate-400 font-medium">
+                  <span className="text-[0.75rem] text-muted-foreground font-medium">
                     Due in 2 days • Project Space
                   </span>
                 </div>
@@ -170,13 +170,13 @@ export default function Dashboard() {
               </div>
 
               {/* Task Item 2 */}
-              <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:border-slate-200 transition-colors group">
-                <div className="w-5 h-5 rounded-md border-2 border-slate-200 cursor-pointer" />
+              <div className="flex items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm hover:border-border transition-colors group">
+                <div className="w-5 h-5 rounded-md border-2 border-border cursor-pointer" />
                 <div className="flex-1 flex flex-col">
-                  <span className="text-[0.9rem] font-semibold text-slate-800">
+                  <span className="text-[0.9rem] font-semibold text-foreground">
                     Weekly team sync preparation
                   </span>
-                  <span className="text-[0.75rem] text-slate-400 font-medium">
+                  <span className="text-[0.75rem] text-muted-foreground font-medium">
                     Tomorrow, 10:00 AM
                   </span>
                 </div>
@@ -186,19 +186,19 @@ export default function Dashboard() {
               </div>
 
               {/* Task Item 3 */}
-              <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:border-slate-200 transition-colors group opacity-70">
+              <div className="flex items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm hover:border-border transition-colors group opacity-70">
                 <div className="w-5 h-5 rounded-md bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center">
                   <Icons.plus size={12} color="#fff" className="rotate-45" />
                 </div>
                 <div className="flex-1 flex flex-col">
-                  <span className="text-[0.9rem] font-semibold text-slate-500 line-through">
+                  <span className="text-[0.9rem] font-semibold text-muted-foreground line-through">
                     Review feedback on 'Garden App'
                   </span>
-                  <span className="text-[0.75rem] text-slate-400 font-medium">
+                  <span className="text-[0.75rem] text-muted-foreground font-medium">
                     Done • 2 hours ago
                   </span>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold bg-slate-100 text-slate-500 uppercase border border-slate-200">
+                <span className="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold bg-muted text-muted-foreground uppercase border border-border">
                   Low
                 </span>
               </div>
@@ -208,21 +208,21 @@ export default function Dashboard() {
 
         {/* Aside Column */}
         <div className="flex flex-col md:flex-row lg:flex-col gap-6">
-          <div className="flex-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 mb-6">Team Activity</h3>
+          <div className="flex-1 bg-card p-6 rounded-2xl border border-border shadow-sm">
+            <h3 className="text-base font-bold text-foreground mb-6">Team Activity</h3>
 
             <div className="flex flex-col gap-6">
               <div className="flex gap-3">
                 <img src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[0.82rem] text-slate-600 leading-snug">
-                    <strong className="text-slate-900 font-bold">Jordan</strong> commented on{' '}
+                  <p className="text-[0.82rem] text-muted-foreground leading-snug">
+                    <strong className="text-foreground font-bold">Jordan</strong> commented on{' '}
                     <a href="#" className="text-blue-500 font-bold hover:underline">User Flow</a>
                   </p>
-                  <p className="text-[0.78rem] text-slate-500 italic pl-2 border-l-2 border-slate-100 mt-1">
+                  <p className="text-[0.78rem] text-muted-foreground italic pl-2 border-l-2 border-border mt-1">
                     "The transition feels so smooth now! Great work on the easing curves."
                   </p>
-                  <span className="block mt-2 text-[0.68rem] font-bold text-slate-400 uppercase tracking-wider">
+                  <span className="block mt-2 text-[0.68rem] font-bold text-muted-foreground uppercase tracking-wider">
                     🕐 12 MINUTES AGO
                   </span>
                 </div>
@@ -231,11 +231,11 @@ export default function Dashboard() {
               <div className="flex gap-3">
                 <img src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[0.82rem] text-slate-600 leading-snug">
-                    <strong className="text-slate-900 font-bold">Sarah</strong> completed{' '}
+                  <p className="text-[0.82rem] text-muted-foreground leading-snug">
+                    <strong className="text-foreground font-bold">Sarah</strong> completed{' '}
                     <a href="#" className="text-blue-500 font-bold hover:underline">Icon Export</a>
                   </p>
-                  <span className="block mt-2 text-[0.68rem] font-bold text-slate-400 uppercase tracking-wider">
+                  <span className="block mt-2 text-[0.68rem] font-bold text-muted-foreground uppercase tracking-wider">
                     🔴 1 HOUR AGO
                   </span>
                 </div>
@@ -244,18 +244,18 @@ export default function Dashboard() {
               <div className="flex gap-3">
                 <img src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[0.82rem] text-slate-600 leading-snug">
-                    <strong className="text-slate-900 font-bold">Liam</strong> added a new file to{' '}
+                  <p className="text-[0.82rem] text-muted-foreground leading-snug">
+                    <strong className="text-foreground font-bold">Liam</strong> added a new file to{' '}
                     <a href="#" className="text-blue-500 font-bold hover:underline">Nebula Assets</a>
                   </p>
-                  <span className="block mt-2 text-[0.68rem] font-bold text-slate-400 uppercase tracking-wider">
+                  <span className="block mt-2 text-[0.68rem] font-bold text-muted-foreground uppercase tracking-wider">
                     🔵 3 HOURS AGO
                   </span>
                 </div>
               </div>
             </div>
 
-            <button className="w-full mt-6 p-2.5 text-[0.82rem] font-semibold text-slate-700 bg-transparent border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all">
+            <button className="w-full mt-6 p-2.5 text-[0.82rem] font-semibold text-foreground bg-transparent border border-border rounded-xl hover:bg-background hover:border-slate-300 transition-all">
               View History
             </button>
           </div>

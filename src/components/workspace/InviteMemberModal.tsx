@@ -120,32 +120,32 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
       />
       
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-visible animate-in zoom-in-95 duration-200 flex flex-col">
-        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0 rounded-t-2xl">
+      <div className="relative bg-card rounded-2xl shadow-xl w-full max-w-md overflow-visible animate-in zoom-in-95 duration-200 flex flex-col">
+        <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-card shrink-0 rounded-t-2xl">
           <div>
-            <h2 className="text-lg font-bold text-slate-800">Add to project</h2>
-            <p className="text-xs font-semibold text-slate-500 mt-0.5">{projectName}</p>
+            <h2 className="text-lg font-bold text-foreground">Add to project</h2>
+            <p className="text-xs font-semibold text-muted-foreground mt-0.5">{projectName}</p>
           </div>
           <button 
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
             <Icons.plus size={20} className="rotate-45" />
           </button>
         </div>
         
         {/* Tabs */}
-        <div className="flex border-b border-slate-100 px-6 pt-4">
+        <div className="flex border-b border-border px-6 pt-4">
           <button
             type="button"
-            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'user' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'user' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('user')}
           >
             Mời cá nhân
           </button>
           <button
             type="button"
-            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'team' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'team' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('team')}
           >
             Thêm nhóm (Team)
@@ -154,11 +154,11 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
 
         <form onSubmit={handleSubmit(onInviteSubmit)} className="p-6">
           <div className="mb-4 relative">
-            <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-foreground mb-2 uppercase tracking-wide">
               {activeTab === 'user' ? 'Tìm kiếm Email hoặc Tên thành viên' : 'Tìm kiếm Tên nhóm'}
             </label>
             <div className="relative">
-              <Icons.search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Icons.search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 {...register('query')}
@@ -173,7 +173,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                   if (searchResults.length > 0) setSearchDropdownOpen(true);
                 }}
                 placeholder={activeTab === 'user' ? "Nhập email hoặc tên của thành viên..." : "Nhập tên nhóm..."}
-                className={`w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:bg-white focus:ring-4 transition-all font-medium text-sm text-slate-800 animate-in ${errors.query ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10 bg-rose-50' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/10 bg-slate-50'}`}
+                className={`w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:bg-card focus:ring-4 transition-all font-medium text-sm text-foreground animate-in ${errors.query ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10 bg-rose-50' : 'border-border focus:border-blue-500 focus:ring-blue-500/10 bg-background'}`}
                 disabled={isSending || success}
                 autoComplete="off"
               />
@@ -200,8 +200,8 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                   className="w-7 h-7 rounded-full object-cover border border-blue-200" 
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-bold text-slate-800 truncate">{selectedItem.fullName || selectedItem.name}</div>
-                  <div className="text-[10px] text-slate-500 truncate">{selectedItem.email || `${selectedItem.members?.length || 0} thành viên`}</div>
+                  <div className="text-xs font-bold text-foreground truncate">{selectedItem.fullName || selectedItem.name}</div>
+                  <div className="text-[10px] text-muted-foreground truncate">{selectedItem.email || `${selectedItem.members?.length || 0} thành viên`}</div>
                 </div>
               </div>
             )}
@@ -210,7 +210,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             {searchDropdownOpen && queryValue.trim() !== '' && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setSearchDropdownOpen(false)} />
-                <div className="absolute left-0 right-0 z-20 mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-56 overflow-y-auto">
+                <div className="absolute left-0 right-0 z-20 mt-2 bg-card border border-border rounded-xl shadow-2xl max-h-56 overflow-y-auto">
                   {searchResults.length > 0 ? (
                     <div className="p-1">
                       {searchResults.map((item) => (
@@ -218,23 +218,23 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                           key={item.id}
                           type="button"
                           onClick={() => selectItem(item)}
-                          className="w-full flex items-center gap-3 p-2.5 hover:bg-slate-50 rounded-lg transition-colors text-left"
+                          className="w-full flex items-center gap-3 p-2.5 hover:bg-background rounded-lg transition-colors text-left"
                         >
                           <img 
                             src={item.avatar || defaultMan} 
                             alt={item.fullName || item.name} 
-                            className="w-8 h-8 rounded-full object-cover bg-slate-100" 
+                            className="w-8 h-8 rounded-full object-cover bg-muted" 
                           />
                           <div className="min-w-0 flex-1">
-                            <div className="font-bold text-xs text-slate-800 truncate">{item.fullName || item.name}</div>
-                            <div className="text-[10px] text-slate-500 truncate">{item.email || `${item.members?.length || 0} thành viên`}</div>
+                            <div className="font-bold text-xs text-foreground truncate">{item.fullName || item.name}</div>
+                            <div className="text-[10px] text-muted-foreground truncate">{item.email || `${item.members?.length || 0} thành viên`}</div>
                           </div>
                         </button>
                       ))}
                     </div>
                   ) : (
                     !isSearching && (
-                      <div className="p-4 text-center text-xs text-slate-500 font-bold">
+                      <div className="p-4 text-center text-xs text-muted-foreground font-bold">
                         Không tìm thấy {activeTab === 'user' ? 'người dùng' : 'nhóm'} nào phù hợp.
                       </div>
                     )
@@ -255,7 +255,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-xl transition-colors"
+              className="px-4 py-2 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-colors"
               disabled={isSending || success}
             >
               Cancel

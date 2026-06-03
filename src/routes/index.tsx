@@ -21,6 +21,7 @@ const MyTasks = React.lazy(() => import('../pages/workspace/MyTasks'))
 const Teams = React.lazy(() => import('../pages/workspace/Teams'))
 const TeamDetail = React.lazy(() => import('../pages/workspace/TeamDetail'))
 const GlobalCalendar = React.lazy(() => import('../pages/workspace/GlobalCalendar'))
+const GlobalReports = React.lazy(() => import('../pages/workspace/GlobalReports'))
 
 const SuspenseLoader = () => (
   <div className="flex h-screen w-screen items-center justify-center bg-[#F4F5F7]">
@@ -108,7 +109,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '',
-            element: <Dashboard />,
+            element: <Navigate to="projects" replace />,
           },
           {
             path: 'projects',
@@ -141,6 +142,14 @@ export const router = createBrowserRouter([
           {
             path: 'calendar',
             element: <GlobalCalendar />,
+          },
+          {
+            path: 'reports',
+            element: <GlobalReports />,
+          },
+          {
+            path: 'settings',
+            element: <ProfileSettings />,
           },
         ],
       },

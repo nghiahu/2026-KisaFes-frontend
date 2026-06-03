@@ -62,15 +62,15 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-32 p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-100 overflow-visible animate-in zoom-in-95 duration-200">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-card w-full max-w-lg rounded-2xl shadow-xl border border-border overflow-visible animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-slate-800 text-lg">Mời thành viên</h3>
-            <p className="text-sm text-slate-500">Tìm kiếm người dùng để gửi lời mời tham gia nhóm.</p>
+            <h3 className="font-bold text-foreground text-lg">Mời thành viên</h3>
+            <p className="text-sm text-muted-foreground">Tìm kiếm người dùng để gửi lời mời tham gia nhóm.</p>
           </div>
           <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-2 rounded-xl hover:bg-slate-100 transition-colors"
+            className="text-muted-foreground hover:text-muted-foreground p-2 rounded-xl hover:bg-muted transition-colors"
           >
             <Icons.x size={20} />
           </button>
@@ -78,11 +78,11 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
 
         <div className="p-6">
           <div className="relative mb-4">
-            <Icons.search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Icons.search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               autoFocus
-              className="w-full bg-slate-50 border border-slate-200 pl-11 pr-5 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-sm"
+              className="w-full bg-background border border-border pl-11 pr-5 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-sm"
               placeholder="Search users by name or email..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -103,25 +103,25 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
 
           <div className="min-h-[200px] max-h-[300px] overflow-y-auto">
             {!searchInput.trim() ? (
-              <div className="flex flex-col items-center justify-center h-48 text-slate-400">
+              <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
                 <Icons.users size={32} className="mb-2 opacity-50" />
                 <p className="text-sm">Type a name or email to search</p>
               </div>
             ) : searchResults.length > 0 ? (
               <div className="space-y-2">
                 {searchResults.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
+                  <div key={user.id} className="flex items-center justify-between p-3 hover:bg-background rounded-xl transition-colors border border-transparent hover:border-border">
                     <div className="flex items-center gap-3">
                       {(user.avatar || user.avatarUrl) ? (
-                        <img src={user.avatar || user.avatarUrl} alt={user.fullName} className="w-10 h-10 rounded-full object-cover bg-slate-100" />
+                        <img src={user.avatar || user.avatarUrl} alt={user.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
                           {user.fullName?.charAt(0) || user.email?.charAt(0)}
                         </div>
                       )}
                       <div>
-                        <div className="font-bold text-slate-800 text-sm">{user.fullName || "User"}</div>
-                        <div className="text-xs text-slate-500">{user.email}</div>
+                        <div className="font-bold text-foreground text-sm">{user.fullName || "User"}</div>
+                        <div className="text-xs text-muted-foreground">{user.email}</div>
                       </div>
                     </div>
                     <button
@@ -139,7 +139,7 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
                 ))}
               </div>
             ) : !isSearching ? (
-              <div className="flex flex-col items-center justify-center h-48 text-slate-400">
+              <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
                 <p className="text-sm">No users found matching "{searchInput}"</p>
               </div>
             ) : null}

@@ -14,7 +14,7 @@ export default function LandingLayout() {
     setUser(userData)
   }, [])
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
       {!user && (
         <main>

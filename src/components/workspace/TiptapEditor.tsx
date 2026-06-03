@@ -17,7 +17,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
   if (!editor) return null;
 
   return (
-    <div className="flex items-center gap-1 border-b border-[#dfe1e6] p-1 px-2 bg-slate-50/50 flex-wrap text-[#42526e]">
+    <div className="flex items-center gap-1 border-b border-[#dfe1e6] p-1 px-2 bg-background/50 flex-wrap text-[#42526e]">
       <button 
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-xs ${editor.isActive('heading', { level: 1 }) ? 'bg-[#091e4214] text-blue-600' : ''}`}
@@ -130,11 +130,11 @@ export default function TiptapEditor({ content, onChange, onSave, onCancel }: Ti
   });
 
   return (
-    <div className="flex flex-col border border-[#dfe1e6] rounded focus-within:border-[#4c9aff] focus-within:shadow-[0_0_0_1px_#4c9aff] transition-all bg-white overflow-hidden">
+    <div className="flex flex-col border border-[#dfe1e6] rounded focus-within:border-[#4c9aff] focus-within:shadow-[0_0_0_1px_#4c9aff] transition-all bg-card overflow-hidden">
       <MenuBar editor={editor} />
       <EditorContent editor={editor} className="tiptap-editor-content" />
       
-      <div className="flex items-center gap-2 p-2 border-t border-slate-100 bg-slate-50/50">
+      <div className="flex items-center gap-2 p-2 border-t border-border bg-background/50">
         <button 
           onClick={onSave}
           className="px-3 py-1.5 bg-[#0052cc] hover:bg-[#0047b3] text-white font-medium text-[13px] rounded-[3px] transition-colors"

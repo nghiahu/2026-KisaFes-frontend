@@ -95,7 +95,11 @@ import {
   Hash,
   ArrowRight,
   PanelRightClose,
-  PanelRightOpen
+  PanelRightOpen,
+  CalendarX2,
+  Lightbulb,
+  Cloud,
+  Minimize2
 } from 'lucide-react';
 
 export const Icons = {
@@ -196,4 +200,8 @@ export const Icons = {
   arrowRight: ArrowRight,
   panelRightClose: PanelRightClose,
   panelRightOpen: PanelRightOpen,
+  calendarX2: CalendarX2,
+  lightbulb: Lightbulb,
+  cloud: Cloud,
+  minimize2: Minimize2,
 };

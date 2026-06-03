@@ -4,10 +4,12 @@ import { z } from 'zod';
 import { useAuthActions } from '../../hooks/useAuthActions';
 import { Icons } from '../../assets/icons';
 import { useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'Email or username is required'),
-  password: z.string().min(1, 'Password is required')
+  // We'll handle validation messages dynamically in the component using t()
+  email: z.string().min(1, 'email_required'),
+  password: z.string().min(1, 'password_required')
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -15,6 +17,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginForm() {
   const { loading, errorMsg, loginUser } = useAuthActions();
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useLanguage();
 
   const {
     register,
@@ -39,8 +42,8 @@ export default function LoginForm() {
   return (
     <>
       <div className="mb-5">
-        <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-        <p className="text-sm text-gray-600 mt-1">Enter your details to sign in.</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('auth.login.title')}</h2>
+        <p className="text-sm text-gray-600 mt-1">{t('auth.login.subtitle')}</p>
       </div>
 
       {errorMsg && <div className="mb-3 p-2 bg-red-100 text-red-600 text-sm rounded">{errorMsg}</div>}
@@ -48,23 +51,23 @@ export default function LoginForm() {
       <form className="space-y-3 mt-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-            EMAIL / USERNAME
+            {t('auth.login.email_username')}
           </label>
           <input
             type="text"
-            placeholder="name@company.com"
+            placeholder={t('auth.login.email_username_placeholder')}
             autoComplete="username"
             {...register('email')}
             className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          {errors.email && <p className="text-red-500 text-xs mt-1">{t(`auth.login.${errors.email.message}`)}</p>}
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-xs font-semibold text-gray-700">PASSWORD</label>
+            <label className="block text-xs font-semibold text-gray-700">{t('auth.login.password')}</label>
             <a href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-700 font-semibold">
-              Forgot?
+              {t('auth.login.forgot_password')}
             </a>
           </div>
           <div>
@@ -84,13 +87,13 @@ export default function LoginForm() {
                 )}
               </button>
             </div>
-            {errors.password && (<p className="text-red-500 text-xs mt-1">{errors.password.message}</p>)}
+            {errors.password && (<p className="text-red-500 text-xs mt-1">{t(`auth.login.${errors.password.message}`)}</p>)}
           </div>
         </div>
 
         <label className="flex items-center gap-2">
           <input type="checkbox" className="w-3 h-3 rounded border-gray-300" />
-          <span className="text-xs text-gray-600">Remember me</span>
+          <span className="text-xs text-gray-600">{t('auth.login.remember_me')}</span>
         </label>
 
         <button
@@ -98,7 +101,7 @@ export default function LoginForm() {
           disabled={loading}
           className="w-full py-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition duration-200 mt-1"
         >
-          {loading ? 'Logging in...' : 'Log In'}
+          {loading ? t('auth.login.logging_in_btn') : t('auth.login.login_btn')}
         </button>
       </form>
 
@@ -108,7 +111,7 @@ export default function LoginForm() {
             <div className="w-full border-t border-gray-200"></div>
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="px-2 bg-white text-gray-500">OR</span>
+            <span className="px-2 bg-white text-gray-500">{t('auth.login.or')}</span>
           </div>
         </div>
 
@@ -125,18 +128,18 @@ export default function LoginForm() {
       </div>
 
       <p className="mt-3 text-center text-gray-600 text-xs">
-        Don't have an account?{' '}
+        {t('auth.login.no_account')}{' '}
         <a href="/signup" className="text-blue-600 font-semibold hover:text-blue-700">
-          Sign up
+          {t('auth.login.sign_up')}
         </a>
       </p>
 
       <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-center gap-2 text-xs text-gray-500">
         <a href="#" className="hover:text-gray-700">
-          Privacy
+          {t('auth.login.privacy')}
         </a>
         <span>•</span>
-        <span>© 2024 KisaFres</span>
+        <span>{t('auth.login.copyright')}</span>
       </div>
     </>
   );

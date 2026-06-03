@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ProjectSettingsProps {
   currentProject: any;
@@ -10,6 +11,7 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
   const [statuses, setStatuses] = useState<any[]>([]);
   const [boardColumns, setBoardColumns] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (currentProject) {
@@ -40,26 +42,26 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
     <div className="flex flex-col gap-8 p-6 animate-in fade-in duration-300 overflow-y-auto h-full">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Project Settings</h2>
-          <p className="text-slate-500 font-medium">Customize project statuses and column structure.</p>
+          <h2 className="text-2xl font-black text-foreground tracking-tight">{t('project_settings.title')}</h2>
+          <p className="text-muted-foreground font-medium">{t('project_settings.subtitle')}</p>
         </div>
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-blue-200 disabled:opacity-70"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-blue-200 dark:shadow-none dark:shadow-none disabled:opacity-70"
         >
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isSaving ? t('project_settings.saving') : t('project_settings.save')}
         </button>
       </div>
 
       <div className="flex flex-col gap-4">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Statuses</label>
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('project_settings.active_statuses')}</label>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {statuses.map((status, idx) => (
-            <div key={status.statusId || idx} className="flex items-center gap-3 bg-white border border-slate-200 p-4 rounded-2xl shadow-sm group">
+            <div key={status.statusId || idx} className="flex items-center gap-3 bg-card border border-border p-4 rounded-2xl shadow-sm group">
               <div className={`w-3 h-3 rounded-full ${status.color || 'bg-slate-500'}`} />
               <input
-                className="flex-1 min-w-0 font-bold text-slate-700 bg-transparent outline-none"
+                className="flex-1 min-w-0 font-bold text-foreground bg-transparent outline-none"
                 value={status.label}
                 onChange={(e) => {
                   const newStatus = [...statuses];
@@ -76,8 +78,8 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
             </div>
           ))}
           <button 
-            onClick={() => setStatuses([...statuses, { statusId: crypto.randomUUID(), label: 'New Status', category: 'TO_DO', color: 'bg-slate-500' }])}
-            className="flex items-center justify-center bg-slate-50 border border-dashed border-slate-300 p-4 rounded-2xl text-slate-400 hover:bg-slate-100 transition-all"
+            onClick={() => setStatuses([...statuses, { statusId: crypto.randomUUID(), label: t('project_settings.new_status'), category: 'TO_DO', color: 'bg-slate-500' }])}
+            className="flex items-center justify-center bg-background border border-dashed border-slate-300 p-4 rounded-2xl text-muted-foreground hover:bg-muted transition-all"
           >
             <Icons.plus size={20} />
           </button>
@@ -85,9 +87,9 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
       </div>
 
       <div className="flex flex-col gap-4">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Unmapped Statuses (Drag to assign)</label>
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('project_settings.unmapped_statuses')}</label>
         <div 
-          className="min-h-[60px] p-4 bg-slate-100 border-2 border-dashed border-slate-300 rounded-2xl flex flex-wrap gap-2"
+          className="min-h-[60px] p-4 bg-muted border-2 border-dashed border-slate-300 rounded-2xl flex flex-wrap gap-2"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
             e.preventDefault();
@@ -106,14 +108,14 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
           }}
         >
           {statuses.filter(s => !boardColumns.some(c => c.mappedStatusIds?.includes(s.statusId))).length === 0 && (
-            <span className="text-slate-400 text-sm font-semibold italic">All statuses are mapped</span>
+            <span className="text-muted-foreground text-sm font-semibold italic">{t('project_settings.all_statuses_mapped')}</span>
           )}
           {statuses.filter(s => !boardColumns.some(c => c.mappedStatusIds?.includes(s.statusId))).map(st => (
             <div
               key={st.statusId}
               draggable
               onDragStart={(e) => e.dataTransfer.setData('statusId', st.statusId)}
-              className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-bold text-slate-700 cursor-grab active:cursor-grabbing hover:border-blue-400 hover:shadow-md transition-all flex items-center gap-2"
+              className="px-3 py-1.5 bg-card border border-border shadow-sm rounded-lg text-xs font-bold text-foreground cursor-grab active:cursor-grabbing hover:border-blue-400 hover:shadow-md transition-all flex items-center gap-2"
             >
               <div className={`w-2 h-2 rounded-full ${st.color || 'bg-slate-500'}`} />
               {st.label}
@@ -123,13 +125,13 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
       </div>
 
       <div className="flex flex-col gap-4">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Board Columns</label>
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('project_settings.board_columns')}</label>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {boardColumns.map((column, idx) => (
-            <div key={column.id || idx} className="flex flex-col gap-2 bg-slate-50/50 border border-slate-200 p-4 rounded-2xl">
+            <div key={column.id || idx} className="flex flex-col gap-2 bg-background/50 border border-border p-4 rounded-2xl">
               <div className="flex items-center justify-between gap-2">
                 <input 
-                  className="flex-1 min-w-0 font-bold text-slate-900 bg-transparent outline-none"
+                  className="flex-1 min-w-0 font-bold text-foreground bg-transparent outline-none"
                   value={column.name}
                   onChange={(e) => {
                     const newCols = [...boardColumns];
@@ -139,14 +141,14 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
                 />
                 <button 
                   onClick={() => setBoardColumns(boardColumns.filter((_, i) => i !== idx))}
-                  className="text-slate-400 hover:text-rose-500 transition-colors shrink-0"
+                  className="text-muted-foreground hover:text-rose-500 transition-colors shrink-0"
                 >
                   <Icons.trash2 size={14} />
                 </button>
               </div>
               
               <div 
-                className={`flex flex-col gap-2 mt-2 min-h-[60px] bg-white border border-dashed rounded-xl p-2 transition-colors ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300 hover:border-blue-400'}`}
+                className={`flex flex-col gap-2 mt-2 min-h-[60px] bg-card border border-dashed rounded-xl p-2 transition-colors ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300 hover:border-blue-400'}`}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -167,7 +169,7 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
                   setBoardColumns(newCols);
                 }}
               >
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'text-rose-500' : 'text-slate-500'}`}>Mapped Statuses</span>
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'text-rose-500' : 'text-muted-foreground'}`}>{t('project_settings.mapped_statuses')}</span>
                 <div className="flex flex-wrap gap-1">
                   {column.mappedStatusIds?.map((sid: string) => {
                     const st = statuses.find(s => s.statusId === sid);
@@ -187,7 +189,7 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
                   {(!column.mappedStatusIds || column.mappedStatusIds.length === 0) && (
                     <div className="flex items-center gap-1 text-rose-500 p-1">
                       <Icons.alertCircle size={12} />
-                      <span className="text-[10px] italic font-bold">Please drag at least 1 status here</span>
+                      <span className="text-[10px] italic font-bold">{t('project_settings.drag_instruction')}</span>
                     </div>
                   )}
                 </div>
@@ -196,8 +198,8 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
             </div>
           ))}
           <button 
-            onClick={() => setBoardColumns([...boardColumns, { id: crypto.randomUUID(), name: 'New Column', mappedStatusIds: [], defaultStatusId: '', position: boardColumns.length }])}
-            className="flex items-center justify-center bg-white border border-dashed border-slate-300 p-4 rounded-2xl text-slate-400 hover:bg-slate-50 transition-all min-h-[150px]"
+            onClick={() => setBoardColumns([...boardColumns, { id: crypto.randomUUID(), name: t('project_settings.new_column'), mappedStatusIds: [], defaultStatusId: '', position: boardColumns.length }])}
+            className="flex items-center justify-center bg-card border border-dashed border-slate-300 p-4 rounded-2xl text-muted-foreground hover:bg-background transition-all min-h-[150px]"
           >
             <Icons.plus size={20} />
           </button>

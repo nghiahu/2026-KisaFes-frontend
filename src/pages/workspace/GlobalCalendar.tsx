@@ -100,39 +100,39 @@ export default function GlobalCalendar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50/50 overflow-hidden">
+    <div className="flex flex-col h-full bg-background/50 overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-5 bg-white border-b border-slate-200 shrink-0">
+      <div className="px-6 py-5 bg-card border-b border-border shrink-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Icons.calendar size={26} className="text-blue-600" />
               Calendar
             </h1>
-            <p className="text-sm text-slate-500 mt-1">Lịch biểu tổng quát chứa tất cả các công việc của bạn.</p>
+            <p className="text-sm text-muted-foreground mt-1">Lịch biểu tổng quát chứa tất cả các công việc của bạn.</p>
           </div>
 
           {/* Calendar Controls */}
           <div className="flex items-center gap-4">
-            <h2 className="text-lg font-bold text-slate-800 w-[160px] text-right">
+            <h2 className="text-lg font-bold text-foreground w-[160px] text-right">
               {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
             </h2>
-            <div className="flex items-center bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden shrink-0">
+            <div className="flex items-center bg-card border border-border rounded-lg shadow-sm overflow-hidden shrink-0">
               <button 
                 onClick={handlePrevMonth}
-                className="p-2 hover:bg-slate-50 text-slate-600 transition-colors border-r border-slate-200"
+                className="p-2 hover:bg-background text-muted-foreground transition-colors border-r border-border"
               >
                 <Icons.chevronLeft size={20} />
               </button>
               <button 
                 onClick={handleToday}
-                className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                className="px-4 py-2 text-sm font-semibold text-foreground hover:bg-background transition-colors"
               >
                 Today
               </button>
               <button 
                 onClick={handleNextMonth}
-                className="p-2 hover:bg-slate-50 text-slate-600 transition-colors border-l border-slate-200"
+                className="p-2 hover:bg-background text-muted-foreground transition-colors border-l border-border"
               >
                 <Icons.chevronRight size={20} />
               </button>
@@ -144,23 +144,23 @@ export default function GlobalCalendar() {
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden p-4 md:p-6 flex flex-col">
         {isLoading ? (
-          <div className="h-full bg-slate-50 animate-pulse rounded-2xl border border-slate-100"></div>
+          <div className="h-full bg-background animate-pulse rounded-2xl border border-border"></div>
         ) : error ? (
-          <div className="h-full bg-white rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center">
+          <div className="h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center text-center">
             <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 mb-3">
               <Icons.alertTriangle size={24} />
             </div>
-            <p className="text-slate-600 text-sm">Failed to load tasks</p>
+            <p className="text-muted-foreground text-sm">Failed to load tasks</p>
             <button onClick={() => refetch()} className="mt-3 text-sm text-blue-600 hover:underline">
               Retry
             </button>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="flex-1 flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
             {/* Days of week header */}
-            <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50 shrink-0">
+            <div className="grid grid-cols-7 border-b border-border bg-background shrink-0">
               {DAYS_OF_WEEK.map(day => (
-                <div key={day} className="py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <div key={day} className="py-3 text-center text-xs font-bold text-muted-foreground uppercase tracking-wider">
                   {day}
                 </div>
               ))}
@@ -176,8 +176,8 @@ export default function GlobalCalendar() {
                 return (
                   <div 
                     key={idx} 
-                    className={`min-h-[100px] border-r border-b border-slate-100 p-2 flex flex-col transition-colors
-                      ${!cell.isCurrentMonth ? 'bg-slate-50/50' : 'bg-white hover:bg-slate-50/30'}
+                    className={`min-h-[100px] border-r border-b border-border p-2 flex flex-col transition-colors
+                      ${!cell.isCurrentMonth ? 'bg-background/50' : 'bg-card hover:bg-background/30'}
                       ${(idx + 1) % 7 === 0 ? 'border-r-0' : ''}
                       ${idx >= grid.length - 7 ? 'border-b-0' : ''}
                     `}
@@ -186,7 +186,7 @@ export default function GlobalCalendar() {
                     <div className="flex justify-between items-start mb-1.5">
                       <div 
                         className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-semibold 
-                          ${isToday ? 'bg-blue-600 text-white shadow-sm' : cell.isCurrentMonth ? 'text-slate-700' : 'text-slate-400'}
+                          ${isToday ? 'bg-blue-600 text-white shadow-sm' : cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
                         `}
                       >
                         {cell.date.getDate()}

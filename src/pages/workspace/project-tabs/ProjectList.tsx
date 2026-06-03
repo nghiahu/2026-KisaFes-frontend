@@ -13,7 +13,7 @@ interface ProjectListProps {
 export default function ProjectList({ currentProject, projectId }: ProjectListProps) {
   return (
     <ProjectListProvider currentProject={currentProject} projectId={projectId}>
-      <div className="flex flex-col h-full bg-slate-50 relative">
+      <div className="flex flex-col h-full bg-background relative">
         <ProjectListToolbar />
         <ProjectListTable />
         <ProjectListPagination />

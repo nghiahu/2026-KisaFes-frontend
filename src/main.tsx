@@ -2,8 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-
 import { Provider } from 'react-redux'
+import { ThemeProvider } from './contexts/ThemeContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { store } from './store'
 
@@ -31,7 +32,11 @@ createRoot(document.getElementById('root')!).render(
         client={queryClient}
         persistOptions={{ persister }}
       >
-        <App />
+        <ThemeProvider>
+          <LanguageProvider>
+            <App />
+          </LanguageProvider>
+        </ThemeProvider>
       </PersistQueryClientProvider>
     </Provider>
   </StrictMode>,

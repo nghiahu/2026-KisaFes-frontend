@@ -32,19 +32,19 @@ export default function PermissionDeniedToast() {
         isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95 pointer-events-none'
       }`}
     >
-      <div className="bg-white border-l-4 border-rose-500 shadow-2xl rounded-r-xl border border-slate-200/80 p-4 max-w-sm flex gap-3.5 items-start backdrop-blur-md bg-white/95">
+      <div className="bg-card border-l-4 border-rose-500 shadow-2xl rounded-r-xl border border-border/80 p-4 max-w-sm flex gap-3.5 items-start backdrop-blur-md bg-card/95">
         <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 shrink-0 shadow-sm shadow-rose-100 animate-pulse">
           <Icons.ban size={18} />
         </div>
         <div className="flex-1 min-w-0 pr-2">
-          <h4 className="text-sm font-black text-slate-800 tracking-tight">Hành động bị chặn</h4>
-          <p className="text-xs font-semibold text-slate-500 mt-1 leading-relaxed">
+          <h4 className="text-sm font-black text-foreground tracking-tight">Hành động bị chặn</h4>
+          <p className="text-xs font-semibold text-muted-foreground mt-1 leading-relaxed">
             {message}
           </p>
         </div>
         <button 
           onClick={() => setIsVisible(false)}
-          className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg transition-all shrink-0"
+          className="text-muted-foreground hover:text-muted-foreground hover:bg-muted p-1.5 rounded-lg transition-all shrink-0"
         >
           <Icons.x size={14} />
         </button>

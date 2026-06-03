@@ -1,36 +1,38 @@
 import { Icons } from "../../assets/icons"
+import { useLanguage } from "../../contexts/LanguageContext"
 
 export default function Features() {
+  const { t } = useLanguage()
   const featureCards = [
     {
       id: 1,
       icon: Icons.squareLibrary,
-      title: "Visual Pipeline Management",
-      description: "Our industrial Kanban boards support nested tasks, custom workflows, and automated state transitions. Map your team's unique process with zero friction.",
-      link: "Explore Boards →",
+      title: t('landing.features.f1_title'),
+      description: t('landing.features.f1_desc'),
+      link: t('landing.features.f1_link'),
       highlight: false,
     },
     {
       id: 2,
       icon: Icons.gauge,
-      title: "Blazing Performance",
-      description: "Built for speed. Our 60FPS interface ensures you never wait for a page load or state update. Experience the precision of local-first interaction.",
+      title: t('landing.features.f2_title'),
+      description: t('landing.features.f2_desc'),
       link: null,
       highlight: true,
     },
     {
       id: 3,
       icon: Icons.bug,
-      title: "Advanced Issue Tracking",
-      description: "Deep integration with Git and CI/CD tools. Automatic bug linking and smart prioritization for engineering teams.",
+      title: t('landing.features.f3_title'),
+      description: t('landing.features.f3_desc'),
       link: null,
       highlight: false,
     },
     {
       id: 4,
       icon: Icons.clipboardClock,
-      title: "Real-time Analytics",
-      description: "Velocity charts, burn-down reports, and resource allocation heatmaps updated in real-time as your team completes work.",
+      title: t('landing.features.f4_title'),
+      description: t('landing.features.f4_desc'),
       link: null,
       highlight: false,
     },
@@ -40,9 +42,9 @@ export default function Features() {
     <section className="py-20 px-4 bg-gray-50">
       <div className="container-custom">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-4">Engineered for focus</h2>
+          <h2 className="text-4xl lg:text-5xl font-bold mb-4">{t('landing.features.title')}</h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Stop juggling tabs. Kisafres consolidates your entire project lifecycle into a single, high-fidelity command center.
+            {t('landing.features.desc')}
           </p>
         </div>
 
@@ -83,7 +85,7 @@ export default function Features() {
               <div className="mb-4">
                 <Icons.badgePlus className="w-12 h-12 mx-auto text-blue-600" />
               </div>
-              <p className="text-gray-600 font-semibold">Add 20+ more features</p>
+              <p className="text-gray-600 font-semibold">{t('landing.features.add_more')}</p>
             </div>
           </div>
         </div>

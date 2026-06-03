@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight, Pencil, Trash2, MoreHorizontal, Plus, Zap, C
 import defaultMan from '../../../../assets/avatar_def_man.png';
 import { DraggableTaskRow } from './DraggableTaskRow';
 import { InlineTaskCreator } from '../../../../components/workspace/InlineTaskCreator';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 // ─── Sprint Section ────────────────────────────────────────────────────────
 export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, onEdit, onDelete, onStart, onComplete, onMoveToSprint, onDeleteTask, allSprints, selectedTaskIds, onToggleTask, onTaskUpdated, onCreateTask, onTaskClick }: any) {
@@ -17,6 +18,7 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
   const [isCreating, setIsCreating] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -57,9 +59,9 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
   return (
     <div className={`mb-6 ${isOver ? 'ring-2 ring-blue-400 rounded-sm' : ''}`} ref={setSprintNodeRef}>
       {/* Sprint Header */}
-      <div className={`flex items-center gap-2 px-2 py-1.5 bg-slate-50 cursor-pointer select-none transition-colors group border border-slate-200 rounded-sm ${isExpanded ? 'border-b-0 rounded-b-none' : ''}`}
+      <div className={`flex items-center gap-2 px-2 py-1.5 bg-background cursor-pointer select-none transition-colors group border border-border rounded-sm ${isExpanded ? 'border-b-0 rounded-b-none' : ''}`}
         onClick={onToggle}>
-        <button className="text-slate-500 hover:bg-slate-200 p-0.5 rounded transition-colors shrink-0 w-5 flex items-center justify-center">
+        <button className="text-muted-foreground hover:bg-slate-200 p-0.5 rounded transition-colors shrink-0 w-5 flex items-center justify-center">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
 
@@ -71,17 +73,17 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
           className="w-3.5 h-3.5 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
         />
 
-        <h3 className="font-bold text-slate-800 text-[13px] truncate">{sprint.name}</h3>
+        <h3 className="font-bold text-foreground text-[13px] truncate">{sprint.name}</h3>
 
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
+        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
           <button className="flex items-center gap-1 hover:bg-slate-200 px-1.5 py-0.5 rounded transition-colors" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
             <Pencil size={11} />
-            {sprint.startDate && sprint.endDate ? `${new Date(sprint.startDate).toLocaleDateString()} - ${new Date(sprint.endDate).toLocaleDateString()}` : 'Add dates'}
+            {sprint.startDate && sprint.endDate ? `${new Date(sprint.startDate).toLocaleDateString()} - ${new Date(sprint.endDate).toLocaleDateString()}` : t('sprint_section.add_dates')}
           </button>
-          <span>({sprintTasks.length} work {sprintTasks.length === 1 ? 'item' : 'items'})</span>
+          <span>{sprintTasks.length === 1 ? t('backlog.work_item').replace('{count}', String(sprintTasks.length)) : t('backlog.work_items').replace('{count}', String(sprintTasks.length))}</span>
           {daysLeft !== null && sprint.status === 'ACTIVE' && (
-            <span className={`px-1.5 ${daysLeft < 0 ? 'text-rose-500' : 'text-slate-500'}`}>
-              {daysLeft < 0 ? 'Overdue' : `${daysLeft} days remaining`}
+            <span className={`px-1.5 ${daysLeft < 0 ? 'text-rose-500' : 'text-muted-foreground'}`}>
+              {daysLeft < 0 ? t('sprint_section.overdue') : t('sprint_section.days_remaining').replace('{days}', String(daysLeft))}
             </span>
           )}
         </div>
@@ -92,38 +94,38 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
           <div onClick={e => e.stopPropagation()} className="flex items-center gap-1 ml-2">
             {sprint.status === 'PLANNING' && (
               <button onClick={onStart}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded font-semibold transition-colors">
-                Start sprint
+                className="bg-muted hover:bg-slate-200 text-foreground px-3 py-1 rounded font-semibold transition-colors">
+                {t('sprint_section.start_sprint')}
               </button>
             )}
             {sprint.status === 'ACTIVE' && (
               <button onClick={onComplete}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded font-semibold transition-colors">
-                Complete sprint
+                className="bg-muted hover:bg-slate-200 text-foreground px-3 py-1 rounded font-semibold transition-colors">
+                {t('sprint_section.complete_sprint')}
               </button>
             )}
             <div className="relative" ref={menuRef}>
               <button 
                 onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
-                className="p-1 text-slate-500 hover:bg-slate-200 rounded transition-colors"
+                className="p-1 text-muted-foreground hover:bg-slate-200 rounded transition-colors"
               >
                 <MoreHorizontal size={16} />
               </button>
               {showMenu && (
-                <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-50">
+                <div className="absolute right-0 mt-1 w-40 bg-card rounded-lg shadow-xl border border-border py-1 z-50">
                   <button 
                     onClick={(e) => { e.stopPropagation(); setShowMenu(false); onEdit?.(); }}
-                    className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2"
                   >
                     <Pencil size={14} />
-                    Edit sprint
+                    {t('sprint_section.edit_sprint')}
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setShowMenu(false); onDelete?.(); }}
                     className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2"
                   >
                     <Trash2 size={14} />
-                    Delete sprint
+                    {t('sprint_section.delete_sprint')}
                   </button>
                 </div>
               )}
@@ -134,11 +136,11 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
 
       {/* Tasks */}
       {isExpanded && (
-        <div className="flex flex-col border border-slate-200 border-t-0 bg-white rounded-b-sm">
+        <div className="flex flex-col border border-border border-t-0 bg-card rounded-b-sm">
           <SortableContext items={sprintTasks.map((t: any) => t.id)} strategy={verticalListSortingStrategy}>
             {sprintTasks.length === 0 && (
-              <div className="border border-dashed border-slate-300 bg-slate-50/50 text-slate-500 text-[13px] text-center py-6 mx-2 my-2 rounded-sm select-none">
-                There's nothing in sprint
+              <div className="border border-dashed border-slate-300 bg-background/50 text-muted-foreground text-[13px] text-center py-6 mx-2 my-2 rounded-sm select-none">
+                {t('sprint_section.sprint_empty')}
               </div>
             )}
             {sprintTasks.map((task: any) => (
@@ -159,9 +161,9 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
           {!isCreating ? (
             <div
               onClick={() => setIsCreating(true)}
-              className="px-8 py-2 hover:bg-slate-50 cursor-pointer text-slate-600 flex items-center gap-1.5 text-[13px] font-semibold transition-colors"
+              className="px-8 py-2 hover:bg-background cursor-pointer text-muted-foreground flex items-center gap-1.5 text-[13px] font-semibold transition-colors"
             >
-              <Plus size={14} /> Create
+              <Plus size={14} /> {t('backlog.create')}
             </div>
           ) : (
             <div className="px-2 pb-2">
