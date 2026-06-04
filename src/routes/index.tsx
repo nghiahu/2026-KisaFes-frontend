@@ -5,6 +5,8 @@ import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler'
 import LandingLayout from '../layouts/LandingLayout'
 import ProtectedRoute from './ProtectedRoute'
 
+import RootRedirect from './RootRedirect'
+
 // Lazy loaded layouts
 const ProfileLayout = React.lazy(() => import('../layouts/ProfileLayout'))
 const RootLayout = React.lazy(() => import('../layouts/RootLayout'))
@@ -39,7 +41,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Navigate to="/software/kisa" replace />,
+        element: <RootRedirect />,
       },
       {
         path: '/software/kisa',

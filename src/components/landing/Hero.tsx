@@ -1,5 +1,5 @@
-import dashboardImage from "../../assets/dashboard.png"
-import boardImage from "../../assets/board.png"
+import dashboardImage from "../../assets/dashboard.png";
+import boardImage from "../../assets/board.png";
 import reportImage from "../../assets/report.png"
 import { useLanguage } from "../../contexts/LanguageContext"
 

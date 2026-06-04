@@ -27,6 +27,11 @@ export const useAuthActions = () => {
         userName: rawUser.userName || rawUser.username || rawUser.user_name || '',
         avatar: rawUser.avatar || rawUser.avatarUrl || rawUser.avatar_url || null,
       };
+      // Block admin accounts from User portal
+      if (!normalizedUser.roles.includes('USER')) {
+        throw new Error('Tài khoản không có quyền truy cập trang User.');
+      }
+
       dispatch(loginSuccess({
         user: normalizedUser,
         token: authData.accessToken,

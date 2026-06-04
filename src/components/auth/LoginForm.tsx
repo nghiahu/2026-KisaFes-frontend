@@ -116,11 +116,11 @@ export default function LoginForm() {
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/google'}>
+          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => { document.cookie = `oauth2_client_url=${window.location.origin}; path=/; max-age=300`; window.location.href = 'http://localhost:8080/oauth2/authorization/google'; }}>
             <span>G</span>
             <span className="hidden sm:inline">Google</span>
           </button>
-          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/github'}>
+          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => { document.cookie = `oauth2_client_url=${window.location.origin}; path=/; max-age=300`; window.location.href = 'http://localhost:8080/oauth2/authorization/github'; }}>
             <span>⚫</span>
             <span className="hidden sm:inline">GitHub</span>
           </button>
