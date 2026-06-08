@@ -269,7 +269,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                 className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-all hover:bg-muted cursor-pointer group/assignee w-full text-left overflow-hidden ${isAssigneeOpen ? 'bg-blue-50 ring-1 ring-blue-200' : ''}`}
               >
                 {hasAssignee ? (
-                  <img src={task.assigneeAvatar || defaultAvatar} alt={task.assigneeName} className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
+                  <img  src={task.assigneeAvatar || defaultAvatar} alt={task.assigneeName} className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
                 ) : (
                   <div className="w-5 h-5 rounded-full bg-muted border border-dashed border-slate-300 flex items-center justify-center text-muted-foreground shrink-0">
                     <Icons.user size={10} />
@@ -304,7 +304,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                           const isSelected = task.assigneeId === member.id;
                           return (
                             <button key={member.id} onClick={() => handleAssigneeSelect(member)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-foreground hover:bg-background'}`}>
-                              <img src={member.avatar || defaultAvatar} alt={member.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
+                              <img  src={member.avatar || defaultAvatar} alt={member.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                               <div className="flex flex-col min-w-0">
                                 <span className="truncate font-semibold">{member.name}</span>
                                 {member.email && <span className="truncate text-[10px] text-muted-foreground font-normal">{member.email}</span>}
@@ -326,7 +326,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
           case 'reporter': return (
             <td key={col.id} style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }} className="py-3.5 px-4 text-muted-foreground text-xs font-bold">
               <div className="flex items-center gap-2 overflow-hidden w-full">
-                <img src={task.reporterAvatar || defaultAvatar} alt={task.reporterName || 'Reporter'} className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
+                <img  src={task.reporterAvatar || defaultAvatar} alt={task.reporterName || 'Reporter'} className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
                 <span className="text-foreground truncate" title={task.reporterName || t('list.unassigned')}>{task.reporterName || t('list.unassigned')}</span>
               </div>
             </td>

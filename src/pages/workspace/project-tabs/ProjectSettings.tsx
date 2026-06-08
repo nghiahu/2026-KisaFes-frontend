@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useAppSelector } from '../../../store/hooks';
 
 interface ProjectSettingsProps {
   currentProject: any;
@@ -11,31 +12,86 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
   const [statuses, setStatuses] = useState<any[]>([]);
   const [boardColumns, setBoardColumns] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const { t } = useLanguage();
+  const { user } = useAppSelector(state => state.auth);
+
+  const hasProjectUpdatePermission = () => {
+    if (!user) return false;
+    if (currentProject.ownerId === user.id) return true;
+    
+    const memberObj = currentProject.members?.find((m: any) => m.id === user.id);
+    if (!memberObj) return false;
+    
+    const roleId = memberObj.roleId;
+    const roleObj = currentProject.customRoles?.find((r: any) => r.id === roleId);
+    if (!roleObj) return false;
+    
+    return roleObj.permissions?.includes('PROJECT_UPDATE') || roleObj.permissions?.includes('BOARD_UPDATE') || roleObj.permissions?.includes('PERMISSION_MANAGE');
+  };
 
   useEffect(() => {
     if (currentProject) {
       setStatuses(currentProject.statuses || []);
       setBoardColumns(currentProject.boardColumns || []);
+      setShowValidationErrors(false);
     }
   }, [currentProject]);
 
   const handleSave = async () => {
+    const hasEmptyColumn = boardColumns.some(col => !col.mappedStatusIds || col.mappedStatusIds.length === 0);
+    if (hasEmptyColumn) {
+      setShowValidationErrors(true);
+      return;
+    }
+
+    if (!hasProjectUpdatePermission()) {
+      import('../../../utils/permission-denied-event').then(({ permissionDeniedEvent }) => {
+        permissionDeniedEvent.emit(t('common.permission_denied_msg') || "Bạn không có quyền thực hiện hành động này.");
+      });
+      // Revert state
+      if (currentProject) {
+        setStatuses(currentProject.statuses || []);
+        setBoardColumns(currentProject.boardColumns || []);
+      }
+      return;
+    }
+
     setIsSaving(true);
     try {
       // TODO: Call actual API to update project workflow settings
       console.log('Update project settings:', { id: currentProject.id, statuses, boardColumns });
       await new Promise(r => setTimeout(r, 1000));
+      setShowValidationErrors(false);
       onUpdate();
     } catch (err) {
       console.error("Failed to update project settings:", err);
+      // Revert state on error
+      if (currentProject) {
+        setStatuses(currentProject.statuses || []);
+        setBoardColumns(currentProject.boardColumns || []);
+      }
     } finally {
       setIsSaving(false);
     }
   };
 
   const removeStatus = (idx: number) => {
+    const statusToRemove = statuses[idx];
     setStatuses(statuses.filter((_, i) => i !== idx));
+
+    if (statusToRemove) {
+      setBoardColumns(prev => prev.map(col => {
+        if (!col.mappedStatusIds?.includes(statusToRemove.statusId)) return col;
+        
+        const newMapped = col.mappedStatusIds.filter((id: string) => id !== statusToRemove.statusId);
+        return {
+          ...col,
+          mappedStatusIds: newMapped,
+          defaultStatusId: col.defaultStatusId === statusToRemove.statusId ? (newMapped[0] || '') : col.defaultStatusId
+        };
+      }));
+    }
   };
 
   return (
@@ -127,8 +183,11 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
       <div className="flex flex-col gap-4">
         <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('project_settings.board_columns')}</label>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {boardColumns.map((column, idx) => (
-            <div key={column.id || idx} className="flex flex-col gap-2 bg-background/50 border border-border p-4 rounded-2xl">
+          {boardColumns.map((column, idx) => {
+            const isEmpty = !column.mappedStatusIds || column.mappedStatusIds.length === 0;
+            const showWarning = isEmpty && showValidationErrors;
+            return (
+            <div key={column.id || idx} className={`flex flex-col gap-2 bg-background/50 border p-4 rounded-2xl transition-all ${showWarning ? 'border-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.15)] ring-1 ring-rose-500' : 'border-border'}`}>
               <div className="flex items-center justify-between gap-2">
                 <input 
                   className="flex-1 min-w-0 font-bold text-foreground bg-transparent outline-none"
@@ -147,8 +206,15 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
                 </button>
               </div>
               
+              {showWarning && (
+                <div className="text-xs font-bold text-rose-500 flex items-center gap-1.5 mt-1 bg-rose-50/50 p-2 rounded-lg border border-rose-200">
+                  <Icons.alertCircle size={14} className="shrink-0" />
+                  <span>{t('project_settings.empty_column_warning') || 'Cột này phải có ít nhất 1 trạng thái!'}</span>
+                </div>
+              )}
+              
               <div 
-                className={`flex flex-col gap-2 mt-2 min-h-[60px] bg-card border border-dashed rounded-xl p-2 transition-colors ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300 hover:border-blue-400'}`}
+                className={`flex flex-col gap-2 mt-2 min-h-[60px] bg-card border border-dashed rounded-xl p-2 transition-colors ${showWarning ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300 hover:border-blue-400'}`}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -169,7 +235,7 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
                   setBoardColumns(newCols);
                 }}
               >
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${(!column.mappedStatusIds || column.mappedStatusIds.length === 0) ? 'text-rose-500' : 'text-muted-foreground'}`}>{t('project_settings.mapped_statuses')}</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${showWarning ? 'text-rose-500' : 'text-muted-foreground'}`}>{t('project_settings.mapped_statuses')}</span>
                 <div className="flex flex-wrap gap-1">
                   {column.mappedStatusIds?.map((sid: string) => {
                     const st = statuses.find(s => s.statusId === sid);
@@ -186,17 +252,17 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
                       </div>
                     );
                   })}
-                  {(!column.mappedStatusIds || column.mappedStatusIds.length === 0) && (
-                    <div className="flex items-center gap-1 text-rose-500 p-1">
-                      <Icons.alertCircle size={12} />
-                      <span className="text-[10px] italic font-bold">{t('project_settings.drag_instruction')}</span>
+                  {isEmpty && (
+                    <div className="flex items-center gap-1 text-slate-400 p-1">
+                      <Icons.alertCircle size={12} className={showWarning ? 'text-rose-500' : ''} />
+                      <span className={`text-[10px] italic font-bold ${showWarning ? 'text-rose-500' : ''}`}>{t('project_settings.drag_instruction')}</span>
                     </div>
                   )}
                 </div>
               </div>
               
             </div>
-          ))}
+          )})}
           <button 
             onClick={() => setBoardColumns([...boardColumns, { id: crypto.randomUUID(), name: t('project_settings.new_column'), mappedStatusIds: [], defaultStatusId: '', position: boardColumns.length }])}
             className="flex items-center justify-center bg-card border border-dashed border-slate-300 p-4 rounded-2xl text-muted-foreground hover:bg-background transition-all min-h-[150px]"

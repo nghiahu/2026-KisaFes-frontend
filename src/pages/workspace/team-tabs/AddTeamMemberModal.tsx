@@ -113,7 +113,7 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
                   <div key={user.id} className="flex items-center justify-between p-3 hover:bg-background rounded-xl transition-colors border border-transparent hover:border-border">
                     <div className="flex items-center gap-3">
                       {(user.avatar || user.avatarUrl) ? (
-                        <img src={user.avatar || user.avatarUrl} alt={user.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
+                        <img  src={user.avatar || user.avatarUrl} alt={user.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
                           {user.fullName?.charAt(0) || user.email?.charAt(0)}

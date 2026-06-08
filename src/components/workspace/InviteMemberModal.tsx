@@ -194,11 +194,10 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             {/* Selected Item Badge */}
             {selectedItem && (
               <div className="flex items-center gap-2 mt-3 p-2 bg-blue-50/50 border border-blue-100 rounded-xl animate-in zoom-in-95">
-                <img 
+                <img  
                   src={selectedItem.avatar || defaultMan} 
                   alt={selectedItem.fullName || selectedItem.name} 
-                  className="w-7 h-7 rounded-full object-cover border border-blue-200" 
-                />
+                  className="w-7 h-7 rounded-full object-cover border border-blue-200" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold text-foreground truncate">{selectedItem.fullName || selectedItem.name}</div>
                   <div className="text-[10px] text-muted-foreground truncate">{selectedItem.email || `${selectedItem.members?.length || 0} thành viên`}</div>
@@ -220,11 +219,10 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                           onClick={() => selectItem(item)}
                           className="w-full flex items-center gap-3 p-2.5 hover:bg-background rounded-lg transition-colors text-left"
                         >
-                          <img 
+                          <img  
                             src={item.avatar || defaultMan} 
                             alt={item.fullName || item.name} 
-                            className="w-8 h-8 rounded-full object-cover bg-muted" 
-                          />
+                            className="w-8 h-8 rounded-full object-cover bg-muted" />
                           <div className="min-w-0 flex-1">
                             <div className="font-bold text-xs text-foreground truncate">{item.fullName || item.name}</div>
                             <div className="text-[10px] text-muted-foreground truncate">{item.email || `${item.members?.length || 0} thành viên`}</div>

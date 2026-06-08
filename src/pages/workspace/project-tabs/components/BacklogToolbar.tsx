@@ -138,7 +138,7 @@ export function BacklogToolbar({
                               className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
                             />
                             {member.avatar
-                              ? <img src={member.avatar} alt={member.name} className="w-5 h-5 rounded-full object-cover border border-border shrink-0" />
+                              ? <img  src={member.avatar} alt={member.name} className="w-5 h-5 rounded-full object-cover border border-border shrink-0" />
                               : <div className="w-5 h-5 rounded-full bg-muted border border-dashed border-slate-300 flex items-center justify-center text-muted-foreground shrink-0"><Icons.user size={10} /></div>
                             }
                             <span className="text-[12px] font-medium text-foreground truncate">{member.name}</span>

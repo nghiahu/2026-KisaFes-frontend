@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Icons } from '../../assets/icons';
 import UserDropdown from '../common/UserDropdown';
 import NotificationDropdown from './NotificationDropdown';
@@ -21,6 +21,7 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const notificationWrapperRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -90,7 +91,7 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
         </button>
 
         <div className="flex items-center gap-1 shrink-0">
-          <div className="relative">
+          <div className="relative" ref={notificationWrapperRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-slate-200 hover:bg-background dark:hover:bg-slate-700 rounded-lg transition-all relative"
@@ -107,6 +108,7 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
               <NotificationDropdown
                 onClose={() => setShowNotifications(false)}
                 onNotificationsCountChange={setUnreadCount}
+                ignoreRef={notificationWrapperRef}
               />
             )}
           </div>

@@ -159,11 +159,10 @@ export default function ProfileTab() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
               ) : (
-                <img
+                <img 
                   src={avatarPreview || defaultAvatar}
                   alt="Avatar"
-                  className="h-full w-full object-cover"
-                />
+                  className="h-full w-full object-cover" />
               )}
             </div>
           </div>

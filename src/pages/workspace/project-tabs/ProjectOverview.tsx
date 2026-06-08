@@ -22,7 +22,11 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
 
   // Dynamic stats calculation for Summary Dashboard
   const totalCount = tasks.length;
-  const completedCount = tasks.filter(t => t.status === 'Done' || t.status?.toLowerCase().includes('done') || t.status?.toLowerCase().includes('hoàn thành')).length;
+  const completedCount = tasks.filter(t => {
+    const statusObj = currentProject?.statuses?.find((s: any) => s.statusId === t.statusId);
+    const label = statusObj?.label || t.status || '';
+    return label === 'Done' || label.toLowerCase().includes('done') || label.toLowerCase().includes('hoàn thành');
+  }).length;
   const updatedCount = totalCount;
   const createdCount = totalCount;
   const dueSoonCount = 0;
@@ -30,7 +34,8 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
   // Status breakdown
   const statusCounts: Record<string, number> = {};
   tasks.forEach(t => {
-    const label = t.status || 'To Do';
+    const statusObj = currentProject?.statuses?.find((s: any) => s.statusId === t.statusId);
+    const label = statusObj?.label || t.status || 'To Do';
     statusCounts[label] = (statusCounts[label] || 0) + 1;
   });
 
@@ -127,36 +132,37 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
   });
 
   // Team workload
-  const assigneeCounts: Record<string, number> = {};
+  const assigneeCounts: Record<string, { count: number, avatar?: string }> = {};
   tasks.forEach(t => {
-    const name = t.assignee || 'Unassigned';
-    assigneeCounts[name] = (assigneeCounts[name] || 0) + 1;
+    const name = t.assigneeName || t.assignee || 'Unassigned';
+    if (!assigneeCounts[name]) {
+      assigneeCounts[name] = { count: 0, avatar: t.assigneeAvatar };
+    }
+    assigneeCounts[name].count += 1;
   });
 
-  const uniqueAssignees = Array.from(new Set<string>(tasks.map((t: any) => t.assignee || 'Unassigned')));
-  if (uniqueAssignees.length === 0) uniqueAssignees.push('Unassigned');
-
-  const assigneeStats = uniqueAssignees.map((name: string) => {
-    const count = assigneeCounts[name] || 0;
-    const percentage = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+  const assigneeStats = Object.keys(assigneeCounts).map(name => {
+    const data = assigneeCounts[name];
+    const percentage = totalCount > 0 ? Math.round((data.count / totalCount) * 100) : 0;
     return {
       name,
-      count,
+      count: data.count,
       percentage,
-      avatar: name === 'Unassigned' ? undefined : defaultMan
+      avatar: name === 'Unassigned' ? undefined : (data.avatar || defaultMan)
     };
-  });
+  }).sort((a, b) => b.count - a.count);
 
   // Recent activity
   const activityLog = tasks.slice(0, 5).map((task, idx) => {
+    const statusObj = currentProject?.statuses?.find((s: any) => s.statusId === task.statusId);
     const timeAgos = ['2 minutes ago', '14 minutes ago', '1 hour ago', '3 hours ago', 'Yesterday'];
     return {
-      userName: task.reporter || 'nghĩa Ngô',
+      userName: task.reporterName || task.reporter || 'nghĩa Ngô',
       action: idx % 2 === 0 ? t('overview.created_action') : t('overview.updated_field'),
-      taskKey: task.id,
+      taskKey: task.taskKey || task.id,
       taskTitle: task.title,
       taskType: task.type,
-      status: task.status,
+      status: statusObj?.label || task.status || 'To Do',
       timeAgo: timeAgos[idx % timeAgos.length]
     };
   });
@@ -427,7 +433,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             <div key={idx} className="flex items-center gap-4">
               <div className="flex items-center gap-2.5 w-40 shrink-0">
                 {item.avatar ? (
-                  <img src={item.avatar} alt={item.name} className="w-6 h-6 rounded-full border border-border object-cover" />
+                  <img  src={item.avatar} alt={item.name} className="w-6 h-6 rounded-full border border-border object-cover" />
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground text-[10px] font-bold">
                     ?

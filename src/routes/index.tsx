@@ -3,6 +3,7 @@ import React, { Suspense } from 'react'
 import AuthLayout from '../layouts/AuthLayout'
 import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler'
 import LandingLayout from '../layouts/LandingLayout'
+import PublicLayout from '../layouts/PublicLayout'
 import ProtectedRoute from './ProtectedRoute'
 
 import RootRedirect from './RootRedirect'
@@ -25,6 +26,10 @@ const TeamDetail = React.lazy(() => import('../pages/workspace/TeamDetail'))
 const GlobalCalendar = React.lazy(() => import('../pages/workspace/GlobalCalendar'))
 const GlobalReports = React.lazy(() => import('../pages/workspace/GlobalReports'))
 
+const LandingBlogDetail = React.lazy(() => import('../pages/landing/BlogDetail'))
+const NotFound = React.lazy(() => import('../pages/NotFound'))
+const NetworkError = React.lazy(() => import('../pages/NetworkError'))
+
 const SuspenseLoader = () => (
   <div className="flex h-screen w-screen items-center justify-center bg-[#F4F5F7]">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -46,6 +51,20 @@ export const router = createBrowserRouter([
       {
         path: '/software/kisa',
         element: <LandingLayout />,
+      },
+      {
+        path: '/blog',
+        element: (
+          <Suspense fallback={<SuspenseLoader />}>
+            <PublicLayout />
+          </Suspense>
+        ),
+        children: [
+          {
+            path: ':id',
+            element: <LandingBlogDetail />
+          }
+        ]
       },
       {
         path: '/login',
@@ -158,6 +177,22 @@ export const router = createBrowserRouter([
       {
         path: '/oauth2/redirect',
         element: <OAuth2RedirectHandler />,
+      },
+      {
+        path: '/network-error',
+        element: (
+          <Suspense fallback={<SuspenseLoader />}>
+            <NetworkError />
+          </Suspense>
+        ),
+      },
+      {
+        path: '*',
+        element: (
+          <Suspense fallback={<SuspenseLoader />}>
+            <NotFound />
+          </Suspense>
+        ),
       },
     ],
   },

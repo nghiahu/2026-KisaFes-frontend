@@ -105,10 +105,12 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       onUpdate();
       setMemberToRemove(null);
     } catch (err: any) {
-      setAlertInfo({
-        title: t('members.error_title'),
-        message: err.response?.data?.message || t('members.error_default')
-      });
+      if (err?.status !== 403 && err?.response?.status !== 403) {
+        setAlertInfo({
+          title: t('members.error_title'),
+          message: err.response?.data?.message || err.message || t('members.error_default')
+        });
+      }
     } finally {
       setLoadingAction(null);
     }
@@ -123,10 +125,12 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       onUpdate();
       setMemberToRestore(null);
     } catch (err: any) {
-      setAlertInfo({
-        title: t('members.error_title'),
-        message: err.response?.data?.message || t('members.error_default')
-      });
+      if (err?.status !== 403 && err?.response?.status !== 403) {
+        setAlertInfo({
+          title: t('members.error_title'),
+          message: err.response?.data?.message || err.message || t('members.error_default')
+        });
+      }
     } finally {
       setLoadingAction(null);
     }
@@ -142,10 +146,12 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       await projectService.changeMemberRole(currentProject.id, userId, roleId);
       onUpdate();
     } catch (err: any) {
-      setAlertInfo({
-        title: t('members.error_title'),
-        message: err.response?.data?.message || t('members.error_default')
-      });
+      if (err?.status !== 403 && err?.response?.status !== 403) {
+        setAlertInfo({
+          title: t('members.error_title'),
+          message: err.response?.data?.message || err.message || t('members.error_default')
+        });
+      }
     } finally {
       setLoadingAction(null);
       setShowRoleMenu(null);
@@ -178,10 +184,12 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
       queryClient.invalidateQueries({ queryKey: ['project', currentProject.id] });
       setTeamToRemove(null);
     } catch (err: any) {
-      setAlertInfo({
-        title: t('members.error_title'),
-        message: err.response?.data?.message || t('members.error_remove_team')
-      });
+      if (err?.status !== 403 && err?.response?.status !== 403) {
+        setAlertInfo({
+          title: t('members.error_title'),
+          message: err.response?.data?.message || err.message || t('members.error_remove_team')
+        });
+      }
     } finally {
       setLoadingAction(null);
     }
@@ -229,7 +237,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
         {filteredMembers.map((member: any) => (
           <div key={member.id} className={`bg-card border border-border rounded-xl p-4 flex items-center justify-between shadow-sm transition-all ${member.active === false ? 'opacity-60 grayscale hover:opacity-80' : 'hover:shadow-md'}`}>
             <div className="flex items-center gap-3">
-              <img src={member.avatar || defaultMan} alt={member.name} className="w-12 h-12 rounded-full border-2 border-border object-cover" />
+              <img  src={member.avatar || defaultMan} alt={member.name} className="w-12 h-12 rounded-full border-2 border-border object-cover" />
               <div>
                 <h3 className={`font-bold text-sm flex items-center gap-2 ${member.active === false ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                   {member.name}
@@ -346,7 +354,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
             <div key={team.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center gap-3">
                 {team.avatar ? (
-                  <img src={team.avatar} alt={team.name} className="w-12 h-12 rounded-xl object-cover border border-border shrink-0" />
+                  <img  src={team.avatar} alt={team.name} className="w-12 h-12 rounded-xl object-cover border border-border shrink-0" />
                 ) : (
                   <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0">
                     <Icons.users size={24} />

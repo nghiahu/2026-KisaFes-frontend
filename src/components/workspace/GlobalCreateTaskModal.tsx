@@ -232,7 +232,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                 className="flex items-center gap-2 px-3 py-1.5 border border-border rounded hover:bg-background transition-colors text-xs font-medium text-foreground"
               >
                 {selectedAssigneeObj ? (
-                  <img src={selectedAssigneeObj.avatar || defaultMan} alt="" className="w-4 h-4 rounded-full" />
+                  <img  src={selectedAssigneeObj.avatar || defaultMan} alt="" className="w-4 h-4 rounded-full" />
                 ) : (
                   <Icons.user size={14} className="text-muted-foreground" />
                 )}
@@ -256,7 +256,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                       onClick={() => { setAssigneeId(m.id); setShowAssigneeDropdown(false); }}
                       className="w-full flex items-center gap-2 px-3 py-2 hover:bg-background text-left text-xs text-foreground"
                     >
-                      <img src={m.avatar || defaultMan} alt="" className="w-5 h-5 rounded-full" />
+                      <img  src={m.avatar || defaultMan} alt="" className="w-5 h-5 rounded-full" />
                       <span className="truncate">{m.name}</span>
                     </button>
                   ))}

@@ -56,6 +56,7 @@ export default function UserDropdown({ user, variant = 'landing' }: UserDropdown
             src={user.avatar || defaultAvatar}
             alt="Avatar"
             className="h-full w-full object-cover"
+           
           />
         </button>
 
@@ -98,7 +99,7 @@ export default function UserDropdown({ user, variant = 'landing' }: UserDropdown
         className="flex items-center gap-3 rounded-2xl p-1 border border-border bg-card px-3 shadow-sm cursor-pointer transition hover:border-blue-300 hover:shadow-md"
       >
         <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-orange-500">
-          <img src={user.avatar || defaultAvatar} alt="User Avatar" className="h-full w-full object-cover"/>
+          <img src={user.avatar || defaultAvatar} alt="User Avatar" className="h-full w-full object-cover" />
         </div>
         <span className="hidden text-sm font-semibold text-foreground sm:inline">
           {user.fullName}

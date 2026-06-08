@@ -302,7 +302,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
         </div>
 
         <div className="relative" ref={assigneeRef}>
-          <img
+          <img 
             src={task.assigneeAvatar || defaultMan}
             alt={task.assigneeName || t('backlog.unassigned')}
             className="w-5 h-5 rounded-full shrink-0 cursor-pointer object-cover border border-border hover:ring-2 hover:ring-blue-400 transition-all"
@@ -389,7 +389,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
                           }}
                           className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-foreground hover:bg-background'}`}
                         >
-                          <img src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
+                          <img  src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                           <div className="flex flex-col min-w-0">
                             <span className={`truncate ${isSelected ? 'font-bold' : 'font-semibold'}`}>{m.name}</span>
                             {m.email && <span className="truncate text-[10px] text-muted-foreground font-normal">{m.email}</span>}

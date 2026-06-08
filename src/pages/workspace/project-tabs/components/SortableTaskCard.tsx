@@ -231,7 +231,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
           }}
           className="flex items-center gap-1.5 hover:ring-2 hover:ring-blue-200 rounded-full transition-all"
         >
-          <img src={task.assigneeAvatar || defaultMan} alt="Assignee" className="w-6 h-6 rounded-full border border-border shadow-sm object-cover" title={task.assigneeName || t('board.unassigned')} />
+          <img  src={task.assigneeAvatar || defaultMan} alt="Assignee" className="w-6 h-6 rounded-full border border-border shadow-sm object-cover" title={task.assigneeName || t('board.unassigned')} />
         </button>
       </div>
 
@@ -284,7 +284,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
             </button>
             {filteredMembers.map((m: any) => (
               <button key={m.id} onClick={() => handleAssigneeSelect(m)} className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-background text-left text-foreground">
-                <img src={m.avatar || defaultMan} alt={m.name} className="w-5 h-5 rounded-full object-cover" />
+                <img  src={m.avatar || defaultMan} alt={m.name} className="w-5 h-5 rounded-full object-cover" />
                 <span className="truncate">{m.name}</span>
               </button>
             ))}

@@ -183,7 +183,7 @@ export function ProjectListNewRow() {
                   title={newTaskAssignee ? (newTaskAssignee === 'automatic' ? `${t('list.assignee_prefix')} ${t('list.automatic')}` : `${t('list.assignee_prefix')} ${newTaskAssignee.name}`) : t('list.assign')}
                 >
                   {newTaskAssignee && newTaskAssignee !== 'automatic' ? (
-                    <img src={newTaskAssignee.avatar || defaultAvatar} alt={newTaskAssignee.name} className="w-full h-full rounded-full object-cover" />
+                    <img  src={newTaskAssignee.avatar || defaultAvatar} alt={newTaskAssignee.name} className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <Icons.user size={15} />
                   )}
@@ -207,7 +207,7 @@ export function ProjectListNewRow() {
                       </button>
                       {projectMembers.map((member: any) => (
                         <button key={member.id} onClick={() => { setNewTaskAssignee(member); setShowNewTaskAssigneeDropdown(false); }} className="w-full flex items-center gap-3 px-3 py-1.5 text-[13px] rounded-[3px] text-left text-foreground hover:bg-background font-medium">
-                          <img src={member.avatar || defaultAvatar} alt={member.name} className="w-6 h-6 rounded-full object-cover border border-border" />
+                          <img  src={member.avatar || defaultAvatar} alt={member.name} className="w-6 h-6 rounded-full object-cover border border-border" />
                           <span className="truncate">{member.name}</span>
                         </button>
                       ))}

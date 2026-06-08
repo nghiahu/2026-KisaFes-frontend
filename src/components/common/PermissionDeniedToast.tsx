@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Icons } from '../../assets/icons';
 import { permissionDeniedEvent } from '../../utils/permission-denied-event';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function PermissionDeniedToast() {
+  const { t } = useLanguage();
   const [message, setMessage] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -37,9 +39,9 @@ export default function PermissionDeniedToast() {
           <Icons.ban size={18} />
         </div>
         <div className="flex-1 min-w-0 pr-2">
-          <h4 className="text-sm font-black text-foreground tracking-tight">Hành động bị chặn</h4>
+          <h4 className="text-sm font-black text-foreground tracking-tight">{t('common.permission_denied_title') || 'Hành động bị chặn'}</h4>
           <p className="text-xs font-semibold text-muted-foreground mt-1 leading-relaxed">
-            {message}
+            {t(message || '') || message}
           </p>
         </div>
         <button 

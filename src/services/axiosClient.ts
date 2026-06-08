@@ -120,10 +120,21 @@ axiosClient.interceptors.response.use(
     }
     
     if (error.response?.status === 403) {
-      const message = error.response?.data?.message || "Bạn không có quyền thực hiện hành động này hoặc thay đổi cài đặt này.";
+      const message = error.response?.data?.message || "common.permission_denied_msg";
       permissionDeniedEvent.emit(message);
     }
     
+    // Xử lý lỗi Network (Backend sập, mất mạng, hoặc lỗi Proxy từ Vite)
+    const isNetworkError = 
+      (!error.response && (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || error.message === 'Network Error')) ||
+      (error.response && [502, 503, 504].includes(error.response.status));
+
+    if (isNetworkError) {
+      if (window.location.pathname !== '/network-error') {
+        window.location.href = '/network-error';
+      }
+    }
+
     return Promise.reject(error.response?.data || error);
   }
 );

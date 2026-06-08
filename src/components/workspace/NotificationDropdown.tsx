@@ -6,9 +6,10 @@ import { X } from 'lucide-react';
 interface NotificationDropdownProps {
   onClose: () => void;
   onNotificationsCountChange: (count: number) => void;
+  ignoreRef?: React.RefObject<HTMLElement | null>;
 }
 
-export default function NotificationDropdown({ onClose, onNotificationsCountChange }: NotificationDropdownProps) {
+export default function NotificationDropdown({ onClose, onNotificationsCountChange, ignoreRef }: NotificationDropdownProps) {
   const { data: notifications = [], isLoading: loading } = useNotificationsQuery();
   const acceptInvitationMutation = useAcceptInvitationMutation();
   const declineInvitationMutation = useDeclineInvitationMutation();
@@ -22,7 +23,11 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        (!ignoreRef || !ignoreRef.current || !ignoreRef.current.contains(event.target as Node))
+      ) {
         onClose();
       }
     }
@@ -69,12 +74,12 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
       const diffMs = now.getTime() - date.getTime();
       const diffSec = Math.floor(diffMs / 1000);
       const diffMin = Math.floor(diffSec / 60);
-      const diffHr  = Math.floor(diffMin / 60);
+      const diffHr = Math.floor(diffMin / 60);
       const diffDay = Math.floor(diffHr / 24);
 
       if (diffSec < 60) return 'Vừa xong';
       if (diffMin < 60) return `${diffMin} phút trước`;
-      if (diffHr  < 24) return `${diffHr} giờ trước`;
+      if (diffHr < 24) return `${diffHr} giờ trước`;
       return `${diffDay} ngày trước`;
     } catch {
       return '';
@@ -138,17 +143,17 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
               <div
                 key={item.id}
                 onClick={() => { if (isUnread) markAsReadMutation.mutate(item.id); }}
-                className={`p-4 transition-all flex gap-3 cursor-pointer ${
-                  isUnread ? 'bg-blue-50/30 hover:bg-blue-50/50' : 'hover:bg-background/50'
-                }`}
+                className={`p-4 transition-all flex gap-3 cursor-pointer ${isUnread ? 'bg-blue-50/30 hover:bg-blue-50/50' : 'hover:bg-background/50'
+                  }`}
               >
                 {/* Avatar */}
-                <div className="shrink-0">
+                <div className="shrink-0 w-9 h-9">
                   {item.senderAvatar ? (
-                    <img
-                      src={item.senderAvatar}
-                      alt={item.senderName}
-                      className="w-9 h-9 rounded-full object-cover border border-border"
+                    <img 
+                      src={item.senderAvatar} 
+                      alt={item.senderName} 
+                      className="w-full h-full rounded-full object-cover border border-border"
+                     
                     />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-[0.85rem] border border-blue-100">

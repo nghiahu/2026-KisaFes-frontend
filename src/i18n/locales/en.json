@@ -1,10 +1,22 @@
 {
+  "not_found": {
+    "title": "Page Not Found",
+    "desc": "Oops! The page you're looking for doesn't exist or has been moved.",
+    "go_home": "Go to Dashboard"
+  },
+  "network_error": {
+    "title": "Connection Lost",
+    "desc": "We couldn't connect to the server. Please check your internet connection or try again later. The backend might be offline.",
+    "retry": "Try Again"
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
-    "create": "Create"
+    "create": "Create",
+    "permission_denied_title": "Action Blocked",
+    "permission_denied_msg": "You do not have permission to perform this action or change this setting."
   },
   "settings": {
     "title": "Settings",
@@ -443,17 +455,18 @@
   },
   "project_settings": {
     "title": "Project Settings",
-    "subtitle": "Customize project statuses and column structure.",
+    "subtitle": "Customize your project workflow and board structure.",
     "saving": "Saving...",
     "save": "Save Changes",
     "active_statuses": "Active Statuses",
     "new_status": "New Status",
-    "unmapped_statuses": "Unmapped Statuses (Drag to assign)",
-    "all_statuses_mapped": "All statuses are mapped",
+    "unmapped_statuses": "Unmapped Statuses",
+    "all_statuses_mapped": "All statuses mapped.",
     "board_columns": "Board Columns",
-    "new_column": "New Column",
     "mapped_statuses": "Mapped Statuses",
-    "drag_instruction": "Please drag at least 1 status here"
+    "drag_instruction": "Drag status here",
+    "new_column": "New Column",
+    "empty_column_warning": "This column must have at least 1 status!"
   },
   "auth": {
     "login": {
@@ -509,10 +522,44 @@
   },
   "landing": {
     "nav": {
-      "dashboards": "Dashboards",
-      "projects": "Projects",
-      "issues": "Issues",
-      "teams": "Teams"
+      "features": "Features",
+      "solutions": "Solutions",
+      "guide": "Guide",
+      "templates": "Templates",
+      "pricing": "Pricing",
+      "dropdown": {
+        "features": {
+          "all": "All Features",
+          "rovo": "Rovo in Kisa"
+        },
+        "solutions": {
+          "teams": "TEAMS",
+          "marketing": "Marketing",
+          "engineering": "Engineering",
+          "design": "Design",
+          "operations": "Operations",
+          "it": "IT",
+          "useCases": "USE CASES",
+          "gettingStarted": "Getting started",
+          "planning": "Planning",
+          "campaign": "Campaign Management",
+          "agile": "Agile Project Management",
+          "program": "Program Management",
+          "companySize": "COMPANY SIZE",
+          "enterprise": "Enterprise"
+        },
+        "templates": {
+          "all": "All templates",
+          "software": "Software Development",
+          "finance": "Finance",
+          "sales": "Sales",
+          "service": "Service Management",
+          "hr": "HR",
+          "legal": "Legal",
+          "itOps": "IT Operations",
+          "kisaService": "Kisa Service Management templates"
+        }
+      }
     },
     "header": {
       "search": "Search...",
@@ -544,6 +591,16 @@
       "f4_title": "Real-time Analytics",
       "f4_desc": "Velocity charts, burn-down reports, and resource allocation heatmaps updated in real-time as your team completes work.",
       "add_more": "Add 20+ more features"
+    },
+    "blogshowcase": {
+      "header": "COLLABORATE AND LAUNCH",
+      "title": "Where your team and AI come together",
+      "subtitle": "KisaFres AI helps teams drive better outcomes faster",
+      "readArticle": "Read Article",
+      "noBlogs": "No featured articles available at the moment."
+    },
+    "blogDetail": {
+      "back": "Back to Home"
     },
     "cta": {
       "title": "Ready to ship faster and work smarter?",

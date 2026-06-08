@@ -64,11 +64,10 @@ export default function WelcomeBack() {
 
                   {/* Avatar */}
                   <div className="h-20 w-20 overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm">
-                    <img
+                    <img 
                       src={user?.avatar || defaultAvatar}
                       alt="User Avatar"
-                      className="h-full w-full object-cover"
-                    />
+                      className="h-full w-full object-cover" />
                   </div>
 
                   {/* User Info */}

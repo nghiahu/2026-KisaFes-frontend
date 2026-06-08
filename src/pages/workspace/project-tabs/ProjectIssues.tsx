@@ -49,7 +49,7 @@ export default function ProjectIssues() {
             </div>
             <div className="flex items-center gap-4 shrink-0">
               <span className="text-xs bg-muted text-muted-foreground px-2.5 py-1 rounded-lg font-bold">{issue.status}</span>
-              <img src={defaultMan} alt="Assignee" className="w-8 h-8 rounded-full border-2 border-white shadow-sm" />
+              <img  src={defaultMan} alt="Assignee" className="w-8 h-8 rounded-full border-2 border-white shadow-sm" />
             </div>
           </div>
         )) : (

@@ -641,7 +641,7 @@ function ProjectCard({
       <div className="flex items-center justify-between pt-3 border-t border-border mt-auto">
         <div className="flex items-center -space-x-2">
           {project.members.slice(0, 3).map((member) => (
-            <img key={member.id} src={member.avatar} alt={member.name}
+            <img  key={member.id} src={member.avatar} alt={member.name}
               className="w-7 h-7 rounded-full border-2 border-white object-cover" title={member.name} />
           ))}
           {project.members.length > 3 && (
@@ -775,13 +775,12 @@ function ProjectListItem({
       {/* 6. Avatars */}
       <div className="flex items-center -space-x-2 shrink-0 w-[80px]">
         {project.members.slice(0, 2).map(member => (
-          <img
+          <img 
             key={member.id}
             src={member.avatar}
             alt={member.name}
             className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm"
-            title={member.name}
-          />
+            title={member.name} />
         ))}
         {project.members.length > 2 && (
           <div className="w-8 h-8 rounded-full bg-muted border-2 border-white flex items-center justify-center text-[9px] font-bold text-muted-foreground shadow-sm">

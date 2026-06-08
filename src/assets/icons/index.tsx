@@ -99,7 +99,9 @@ import {
   CalendarX2,
   Lightbulb,
   Cloud,
-  Minimize2
+  Minimize2,
+  ServerCrash,
+  WifiOff
 } from 'lucide-react';
 
 export const Icons = {
@@ -204,4 +206,6 @@ export const Icons = {
   lightbulb: Lightbulb,
   cloud: Cloud,
   minimize2: Minimize2,
+  serverCrash: ServerCrash,
+  wifiOff: WifiOff,
 };

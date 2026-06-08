@@ -70,7 +70,7 @@ export default function ProfileUpdateForm() {
                 onClick={handleAvatarClick}
               >
                 {avatarPreview ? (
-                   <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                   <img  src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
                    nameInitial
                 )}

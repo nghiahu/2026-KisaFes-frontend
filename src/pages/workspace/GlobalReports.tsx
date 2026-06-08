@@ -414,7 +414,7 @@ export default function GlobalReports() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2.5">
                             {user?.avatar ? (
-                              <img src={user.avatar} alt={user.fullName || 'Bạn'} className="w-7 h-7 rounded-full object-cover shrink-0 border border-border" />
+                              <img  src={user.avatar} alt={user.fullName || 'Bạn'} className="w-7 h-7 rounded-full object-cover shrink-0 border border-border" />
                             ) : (
                               <div className="w-7 h-7 rounded-full bg-slate-200 overflow-hidden shrink-0">
                                 <div className="w-full h-full bg-slate-800 text-white flex items-center justify-center text-[11px] font-bold">

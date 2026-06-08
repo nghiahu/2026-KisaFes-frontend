@@ -126,11 +126,10 @@ export default function TeamTasksTab({ teamId }: Props) {
               
               {task.assigneeId ? (
                 <div className="flex items-center gap-2" title={`Assignee: ${task.assigneeName}`}>
-                  <img 
+                  <img  
                     src={task.assigneeAvatar || defaultMan} 
                     alt={task.assigneeName} 
-                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover bg-muted"
-                  />
+                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover bg-muted" />
                 </div>
               ) : (
                 <div className="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-background text-muted-foreground" title="Unassigned">

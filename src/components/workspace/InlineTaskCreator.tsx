@@ -163,7 +163,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
               className={`flex items-center justify-center w-6 h-6 rounded-full transition-colors border ${newTaskAssignee && newTaskAssignee !== 'automatic' ? 'border-blue-200' : 'border-border hover:bg-muted text-muted-foreground'}`} title={newTaskAssignee === 'automatic' ? 'Automatic' : newTaskAssignee ? newTaskAssignee.name : 'Unassigned'}
             >
               {newTaskAssignee && newTaskAssignee !== 'automatic' ? (
-                <img src={newTaskAssignee.avatar || defaultMan} alt={newTaskAssignee.name} className="w-full h-full rounded-full object-cover" />
+                <img  src={newTaskAssignee.avatar || defaultMan} alt={newTaskAssignee.name} className="w-full h-full rounded-full object-cover" />
               ) : newTaskAssignee === 'automatic' ? (
                 <div className="w-full h-full rounded-full bg-muted flex items-center justify-center"><User size={12} className="text-muted-foreground" /></div>
               ) : (
@@ -196,7 +196,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                     const isSelected = newTaskAssignee?.id === m.id;
                     return (
                       <button type="button" key={m.id} onClick={() => { setNewTaskAssignee(m); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${isSelected ? 'bg-blue-50/50' : 'hover:bg-background'}`}>
-                        <img src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
+                        <img  src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                         <div className="flex flex-col min-w-0">
                           <span className="truncate text-foreground font-medium">{m.name}</span>
                         </div>

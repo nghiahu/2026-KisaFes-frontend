@@ -143,7 +143,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
               }
             }} />
             {avatarPreview ? (
-              <img src={avatarPreview} className="w-full h-full object-cover group-hover:opacity-75 transition-opacity" />
+              <img  src={avatarPreview} className="w-full h-full object-cover group-hover:opacity-75 transition-opacity" />
             ) : (
               <Icons.camera size={24} className="text-muted-foreground group-hover:text-blue-500" />
             )}

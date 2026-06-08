@@ -1,10 +1,22 @@
 {
+  "not_found": {
+    "title": "Không tìm thấy trang",
+    "desc": "Rất tiếc! Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.",
+    "go_home": "Về trang chủ"
+  },
+  "network_error": {
+    "title": "Mất kết nối máy chủ",
+    "desc": "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại đường truyền mạng hoặc thử lại sau. Backend có thể đang bảo trì.",
+    "retry": "Thử lại"
+  },
   "common": {
     "save": "Lưu",
     "cancel": "Hủy",
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
-    "create": "Tạo mới"
+    "create": "Tạo mới",
+    "permission_denied_title": "Hành động bị chặn",
+    "permission_denied_msg": "Bạn không có quyền thực hiện hành động này hoặc thay đổi cài đặt này."
   },
   "settings": {
     "title": "Cài đặt",
@@ -448,12 +460,13 @@
     "save": "Lưu thay đổi",
     "active_statuses": "Trạng thái hoạt động",
     "new_status": "Trạng thái mới",
-    "unmapped_statuses": "Trạng thái chưa được ánh xạ (Kéo để gán)",
-    "all_statuses_mapped": "Tất cả trạng thái đã được ánh xạ",
-    "board_columns": "Cột trên bảng",
+    "unmapped_statuses": "Trạng thái chưa được phân bổ",
+    "all_statuses_mapped": "Tất cả trạng thái đã được map vào board.",
+    "board_columns": "Cột trên bảng (Kanban/Scrum)",
+    "mapped_statuses": "Trạng thái thuộc cột",
+    "drag_instruction": "Kéo thả trạng thái vào đây",
     "new_column": "Cột mới",
-    "mapped_statuses": "Trạng thái đã ánh xạ",
-    "drag_instruction": "Vui lòng kéo ít nhất 1 trạng thái vào đây"
+    "empty_column_warning": "Cột này phải có ít nhất 1 trạng thái!"
   },
   "auth": {
     "login": {
@@ -509,10 +522,44 @@
   },
   "landing": {
     "nav": {
-      "dashboards": "Bảng điều khiển",
-      "projects": "Dự án",
-      "issues": "Vấn đề",
-      "teams": "Đội ngũ"
+      "features": "Tính năng",
+      "solutions": "Giải pháp",
+      "guide": "Hướng dẫn",
+      "templates": "Biểu mẫu",
+      "pricing": "Bảng giá",
+      "dropdown": {
+        "features": {
+          "all": "Tất cả tính năng",
+          "rovo": "Rovo trong Kisa"
+        },
+        "solutions": {
+          "teams": "ĐỘI NGŨ",
+          "marketing": "Tiếp thị",
+          "engineering": "Kỹ thuật",
+          "design": "Thiết kế",
+          "operations": "Vận hành",
+          "it": "CNTT",
+          "useCases": "TRƯỜNG HỢP SỬ DỤNG",
+          "gettingStarted": "Bắt đầu",
+          "planning": "Lập kế hoạch",
+          "campaign": "Quản lý chiến dịch",
+          "agile": "Quản lý dự án Agile",
+          "program": "Quản lý chương trình",
+          "companySize": "QUY MÔ CÔNG TY",
+          "enterprise": "Doanh nghiệp lớn"
+        },
+        "templates": {
+          "all": "Tất cả biểu mẫu",
+          "software": "Phát triển phần mềm",
+          "finance": "Tài chính",
+          "sales": "Bán hàng",
+          "service": "Quản lý dịch vụ",
+          "hr": "Nhân sự",
+          "legal": "Pháp lý",
+          "itOps": "Vận hành CNTT",
+          "kisaService": "Biểu mẫu Quản lý dịch vụ Kisa"
+        }
+      }
     },
     "header": {
       "search": "Tìm kiếm...",
@@ -544,6 +591,16 @@
       "f4_title": "Phân tích thời gian thực",
       "f4_desc": "Biểu đồ vận tốc, báo cáo burn-down và bản đồ phân bổ nguồn lực được cập nhật theo thời gian thực khi nhóm của bạn hoàn thành công việc.",
       "add_more": "Thêm 20+ tính năng khác"
+    },
+    "blogshowcase": {
+      "header": "HỢP TÁC VÀ TRIỂN KHAI",
+      "title": "Nơi đội ngũ và AI cùng đồng hành",
+      "subtitle": "KisaFres AI giúp các đội ngũ đạt kết quả tốt hơn, nhanh hơn",
+      "readArticle": "Đọc bài viết",
+      "noBlogs": "Hiện tại chưa có bài viết nổi bật nào."
+    },
+    "blogDetail": {
+      "back": "Quay lại Trang chủ"
     },
     "cta": {
       "title": "Sẵn sàng bàn giao nhanh hơn và làm việc thông minh hơn?",

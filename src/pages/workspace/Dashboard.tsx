@@ -92,9 +92,9 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center">
                   <div className="flex -space-x-2 mr-3">
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img  src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img  src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img  src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
                   </div>
                   <span className="text-[0.7rem] font-bold text-muted-foreground">+2</span>
                 </div>
@@ -130,8 +130,8 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center">
                   <div className="flex -space-x-2">
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
-                    <img src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img  src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
+                    <img  src={defaultAvatar} alt="" className="w-7 h-7 rounded-full border-2 border-white bg-background" />
                   </div>
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function Dashboard() {
 
             <div className="flex flex-col gap-6">
               <div className="flex gap-3">
-                <img src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                <img  src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.82rem] text-muted-foreground leading-snug">
                     <strong className="text-foreground font-bold">Jordan</strong> commented on{' '}
@@ -229,7 +229,7 @@ export default function Dashboard() {
               </div>
 
               <div className="flex gap-3">
-                <img src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                <img  src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.82rem] text-muted-foreground leading-snug">
                     <strong className="text-foreground font-bold">Sarah</strong> completed{' '}
@@ -242,7 +242,7 @@ export default function Dashboard() {
               </div>
 
               <div className="flex gap-3">
-                <img src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                <img  src={defaultAvatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.82rem] text-muted-foreground leading-snug">
                     <strong className="text-foreground font-bold">Liam</strong> added a new file to{' '}

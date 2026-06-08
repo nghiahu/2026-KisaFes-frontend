@@ -33,7 +33,7 @@ export default function Inbox() {
   const markAsReadMutation = useMarkAsReadMutation();
   const markAllAsReadMutation = useMarkAllAsReadMutation();
   const { t } = useLanguage();
-  
+
   const [filter, setFilter] = useState<'ALL' | 'UNREAD'>('ALL');
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [actioningId, setActioningId] = useState<string | null>(null);
@@ -100,7 +100,7 @@ export default function Inbox() {
         </div>
       );
     }
-    
+
     // Default to Avatar
     if (item.senderAvatar) {
       return <img src={item.senderAvatar} alt={item.senderName} className="w-10 h-10 rounded-full object-cover border border-border shrink-0" />;
@@ -114,41 +114,39 @@ export default function Inbox() {
 
   return (
     <div className="flex flex-col h-full bg-background animate-in fade-in duration-500">
-      
+
       {/* Container - Split Screen */}
       <div className="flex flex-1 overflow-hidden m-4 md:m-6 rounded-xl border border-border bg-card shadow-sm">
-        
+
         {/* LEFT COLUMN: 40% */}
         <div className="w-full md:w-[40%] flex flex-col border-r border-border bg-card">
           {/* Left Header */}
           <div className="px-6 py-5 flex items-center justify-between border-b border-border">
             <h1 className="text-xl font-bold text-foreground tracking-tight">{t('inbox.title')}</h1>
-            
+
             <div className="flex items-center gap-3">
               {/* Pill Tabs */}
               <div className="flex p-0.5 bg-background rounded-lg border border-border">
                 <button
                   onClick={() => setFilter('ALL')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-                    filter === 'ALL' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${filter === 'ALL' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    }`}
                 >
                   {t('inbox.filter_all')}
                 </button>
                 <button
                   onClick={() => setFilter('UNREAD')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-                    filter === 'UNREAD' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${filter === 'UNREAD' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    }`}
                 >
                   {t('inbox.filter_unread')}
                 </button>
               </div>
-              
+
               {/* Mark all as read */}
-              <button 
+              <button
                 onClick={() => markAllAsReadMutation.mutate()}
-                className="p-1.5 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" 
+                className="p-1.5 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                 title={t('inbox.mark_all_read')}
               >
                 <Check size={18} strokeWidth={2.5} />
@@ -184,11 +182,10 @@ export default function Inbox() {
                           markAsReadMutation.mutate(item.id);
                         }
                       }}
-                      className={`p-4 cursor-pointer transition-all flex gap-3 m-2 rounded-lg ${
-                        isSelected 
-                          ? 'bg-background border border-border shadow-sm relative' 
-                          : 'hover:bg-muted/50 border border-transparent'
-                      }`}
+                      className={`p-4 cursor-pointer transition-all flex gap-3 m-2 rounded-lg ${isSelected
+                        ? 'bg-background border border-border shadow-sm relative'
+                        : 'hover:bg-muted/50 border border-transparent'
+                        }`}
                     >
                       {/* Active Blue Indicator */}
                       {isSelected && (
@@ -201,7 +198,7 @@ export default function Inbox() {
                           <div className="absolute top-0 right-0 w-3 h-3 bg-[#2563EB] rounded-full border-2 border-white shadow-sm" />
                         )}
                       </div>
-                      
+
                       <div className="flex-1 min-w-0 flex flex-col justify-center">
                         <div className="flex justify-between items-start">
                           <p className={`text-[13px] leading-snug pr-2 ${isUnread ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
@@ -242,7 +239,7 @@ export default function Inbox() {
             </div>
           ) : (
             <div className="flex flex-col h-full overflow-hidden animate-in fade-in duration-300">
-              
+
               {/* Right Header (Context & Metadata) */}
               <div className="px-8 py-6 border-b border-border shrink-0 bg-card">
                 {/* Breadcrumb */}
@@ -255,7 +252,7 @@ export default function Inbox() {
                   <span>/</span>
                   <span className="text-foreground">{t('inbox.message')}</span>
                 </div>
-                
+
                 <h2 className="text-2xl font-bold text-foreground leading-tight mb-4">
                   {selectedItem.message}
                 </h2>
@@ -263,12 +260,11 @@ export default function Inbox() {
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground font-medium">{t('inbox.status')}</span>
-                    <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide ${
-                      (localStatus.get(selectedItem.id) ?? selectedItem.status) === 'PENDING' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
+                    <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide ${(localStatus.get(selectedItem.id) ?? selectedItem.status) === 'PENDING' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
                       (localStatus.get(selectedItem.id) ?? selectedItem.status) === 'ACCEPTED' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                      (localStatus.get(selectedItem.id) ?? selectedItem.status) === 'DECLINED' ? 'bg-rose-50 text-rose-600 border border-rose-100' :
-                      'bg-muted text-foreground border border-border'
-                    }`}>
+                        (localStatus.get(selectedItem.id) ?? selectedItem.status) === 'DECLINED' ? 'bg-rose-50 text-rose-600 border border-rose-100' :
+                          'bg-muted text-foreground border border-border'
+                      }`}>
                       {localStatus.get(selectedItem.id) ?? selectedItem.status}
                     </span>
                   </div>
@@ -342,13 +338,13 @@ export default function Inbox() {
 
 
               </div>
-              
+
               {/* Right Body (Activity Log) */}
               <div className="flex-1 overflow-y-auto p-8 bg-background">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-6">{t('inbox.activity')}</h4>
-                
+
                 <div className="relative pl-4 space-y-6 before:absolute before:inset-0 before:ml-[23px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[#E5E7EB] before:via-[#E5E7EB] before:to-transparent">
-                  
+
                   {/* Activity Item 1 */}
                   <div className="relative flex items-start gap-4">
                     <div className="absolute left-0 w-2 h-2 rounded-full bg-[#2563EB] mt-2"></div>

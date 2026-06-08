@@ -129,7 +129,7 @@ export default function CreateTeamModal({ onClose, onSuccess }: CreateTeamModalP
                   }
                 }} />
                 {avatarPreview ? (
-                  <img src={avatarPreview} className="w-full h-full object-cover" />
+                  <img  src={avatarPreview} className="w-full h-full object-cover" />
                 ) : (
                   <Icons.camera size={20} className="text-muted-foreground group-hover:text-blue-500" />
                 )}

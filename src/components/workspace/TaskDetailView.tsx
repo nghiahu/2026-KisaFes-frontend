@@ -653,7 +653,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
 
               {activeTab === 'Comments' && (
                 <form onSubmit={handleAddComment} className="flex gap-4 mb-6">
-                  <img src={currentUser?.avatar || defaultAvatar} className="w-8 h-8 rounded-full border border-border object-cover" alt="Me" />
+                  <img  src={currentUser?.avatar || defaultAvatar} className="w-8 h-8 rounded-full border border-border object-cover" alt="Me" />
                   <div className="flex-1">
                     <div className="border border-border rounded-xl bg-card focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all p-3">
                       <input
@@ -755,11 +755,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                 )}
 
                                 <div className="flex gap-3 text-[14px] relative">
-                                  <img 
+                                  <img  
                                     src={c.userAvatar || defaultAvatar} 
                                     className="w-8 h-8 rounded-full border border-border object-cover shrink-0 z-10" 
-                                    alt="" 
-                                  />
+                                    alt="" />
                                   <div className="flex-1 relative group">
                                     {/* Author & Timestamp (Vertical layout like image) */}
                                     <div className="flex flex-col mb-1 select-none">
@@ -907,11 +906,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                     {/* Curve Thread Line for Reply Editor */}
                                     <div className="absolute left-[-28px] top-[-16px] bottom-[calc(100%-16px)] w-5 border-l-2 border-b-2 border-border rounded-bl-xl pointer-events-none" />
 
-                                    <img 
+                                    <img  
                                       src={currentUser?.avatar || defaultAvatar} 
                                       className="w-8 h-8 rounded-full border border-border object-cover shrink-0 z-10" 
-                                      alt="" 
-                                    />
+                                      alt="" />
 
                                     <div className="flex-1 flex flex-col gap-2">
                                       <div className="text-xs text-muted-foreground font-medium select-none">
@@ -1014,11 +1012,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     <div className="flex flex-col gap-4">
                       {activities.map(act => (
                         <div key={act.id} className="flex gap-3 text-[14px]">
-                          <img 
+                          <img  
                             src={act.userAvatar || defaultAvatar} 
                             className="w-8 h-8 rounded-full border border-border object-cover shrink-0" 
-                            alt="" 
-                          />
+                            alt="" />
                           <div className="flex-1 bg-background rounded-lg p-3 relative shadow-sm">
                             <div className="flex items-center justify-between mb-1">
                               <span className="font-bold text-foreground">{act.userName}</span>
@@ -1067,11 +1064,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                           };
                           return (
                             <div key={item.id} className="flex gap-3 text-[14px]">
-                              <img 
+                              <img  
                                 src={item.userAvatar || defaultAvatar} 
                                 className="w-8 h-8 rounded-full border border-border object-cover shrink-0" 
-                                alt="" 
-                              />
+                                alt="" />
                               <div className="flex-1 bg-background rounded-2xl p-4 border border-border relative group shadow-sm">
                                 <div className="flex items-center justify-between mb-1.5">
                                   <span className="font-bold text-foreground">{item.userName}</span>
@@ -1282,7 +1278,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                       className="flex items-center gap-2 hover:bg-muted p-1 -ml-1 rounded transition-colors w-full"
                     >
                       {hasAssignee ? (
-                        <img src={task.assigneeAvatar || defaultAvatar} alt="Assignee" className="w-6 h-6 rounded-full border border-border shrink-0 object-cover" />
+                        <img  src={task.assigneeAvatar || defaultAvatar} alt="Assignee" className="w-6 h-6 rounded-full border border-border shrink-0 object-cover" />
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-muted border border-dashed border-slate-300 flex items-center justify-center text-muted-foreground shrink-0"><Icons.user size={12} /></div>
                       )}
@@ -1306,7 +1302,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                             onClick={() => handleAssigneeUpdate(m)}
                             className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
                           >
-                            <img src={m.avatar || defaultAvatar} className="w-6 h-6 rounded-full border border-border object-cover shrink-0" alt="" />
+                            <img  src={m.avatar || defaultAvatar} className="w-6 h-6 rounded-full border border-border object-cover shrink-0" alt="" />
                             <span className="truncate">{m.name}</span>
                           </button>
                         ))}
@@ -1475,7 +1471,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <div className="flex items-center">
                   <div className="w-[120px] text-[13px] font-semibold text-muted-foreground shrink-0">Reporter</div>
                   <button className="flex items-center gap-2 hover:bg-muted p-1 -ml-1 rounded transition-colors flex-1">
-                    <img src={task.reporterAvatar || defaultAvatar} alt="Reporter" className="w-6 h-6 rounded-full border border-border shrink-0 object-cover" />
+                    <img  src={task.reporterAvatar || defaultAvatar} alt="Reporter" className="w-6 h-6 rounded-full border border-border shrink-0 object-cover" />
                     <span className="text-[13px] font-semibold text-foreground truncate">{task.reporterName || 'nghĩa Ngô'}</span>
                   </button>
                 </div>

@@ -44,6 +44,7 @@ export default function ProjectDetail() {
   const { t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<TabType>('list');
+  const initializedProjectId = useRef<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
@@ -153,11 +154,16 @@ export default function ProjectDetail() {
 
     if (location.state?.tab) {
       setActiveTab(location.state.tab as TabType);
+      localStorage.setItem(`project_tab_${projectId}`, location.state.tab as string);
+      initializedProjectId.current = projectId;
     } else {
-      const savedTab = localStorage.getItem(`project_tab_${projectId}`);
-      setActiveTab((savedTab as TabType) || 'list');
+      if (initializedProjectId.current !== projectId) {
+        const savedTab = localStorage.getItem(`project_tab_${projectId}`);
+        setActiveTab((savedTab as TabType) || 'list');
+        initializedProjectId.current = projectId;
+      }
     }
-  }, [projectId, location.state]);
+  }, [projectId, location.state?.tab]);
 
   useEffect(() => {
     if (!currentProject) return;

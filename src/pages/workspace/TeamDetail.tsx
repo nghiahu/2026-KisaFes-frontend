@@ -136,7 +136,7 @@ export default function TeamDetail() {
             <div className="flex flex-col">
               <div className="w-24 h-24 rounded-2xl bg-card shadow-sm border-4 border-slate-50 flex items-center justify-center overflow-hidden mb-4 relative z-10">
                 {isValidImageUrl(team.avatar) ? (
-                  <img src={team.avatar} alt={team.name} className="w-full h-full object-cover" />
+                  <img  src={team.avatar} alt={team.name} className="w-full h-full object-cover" />
                 ) : (
                   <Icons.users size={40} className="text-blue-500" />
                 )}
@@ -228,7 +228,7 @@ export default function TeamDetail() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
-                              {isValidImageUrl(member.avatar) ? <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" /> : member.name.charAt(0)}
+                              {isValidImageUrl(member.avatar) ? <img  src={member.avatar} alt={member.name} className="w-full h-full object-cover" /> : member.name.charAt(0)}
                             </div>
                             <span className="font-semibold text-foreground text-sm">{member.name}</span>
                           </div>

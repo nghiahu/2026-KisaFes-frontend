@@ -1,4 +1,5 @@
 import React, { type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { Icons } from '../../assets/icons';
 
 interface ConfirmModalProps {
@@ -11,6 +12,7 @@ interface ConfirmModalProps {
   cancelText?: string;
   isDestructive?: boolean;
   isLoading?: boolean;
+  showCancel?: boolean;
 }
 
 export default function ConfirmModal({
@@ -22,14 +24,15 @@ export default function ConfirmModal({
   confirmText = 'Xác nhận',
   cancelText = 'Hủy',
   isDestructive = false,
-  isLoading = false
+  isLoading = false,
+  showCancel = true
 }: ConfirmModalProps) {
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
-      <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 animate-in fade-in duration-200" onClick={!isLoading ? onClose : undefined} />
-      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-card rounded-xl shadow-xl z-50 animate-in fade-in zoom-in-95 duration-200">
+      <div className="fixed inset-0 bg-black/60 z-[9999] animate-in fade-in duration-200" onClick={!isLoading ? onClose : undefined} />
+      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-card rounded-xl shadow-xl z-[10000] animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className={`p-3 rounded-full shrink-0 ${isDestructive ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
@@ -44,13 +47,15 @@ export default function ConfirmModal({
           </div>
           
           <div className="mt-6 flex items-center justify-end gap-3">
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors"
-            >
-              {cancelText}
-            </button>
+            {showCancel && (
+              <button
+                onClick={onClose}
+                disabled={isLoading}
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors"
+              >
+                {cancelText}
+              </button>
+            )}
             <button
               onClick={onConfirm}
               disabled={isLoading}
@@ -66,6 +71,7 @@ export default function ConfirmModal({
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

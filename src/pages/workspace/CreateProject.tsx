@@ -591,7 +591,7 @@ export default function CreateProject() {
                               {activeSearchTab === 'user' ? (
                                 <>
                                   {item.avatar ? (
-                                    <img src={item.avatar} alt={item.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
+                                    <img  src={item.avatar} alt={item.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
                                   ) : (
                                     <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                                       {item.fullName?.charAt(0) || item.email?.charAt(0)}
@@ -636,7 +636,7 @@ export default function CreateProject() {
                       <div key={member.email} className="flex items-center justify-between bg-card border border-border p-3 rounded-2xl shadow-sm group animate-in zoom-in-95 duration-200">
                         <div className="flex items-center gap-3">
                           {member.avatar ? (
-                            <img src={member.avatar} alt={member.fullName} className="w-10 h-10 rounded-full object-cover bg-muted border border-border" />
+                            <img  src={member.avatar} alt={member.fullName} className="w-10 h-10 rounded-full object-cover bg-muted border border-border" />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                               {member.fullName?.charAt(0) || member.email?.charAt(0)}

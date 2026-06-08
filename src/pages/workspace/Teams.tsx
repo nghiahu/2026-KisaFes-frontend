@@ -103,7 +103,7 @@ export default function Teams() {
               <div className="flex items-start gap-4 mb-3">
                 <div className="w-14 h-14 bg-muted rounded-xl flex items-center justify-center shrink-0 border border-border shadow-sm relative group overflow-hidden transition-all hover:scale-105">
                   {isValidImageUrl(team.avatar) ? (
-                    <img src={team.avatar} alt={team.name} className="w-full h-full object-cover rounded-xl" />
+                    <img  src={team.avatar} alt={team.name} className="w-full h-full object-cover rounded-xl" />
                   ) : (
                     <Icons.users size={24} className="text-blue-500" />
                   )}
@@ -124,7 +124,7 @@ export default function Teams() {
                     {team.members.slice(0, 3).map((member, i) => (
                       <div key={member.id} className="w-8 h-8 rounded-full border-2 border-white bg-muted text-muted-foreground font-bold text-xs flex items-center justify-center z-10 hover:z-20 transition-transform hover:scale-110 shadow-sm overflow-hidden" title={member.name}>
                         {isValidImageUrl(member.avatar) ? (
-                          <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                          <img  src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-[10px] font-bold text-muted-foreground">{member.name.charAt(0)}</span>
                         )}
