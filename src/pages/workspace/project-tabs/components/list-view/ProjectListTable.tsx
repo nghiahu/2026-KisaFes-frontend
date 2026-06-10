@@ -4,10 +4,11 @@ import { useProjectList } from './ProjectListContext';
 import { ProjectListRow } from './ProjectListRow';
 import { ProjectListNewRow } from './ProjectListNewRow';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
+import { Skeleton } from '../../../../../components/ui/Skeleton';
 
 export function ProjectListTable() {
   const {
-    tasksState: { tasks },
+    tasksState: { tasks, isLoading },
     filtersState: { filteredTasks, groupedTasks, groupBy },
     columnsState: { columns, handleDragStart, handleDragOver, handleDrop, handleResizeStart, dragOverColId, resizingColId },
     isAllSelected,
@@ -70,7 +71,25 @@ export function ProjectListTable() {
             </tr>
           </thead>
           <tbody>
-            {groupBy ? (
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={`skeleton-${i}`} className="bg-background/50 border-b border-border">
+                  {columns.map((col: any) => (
+                    <td key={col.id} className="py-3 px-4">
+                      {col.id === 'checkbox' ? (
+                        <Skeleton className="h-4 w-4 mx-auto" />
+                      ) : col.id === 'actions' ? (
+                        <Skeleton className="h-4 w-4 mx-auto" />
+                      ) : col.id === 'title' ? (
+                        <Skeleton className="h-4 w-3/4 max-w-[300px]" />
+                      ) : (
+                        <Skeleton className="h-4 w-full max-w-[120px]" />
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : groupBy ? (
               groupedTasks.map(({ key, tasks: groupTasks }, groupIndex) => {
                 const isCollapsed = collapsedGroups.has(key);
                 return (

@@ -101,7 +101,15 @@ import {
   Cloud,
   Minimize2,
   ServerCrash,
-  WifiOff
+  WifiOff,
+  MessageCircle,
+  Wand2,
+  BookOpen,
+  Loader2,
+  CheckCircle,
+  Moon,
+  Tag,
+  Target
 } from 'lucide-react';
 
 export const Icons = {
@@ -208,4 +216,12 @@ export const Icons = {
   minimize2: Minimize2,
   serverCrash: ServerCrash,
   wifiOff: WifiOff,
+  messageCircle: MessageCircle,
+  wand2: Wand2,
+  bookOpen: BookOpen,
+  loader: Loader2,
+  checkCircle: CheckCircle,
+  moon: Moon,
+  tag: Tag,
+  target: Target,
 };

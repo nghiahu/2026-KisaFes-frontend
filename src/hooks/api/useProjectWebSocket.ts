@@ -25,6 +25,7 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
               } else {
                 queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               }
+              queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
               break;
 
             case "UPDATE_TASK":
@@ -38,6 +39,7 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
               } else {
                 queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               }
+              queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
               break;
 
             case "DELETE_TASK":
@@ -54,6 +56,7 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
               } else {
                 queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               }
+              queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
               break;
 
             case "UPDATE_PROJECT":
@@ -74,6 +77,7 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
             case "SPRINT_DELETED":
               // Invalidate sprints explicitly if needed
               queryClient.invalidateQueries({ queryKey: ['sprints', projectId] });
+              queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
               break;
 
             default:

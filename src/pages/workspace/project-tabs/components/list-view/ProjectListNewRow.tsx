@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { CornerDownLeft } from 'lucide-react';
 import { Icons } from '../../../../../assets/icons';
 import { useProjectList } from './ProjectListContext';
 import defaultAvatar from '../../../../../assets/avatar_def_man.png';
@@ -216,6 +217,16 @@ export function ProjectListNewRow() {
                   document.body
                 )}
               </div>
+
+              <button
+                onClick={handleCreateTask}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-blue-600 hover:text-white transition-colors text-xs font-medium ml-1"
+              >
+                Create
+                <div className="flex items-center justify-center w-4 h-4 rounded bg-slate-200/60 dark:bg-slate-700 text-current">
+                  <CornerDownLeft size={10} />
+                </div>
+              </button>
             </div>
           </div>
         )}

@@ -8,6 +8,8 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 import { useTasksQuery } from '../../../hooks/api/useTasks';
 import { useParams } from 'react-router-dom';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useQuery } from '@tanstack/react-query';
+import { projectService } from '../../../services/project.service';
 
 interface ProjectOverviewProps {
   currentProject: any;
@@ -19,6 +21,12 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
   const { data: tasksData } = useTasksQuery(projectId || '', { page: 0, size: 100 });
   const tasks = tasksData?.content || [];
   const { t } = useLanguage();
+
+  const { data: recentActivities = [] } = useQuery({
+    queryKey: ['recentActivities', projectId],
+    queryFn: () => projectService.getRecentActivities(projectId!),
+    enabled: !!projectId
+  });
 
   // Dynamic stats calculation for Summary Dashboard
   const totalCount = tasks.length;
@@ -152,18 +160,57 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
     };
   }).sort((a, b) => b.count - a.count);
 
-  // Recent activity
-  const activityLog = tasks.slice(0, 5).map((task, idx) => {
-    const statusObj = currentProject?.statuses?.find((s: any) => s.statusId === task.statusId);
-    const timeAgos = ['2 minutes ago', '14 minutes ago', '1 hour ago', '3 hours ago', 'Yesterday'];
+  const formatTimeAgo = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'vài giây trước';
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} giờ trước`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) return `${diffInDays} ngày trước`;
+    
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) return `${diffInMonths} tháng trước`;
+    
+    return `${Math.floor(diffInMonths / 12)} năm trước`;
+  };
+
+  // Recent activity mapping
+  const activityLog = recentActivities.slice(0, 5).map((act: any) => {
+    let actionText = t('overview.action_update_task');
+    if (act.actionType === 'CREATE_TASK') {
+      actionText = t('overview.action_create_task');
+    } else if (act.actionType === 'UPDATE_STATUS') {
+      actionText = t('overview.action_update_status').replace('{{value}}', act.newValue || '');
+    } else if (act.actionType === 'UPDATE_ASSIGNEE') {
+      actionText = t('overview.action_update_assignee').replace('{{value}}', act.newValue || 'Unassigned');
+    } else if (act.actionType === 'UPDATE_PRIORITY') {
+      actionText = t('overview.action_update_priority').replace('{{value}}', act.newValue || '');
+    } else if (act.actionType === 'MOVE_SPRINT') {
+      actionText = t('overview.action_move_sprint').replace('{{value}}', act.newValue || '');
+    } else if (act.actionType === 'UPDATE_STORY_POINTS') {
+      actionText = t('overview.action_update_story_points').replace('{{value}}', act.newValue || '');
+    }
+
+    const statusObj = currentProject?.statuses?.find((s: any) => s.statusId === act.taskStatusId);
+    
     return {
-      userName: task.reporterName || task.reporter || 'nghĩa Ngô',
-      action: idx % 2 === 0 ? t('overview.created_action') : t('overview.updated_field'),
-      taskKey: task.taskKey || task.id,
-      taskTitle: task.title,
-      taskType: task.type,
-      status: statusObj?.label || task.status || 'To Do',
-      timeAgo: timeAgos[idx % timeAgos.length]
+      userName: act.userName || 'Unknown',
+      userAvatar: act.userAvatar,
+      action: actionText,
+      taskKey: act.taskKey,
+      taskTitle: act.taskTitle,
+      taskType: act.taskType,
+      status: statusObj?.label || 'To Do',
+      timeAgo: formatTimeAgo(act.createdAt)
     };
   });
 
@@ -296,9 +343,13 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             {activityLog.length > 0 ? (
               activityLog.map((act, idx) => (
                 <div key={idx} className="flex gap-3 items-start border-b border-slate-50 pb-3 last:border-0 last:pb-0">
-                  <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-[10px] shrink-0 shadow-sm uppercase">
-                    {act.userName?.substring(0, 2) || 'NN'}
-                  </div>
+                  {act.userAvatar ? (
+                    <img src={act.userAvatar} alt={act.userName} className="w-7 h-7 rounded-full object-cover shrink-0 shadow-sm border border-border" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-[10px] shrink-0 shadow-sm uppercase">
+                      {act.userName?.substring(0, 2) || 'NN'}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-medium text-foreground leading-snug">
                       <span className="font-bold text-slate-850 hover:underline cursor-pointer">{act.userName}</span>{" "}

@@ -59,8 +59,9 @@ export const projectService = {
     const response = await axiosClient.delete(`/projects/${projectId}`);
     return response.data;
   },
-  addTeamToProject: async (projectId: string, teamId: string, roleId: string): Promise<any> => {
-    const params = new URLSearchParams({ teamId, roleId });
+  addTeamToProject: async (projectId: string, teamId: string, roleId?: string): Promise<any> => {
+    const params = new URLSearchParams({ teamId });
+    if (roleId) params.append('roleId', roleId);
     const response = await axiosClient.post(`/projects/${projectId}/teams?${params.toString()}`);
     return response.data;
   },
@@ -72,15 +73,8 @@ export const projectService = {
     const response = await axiosClient.get(`/projects/${projectId}/teams`);
     return response.data;
   },
-  addTeamToProject: async (projectId: string, teamId: string, roleId?: string): Promise<any> => {
-    const params = new URLSearchParams({ teamId });
-    if (roleId) params.append('roleId', roleId);
-    const response = await axiosClient.post(`/projects/${projectId}/teams?${params.toString()}`);
+  getRecentActivities: async (projectId: string): Promise<any> => {
+    const response = await axiosClient.get(`/projects/${projectId}/activities/recent`);
     return response.data;
-  },
-  removeTeamFromProject: async (projectId: string, teamId: string): Promise<any> => {
-    const response = await axiosClient.delete(`/projects/${projectId}/teams/${teamId}`);
-    return response.data;
-  },
+  }
 };
-

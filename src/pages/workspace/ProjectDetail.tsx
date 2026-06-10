@@ -25,6 +25,7 @@ import ProjectMembers from './project-tabs/ProjectMembers';
 import ProjectSettings from './project-tabs/ProjectSettings';
 import InviteMemberModal from '../../components/workspace/InviteMemberModal';
 import { Skeleton } from '../../components/ui/Skeleton';
+import AiChatWidget from '../../components/workspace/AiChatWidget';
 
 type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' | 'backlog' | 'sprint' | 'settings';
 
@@ -529,6 +530,9 @@ export default function ProjectDetail() {
           </div>
         </div>
       )}
+
+      {/* AI Chat Widget */}
+      <AiChatWidget projectId={currentProject.id} projectName={currentProject.name} projectMethodology={currentProject.methodology} />
     </div>
   );
 }

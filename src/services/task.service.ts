@@ -92,3 +92,98 @@ export const taskService = {
     return response.data;
   }
 };
+
+// ─── AI Service methods (Phase 2) ───────────────────────────────────────────
+
+export interface AiGeneratedTask {
+  title: string;
+  description: string;
+  type: 'task' | 'story' | 'bug';
+  priority: 'Lowest' | 'Low' | 'Medium' | 'High' | 'Highest';
+  storyPoints: number;
+  suggestedAssigneeId: string | null;
+  suggestedAssigneeName: string | null;
+  dueDate?: string;
+}
+
+export interface AiConfirmTasksRequest {
+  epicName?: string;
+  epicDescription?: string;
+  tasks: AiGeneratedTask[];
+  targetSprintId?: string;
+  newSprintName?: string;
+}
+
+export interface AiTaskGenerationResult {
+  epicName: string;
+  epicDescription: string;
+  tasks: AiGeneratedTask[];
+}
+
+export interface AiTaskEditAction {
+  taskId: string;
+  taskKey: string;
+  fieldToChange: string;
+  oldValue: string;
+  newValue: string;
+  oldValueDisplay?: string;
+  newValueDisplay?: string;
+  reason: string;
+}
+
+export interface AiTaskEditResult {
+  edits: AiTaskEditAction[];
+}
+
+export interface AiPlanTask {
+  id: string;
+  taskKey: string;
+  title: string;
+  type: string;
+  priority: string;
+}
+
+export interface AiSprintPlanResult {
+  sprintName: string;
+  sprintGoal: string;
+  reasoning: string;
+  selectedTasks: AiPlanTask[];
+}
+
+export interface AiConfirmSprintPlanRequest {
+  sprintName: string;
+  sprintGoal: string;
+  taskIds: string[];
+}
+
+export const aiService = {
+  generateTasks: async (projectId: string, description: string): Promise<AiTaskGenerationResult> => {
+    const response = await axiosClient.post(`/ai/generate-tasks?projectId=${projectId}`, { message: description });
+    return response.data;
+  },
+  confirmTasks: async (projectId: string, data: { epicName: string; epicDescription: string; tasks: AiGeneratedTask[] }): Promise<string[]> => {
+    const response = await axiosClient.post(`/ai/confirm-tasks?projectId=${projectId}`, data);
+    return response.data;
+  },
+  chat: async (projectId: string, message: string): Promise<string> => {
+    const response = await axiosClient.post(`/ai/chat?projectId=${projectId}`, { message });
+    return response.data;
+  },
+  editTasks: async (projectId: string, message: string): Promise<AiTaskEditResult> => {
+    const response = await axiosClient.post(`/ai/edit-tasks?projectId=${projectId}`, { message });
+    return response.data;
+  },
+  confirmEditTasks: async (projectId: string, data: { confirmedEdits: AiTaskEditAction[] }): Promise<string[]> => {
+    const response = await axiosClient.post(`/ai/confirm-edit-tasks?projectId=${projectId}`, data);
+    return response.data;
+  },
+  planSprint: async (projectId: string, message: string): Promise<AiSprintPlanResult> => {
+    const response = await axiosClient.post(`/ai/plan-sprint?projectId=${projectId}`, { message });
+    return response.data;
+  },
+  confirmSprintPlan: async (projectId: string, data: AiConfirmSprintPlanRequest): Promise<string[]> => {
+    const response = await axiosClient.post(`/ai/confirm-sprint-plan?projectId=${projectId}`, data);
+    return response.data;
+  }
+};
+

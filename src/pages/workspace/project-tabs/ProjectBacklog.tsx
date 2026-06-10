@@ -2,26 +2,25 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
-  closestCorners, type DragStartEvent, type DragEndEvent, useDroppable
+  closestCorners, pointerWithin, type DragStartEvent, type DragEndEvent, type CollisionDetection
 } from '@dnd-kit/core';
-import {
-  SortableContext, verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
-  Plus, ChevronDown, ChevronRight,
-  Trash2, CheckSquare, Zap,
-  MousePointer2, Edit3, MinusSquare, X, MoveRight, AlertCircle
-} from 'lucide-react';
+import { Trash2, CheckSquare, Zap, X, MoveRight, AlertCircle } from 'lucide-react';
 import { sprintService, type Sprint } from '../../../services/sprint.service';
 import { taskService } from '../../../services/task.service';
 import SprintModal from '../../../components/workspace/SprintModal';
 import CompleteSprintModal from '../../../components/workspace/CompleteSprintModal';
-import defaultMan from '../../../assets/avatar_def_man.png';
-import { Skeleton } from '../../../components/ui/Skeleton';
 import { MassChangeStatusModal } from '../../../components/workspace/MassChangeStatusModal';
 import { MassEditFieldsModal } from '../../../components/workspace/MassEditFieldsModal';
 import { MassDeleteModal } from '../../../components/workspace/MassDeleteModal';
-import { Icons } from '../../../assets/icons';
+import { Skeleton } from '../../../components/ui/Skeleton';
+import { DraggableTaskRow } from './components/DraggableTaskRow';
+import { SprintSection } from './components/SprintSection';
+import { BacklogSection } from './components/BacklogSection';
+import TaskDetailView from '../../../components/workspace/TaskDetailView';
+import { BacklogToolbar } from './components/BacklogToolbar';
+import { MassActionBar } from './components/MassActionBar';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ProjectBacklogProps {
   projectId: string;
@@ -29,16 +28,6 @@ interface ProjectBacklogProps {
 }
 
 
-
-import { DraggableTaskRow } from './components/DraggableTaskRow';
-import { SprintSection } from './components/SprintSection';
-import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
-import TaskDetailView from '../../../components/workspace/TaskDetailView';
-import { BacklogToolbar } from './components/BacklogToolbar';
-import { MassActionBar } from './components/MassActionBar';
-
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLanguage } from '../../../contexts/LanguageContext';
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function ProjectBacklog({ projectId, currentProject }: ProjectBacklogProps) {
@@ -52,7 +41,6 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
   const [sprintTasks, setSprintTasks] = useState<any[]>(cachedData?.sprintTasks || []); // all tasks in sprints
   const [isLoading, setIsLoading] = useState(!cachedData);
   const [expandedSprints, setExpandedSprints] = useState<Set<string>>(new Set());
-  const [expandedBacklog, setExpandedBacklog] = useState(true);
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [selectedTaskDetail, setSelectedTaskDetail] = useState<any | null>(null);
 
@@ -69,7 +57,13 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
   const [activeTask, setActiveTask] = useState<any>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
-  const [isCreatingTask, setIsCreatingTask] = useState(false);
+  // Custom collision: ưu tiên droppable nằm dưới con trỏ trực tiếp trước
+  const collisionDetection: CollisionDetection = (args) => {
+    const pointerHits = pointerWithin(args);
+    if (pointerHits.length > 0) return pointerHits;
+    return closestCorners(args);
+  };
+
   const [deleteSprintConfirm, setDeleteSprintConfirm] = useState<string | null>(null);
   const [errorAlertMessage, setErrorAlertMessage] = useState<string | null>(null);
 
@@ -282,6 +276,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
   const handleDragEnd = async (event: DragEndEvent) => {
     setActiveTask(null);
     const { active, over } = event;
+    console.log('[DragEnd] over:', over?.id, 'overData:', over?.data?.current, 'active sprintId:', active?.data?.current?.sprintId);
     if (!over) return;
 
     const draggedTaskId = String(active.id);
@@ -291,7 +286,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
     // Tìm sprint đích
     let targetSprintId: string | null = null;
 
-    if (overId === 'backlog-container' || overData?.type === 'backlog') {
+    if (overId === 'backlog-container' || overId === 'backlog-context' || overId === 'backlog-empty-drop' || overData?.type === 'backlog') {
       targetSprintId = null;
     } else if (overData?.type === 'sprint') {
       targetSprintId = overData.sprintId;
@@ -299,8 +294,13 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
       // Nếu thả lên một task, lấy sprintId của task đó
       targetSprintId = overData.sprintId ?? null;
     } else {
-      // Fallback
-      return;
+      // Fallback cho SortableContext của sprint nếu nó sinh ra id tự động là sprint id
+      const sprintExists = sprints.find(s => s.id === overId);
+      if (sprintExists) {
+        targetSprintId = sprintExists.id;
+      } else {
+        return;
+      }
     }
 
     // Kiểm tra xem có thực sự thay đổi sprint không
@@ -346,11 +346,6 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
   const filteredBacklogTasks = allTasks.filter(t => !t.sprintId);
   const backlogPoints = filteredBacklogTasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
 
-  const { setNodeRef: setBacklogNodeRef, isOver: isBacklogOver } = useDroppable({
-    id: 'backlog-container',
-    data: { type: 'backlog', sprintId: null }
-  });
-
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 mx-[2%] mt-[1%]">
@@ -379,7 +374,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
 
   return (
     <>
-      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="flex flex-col gap-4 mx-[2%] mt-[1%]">
           {/* Toolbar */}
           <BacklogToolbar
@@ -429,95 +424,21 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           ))}
 
           {/* Backlog Section */}
-          <div
-            ref={setBacklogNodeRef}
-            className={`mb-10 rounded-sm transition-all ${isBacklogOver ? 'ring-2 ring-blue-400 bg-blue-50/10' : ''}`}
-          >
-            {/* Header */}
-            <div
-              className={`flex items-center gap-2 px-2 py-1.5 bg-background cursor-pointer select-none transition-colors group border border-border rounded-sm ${expandedBacklog ? 'border-b-0 rounded-b-none' : ''}`}
-              onClick={() => setExpandedBacklog(p => !p)}
-            >
-              <button className="text-muted-foreground hover:bg-slate-200 p-0.5 rounded transition-colors shrink-0 w-5 flex items-center justify-center">
-                {expandedBacklog ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-              </button>
-
-              <input
-                type="checkbox"
-                checked={filteredBacklogTasks.length > 0 && filteredBacklogTasks.every(t => selectedTaskIds.has(t.id))}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  const checked = e.target.checked;
-                  filteredBacklogTasks.forEach(t => {
-                    if (checked && !selectedTaskIds.has(t.id)) handleToggleTask(t.id);
-                    else if (!checked && selectedTaskIds.has(t.id)) handleToggleTask(t.id);
-                  });
-                }}
-                onClick={e => e.stopPropagation()}
-                className="w-3.5 h-3.5 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
-              />
-
-              <h3 className="font-bold text-foreground text-[13px] truncate">{t('backlog.backlog_label')}</h3>
-
-              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
-                <span>{filteredBacklogTasks.length === 1 ? t('backlog.work_item').replace('{count}', String(filteredBacklogTasks.length)) : t('backlog.work_items').replace('{count}', String(filteredBacklogTasks.length))}</span>
-              </div>
-
-              <div className="flex-1" />
-
-              <div className="flex items-center gap-2 shrink-0 text-[11px] font-bold">
-                <div onClick={e => e.stopPropagation()} className="flex items-center gap-1 ml-2">
-                  <button onClick={() => setSprintModal({ open: true, sprint: null })}
-                    className="bg-muted hover:bg-slate-200 text-foreground px-3 py-1 rounded font-semibold transition-colors">
-                    {t('backlog.create_sprint')}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Tasks */}
-            {expandedBacklog && (
-              <div className="flex flex-col border border-border border-t-0 bg-card rounded-b-sm min-h-[100px] pointer-events-auto">
-                <SortableContext id="backlog-context" items={filteredBacklogTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                  {filteredBacklogTasks.length === 0 && (
-                    <div className="border border-dashed border-slate-300 bg-background/50 text-muted-foreground text-[13px] text-center py-6 mx-2 my-2 rounded-sm select-none">
-                      {searchKeyword || totalActiveFilters > 0 ? t('backlog.no_tasks_filtered') : t('backlog.backlog_empty')}
-                    </div>
-                  )}
-                  {filteredBacklogTasks.map(task => (
-                    <DraggableTaskRow
-                      key={task.id}
-                      task={task}
-                      project={currentProject}
-                      onMoveToSprint={handleMoveToSprint}
-                      onDeleteTask={handleDeleteTask}
-                      sprints={sprints}
-                      isSelected={selectedTaskIds.has(task.id)}
-                      onToggle={handleToggleTask}
-                      onTaskUpdated={() => load(true)}
-                      onTaskClick={(t) => setSelectedTaskDetail(t)}
-                    />
-                  ))}
-                </SortableContext>
-                {!isCreatingTask ? (
-                  <div
-                    onClick={() => setIsCreatingTask(true)}
-                    className="px-8 py-2 hover:bg-background cursor-pointer text-muted-foreground flex items-center gap-1.5 text-[13px] font-semibold transition-colors"
-                  >
-                    <Plus size={14} /> {t('backlog.create')}
-                  </div>
-                ) : (
-                  <div className="px-2 pb-2">
-                    <InlineTaskCreator
-                      onAdd={(title, type, assignee, dueDate) => handleCreateTask(undefined, title, type, assignee, dueDate)}
-                      onCancel={() => setIsCreatingTask(false)}
-                      projectMembers={currentProject?.members || []}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <BacklogSection
+            tasks={filteredBacklogTasks}
+            project={currentProject}
+            sprints={sprints}
+            onCreateSprint={() => setSprintModal({ open: true, sprint: null })}
+            onMoveToSprint={handleMoveToSprint}
+            onDeleteTask={handleDeleteTask}
+            selectedTaskIds={selectedTaskIds}
+            onToggleTask={handleToggleTask}
+            onTaskUpdated={() => load(true)}
+            onTaskClick={(t) => setSelectedTaskDetail(t)}
+            onCreateTask={(title, type, assignee, dueDate) => handleCreateTask(undefined, title, type, assignee, dueDate)}
+            searchKeyword={searchKeyword}
+            totalActiveFilters={totalActiveFilters}
+          />
         </div>
 
         <DragOverlay dropAnimation={{

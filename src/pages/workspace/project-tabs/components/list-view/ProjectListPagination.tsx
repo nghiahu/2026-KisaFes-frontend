@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactPaginatePkg from 'react-paginate';
+const ReactPaginate = (ReactPaginatePkg as any).default || ReactPaginatePkg;
 import { Icons } from '../../../../../assets/icons';
 import { useProjectList } from './ProjectListContext';
 import { useLanguage } from '../../../../../contexts/LanguageContext';
@@ -77,23 +79,24 @@ export function ProjectListPagination() {
       </div>
       
       <div className="flex items-center gap-1">
-        <button
-          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-          disabled={validCurrentPage === 1}
-          className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-50 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
-        >
-          <Icons.chevronLeft size={16} />
-        </button>
-        <span className="text-[11px] font-bold text-muted-foreground min-w-[32px] text-center">
-          {validCurrentPage} / {totalPages}
-        </span>
-        <button
-          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-          disabled={validCurrentPage === totalPages}
-          className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-50 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
-        >
-          <Icons.chevronRight size={16} />
-        </button>
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel={<Icons.chevronRight size={16} />}
+          onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+          pageRangeDisplayed={3}
+          pageCount={Math.max(1, totalPages)}
+          previousLabel={<Icons.chevronLeft size={16} />}
+          forcePage={validCurrentPage - 1}
+          renderOnZeroPageCount={null}
+          containerClassName="flex items-center gap-1"
+          pageLinkClassName="w-7 h-7 flex items-center justify-center text-[12px] font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          previousLinkClassName="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          nextLinkClassName="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          breakLinkClassName="w-7 h-7 flex items-center justify-center text-[12px] font-medium text-muted-foreground"
+          activeLinkClassName="bg-blue-50 text-blue-600 hover:bg-blue-50 hover:text-blue-600 font-bold"
+          disabledClassName="opacity-50 cursor-not-allowed"
+          disabledLinkClassName="cursor-not-allowed"
+        />
       </div>
     </div>
   );
