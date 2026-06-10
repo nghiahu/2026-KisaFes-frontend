@@ -25,14 +25,9 @@ import { commentService, type CommentResponse } from '../../services/comment.ser
 import { socketService } from '../../services/socketService';
 import { CornerDownLeft, SmilePlus, Pencil, MoreHorizontal, Trash2, ChevronDown, ListTodo, Image, Code, Plus, Link, Undo2, Redo2, History, Sparkles } from 'lucide-react';
 
-interface TaskDetailViewProps {
-  task: any;
-  currentProject: any;
-  onClose: () => void;
-  onUpdateTaskLocally: (taskId: string, updates: any) => void;
-  onDeleteRequest?: (task: any) => void;
-}
 
+
+import type { TaskDetailViewProps } from '../../types/components.interface';
 export default function TaskDetailView({ task, currentProject, onClose, onUpdateTaskLocally, onDeleteRequest }: TaskDetailViewProps) {
   const projectId = currentProject?.id || '';
   const updateTitleMutation = useUpdateTaskTitleMutation(projectId);
@@ -451,7 +446,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
     { label: 'Highest', icon: <Icons.chevronsUp size={14} className="text-rose-500" /> },
     { label: 'High', icon: <Icons.chevronUp size={14} className="text-orange-500" /> },
     { label: 'Medium', icon: <Icons.equal size={14} strokeWidth={3} className="text-amber-500" /> },
-    { label: 'Low', icon: <Icons.chevronDown size={14} className="text-blue-400" /> },
+    { label: 'Low', icon: <Icons.chevronDown size={14} className="text-primary/70" /> },
     { label: 'Lowest', icon: <Icons.chevronsDown size={14} className="text-muted-foreground" /> },
   ];
 
@@ -477,8 +472,8 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <Icons.gitBranch size={14} /> Add epic
               </button>
               <span className="text-slate-300">/</span>
-              <div className="flex items-center gap-1.5 text-blue-600 hover:underline cursor-pointer px-1 py-1.5 rounded-lg">
-                <Icons.checkSquare size={14} className="text-blue-500" />
+              <div className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer px-1 py-1.5 rounded-lg">
+                <Icons.checkSquare size={14} className="text-primary" />
                 {task.taskKey || 'KAN-9'}
               </div>
             </div>
@@ -501,7 +496,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     }
                   }}
                   autoFocus
-                  className="w-full text-2xl font-black text-foreground border-2 border-blue-500 rounded-lg p-2 outline-none resize-none overflow-hidden"
+                  className="w-full text-2xl font-black text-foreground border-2 border-primary rounded-lg p-2 outline-none resize-none overflow-hidden"
                   rows={2}
                 />
               ) : (
@@ -579,7 +574,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                       type="checkbox" 
                       checked={st.done} 
                       onChange={() => handleToggleSubtask(st.id)}
-                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                      className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-blue-600 cursor-pointer"
                     />
                     <span className={`text-[14px] flex-1 ${st.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                       {st.title}
@@ -604,7 +599,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     className="flex-1 text-[14px] px-3 py-1.5 border border-blue-400 rounded-md outline-none focus:ring-2 focus:ring-blue-100 transition-shadow"
                     autoFocus
                   />
-                  <button type="submit" className="px-3 py-1.5 bg-blue-600 text-white text-[13px] font-semibold rounded-md hover:bg-blue-700 transition-colors">
+                  <button type="submit" className="px-3 py-1.5 bg-primary text-white text-[13px] font-semibold rounded-md hover:bg-primary/90 transition-colors">
                     Add
                   </button>
                   <button 
@@ -642,7 +637,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     key={tab}
                     onClick={() => setActiveTab(tab as any)}
                     className={`px-3 py-2 text-[13px] font-bold border-b-2 transition-colors ${activeTab === tab
-                        ? 'border-blue-600 text-blue-700'
+                        ? 'border-primary text-blue-700'
                         : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-background rounded-t-lg'
                       }`}
                   >
@@ -708,7 +703,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                         <button 
                           type="submit" 
                           disabled={(!commentText.trim() && attachedImages.length === 0) || isSubmittingComment}
-                          className="px-3 py-1 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1 bg-primary text-white rounded text-xs font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSubmittingComment ? 'Saving...' : 'Save'}
                         </button>
@@ -1121,7 +1116,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                               onClick={() => handleToggleReaction(item.id, emoji)}
                                               className={`px-1.5 py-0.5 rounded-full border transition-all flex items-center gap-1 hover:scale-105 active:scale-95 ${
                                                 active 
-                                                  ? 'bg-blue-50 border-blue-200 text-blue-600 font-bold shadow-sm' 
+                                                  ? 'bg-primary/10 border-primary/20 text-primary font-bold shadow-sm' 
                                                   : 'bg-card border-border text-muted-foreground'
                                               }`}
                                             >
@@ -1140,7 +1135,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                       >
                                         <button 
                                           type="button"
-                                          className="font-bold text-muted-foreground hover:text-blue-600 transition-colors flex items-center gap-1 py-1"
+                                          className="font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 py-1"
                                         >
                                           <Icons.star size={12} /> React
                                         </button>
@@ -1188,7 +1183,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
               <button className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm" title="Lock">
                 <Icons.lockKeyhole size={16} />
               </button>
-              <button className="p-1.5 text-blue-600 hover:bg-muted rounded-md border border-border transition-colors shadow-sm flex items-center gap-1.5 font-semibold text-xs px-2.5">
+              <button className="p-1.5 text-primary hover:bg-muted rounded-md border border-border transition-colors shadow-sm flex items-center gap-1.5 font-semibold text-xs px-2.5">
                 <Icons.eye size={14} /> 1
               </button>
               <button className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm" title="Share">
@@ -1228,7 +1223,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
               <div className="relative" ref={statusDropdownRef}>
                 <button
                   onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-md text-[13px] font-bold hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-md text-[13px] font-bold hover:bg-primary/90 transition-colors shadow-sm shadow-blue-500/20"
                 >
                   {task.status || 'To Do'}
                   <Icons.chevronDown size={14} />
@@ -1243,10 +1238,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                         <button
                           key={statusId || idx}
                           onClick={() => handleStatusUpdate(statusId, statusLabel)}
-                          className="w-full text-left px-4 py-2 text-[13px] font-semibold text-foreground hover:bg-background hover:text-blue-600 transition-colors flex items-center justify-between"
+                          className="w-full text-left px-4 py-2 text-[13px] font-semibold text-foreground hover:bg-background hover:text-primary transition-colors flex items-center justify-between"
                         >
                           {statusLabel}
-                          {(task.statusId === statusId || task.status === statusLabel) && <Icons.check size={14} className="text-blue-600" />}
+                          {(task.statusId === statusId || task.status === statusLabel) && <Icons.check size={14} className="text-primary" />}
                         </button>
                       );
                     })}
@@ -1340,7 +1335,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                             onClick={() => handleTeamUpdate(t)}
                             className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
                           >
-                            <div className="w-6 h-6 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                            <div className="w-6 h-6 rounded-md bg-primary/20 text-primary flex items-center justify-center shrink-0 font-bold text-[10px]">
                               {t.name.substring(0, 2).toUpperCase()}
                             </div>
                             <span className="truncate">{t.name}</span>
@@ -1389,7 +1384,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                       onClick={() => attachmentInputRef.current?.click()}
                       disabled={uploadingAttachment}
                     >
-                      <Icons.paperclip size={14} className={uploadingAttachment ? "text-blue-500 animate-spin" : "text-muted-foreground"} />
+                      <Icons.paperclip size={14} className={uploadingAttachment ? "text-primary animate-spin" : "text-muted-foreground"} />
                       <span>{uploadingAttachment ? 'Uploading...' : 'Add attachment'}</span>
                     </button>
                     <input 
@@ -1403,7 +1398,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     <div className="flex flex-col gap-2 ml-[120px]">
                       {task.attachments.slice(0, 3).map((file: any) => (
                         <div key={file.fileId} className="flex items-center justify-between bg-background border border-border rounded-md p-2 group">
-                          <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] text-blue-600 hover:underline truncate">
+                          <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] text-primary hover:underline truncate">
                             <Icons.fileText size={14} className="shrink-0" />
                             <span className="truncate max-w-[150px]">{file.fileName}</span>
                           </a>
@@ -1419,7 +1414,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                       {task.attachments.length > 3 && (
                         <button
                           onClick={() => setShowAllAttachments(true)}
-                          className="text-[12px] font-semibold text-muted-foreground hover:text-blue-600 transition-colors self-start mt-1 bg-muted px-3 py-1 rounded-md flex items-center gap-1"
+                          className="text-[12px] font-semibold text-muted-foreground hover:text-primary transition-colors self-start mt-1 bg-muted px-3 py-1 rounded-md flex items-center gap-1"
                         >
                           <Icons.layers size={12} />
                           Xem tất cả {task.attachments.length} tệp
@@ -1522,7 +1517,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
           <div className="bg-card rounded-2xl shadow-xl w-full max-w-md border border-border flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-200">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
               <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <Icons.paperclip size={18} className="text-blue-500" />
+                <Icons.paperclip size={18} className="text-primary" />
                 Tất cả tệp đính kèm ({task.attachments?.length || 0})
               </h3>
               <button 
@@ -1536,13 +1531,13 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
             <div className="p-5 overflow-y-auto flex-1 custom-scrollbar">
               <div className="flex flex-col gap-3">
                 {task.attachments?.map((file: any) => (
-                  <div key={file.fileId} className="flex items-center justify-between bg-background border border-border rounded-xl p-3 hover:border-blue-200 transition-colors group">
+                  <div key={file.fileId} className="flex items-center justify-between bg-background border border-border rounded-xl p-3 hover:border-primary/20 transition-colors group">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
                         <Icons.fileText size={20} />
                       </div>
                       <div className="min-w-0">
-                        <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-foreground hover:text-blue-600 hover:underline truncate block">
+                        <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-foreground hover:text-primary hover:underline truncate block">
                           {file.fileName}
                         </a>
                         <span className="text-[11px] text-muted-foreground mt-0.5 block">Đính kèm vào dự án</span>

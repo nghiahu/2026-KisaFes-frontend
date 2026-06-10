@@ -446,7 +446,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
           easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
         }}>
           {activeTask && (
-            <div className="bg-card rounded-md shadow-2xl border border-blue-200 opacity-95 scale-[1.02] rotate-1 w-full pointer-events-none">
+            <div className="bg-card rounded-md shadow-2xl border border-primary/20 opacity-95 scale-[1.02] rotate-1 w-full pointer-events-none">
               <DraggableTaskRow
                 task={activeTask}
                 project={currentProject}
@@ -697,7 +697,7 @@ export default function ProjectBacklog({ projectId, currentProject }: ProjectBac
             <div className="px-5 py-3 border-t border-border flex justify-center bg-background/50">
               <button 
                 onClick={() => setErrorAlertMessage(null)} 
-                className="px-6 py-2 w-full text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
+                className="px-6 py-2 w-full text-xs font-bold text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm transition-colors"
               >
                 {t('backlog.close')}
               </button>

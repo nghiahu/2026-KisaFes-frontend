@@ -37,13 +37,13 @@ export default function WelcomeBack() {
 
             {/* Welcome */}
             <div className="space-y-4">
-              <p className="text-sm font-medium uppercase tracking-[0.35em] text-blue-600">
+              <p className="text-sm font-medium uppercase tracking-[0.35em] text-primary">
                 {t('welcome_back.welcome_back')}
               </p>
 
               <h1 className="text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl">
                 {t('welcome_back.welcome_back_name')}{" "}
-                <span className="text-blue-600">
+                <span className="text-primary">
                   {firstName}.
                 </span>
               </h1>

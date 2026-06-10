@@ -4,15 +4,10 @@ import {
   Plus, ChevronDown, CheckSquare, Zap, AlertCircle, User, Calendar, Search, X, CornerDownLeft
 } from 'lucide-react';
 import defaultMan from '../../assets/avatar_def_man.png';
+import { Button } from '@/components/ui/Button';
+import { Textarea } from '@/components/ui/textarea';
 
-interface InlineTaskCreatorProps {
-  onAdd: (title: string, type: string, assignee: any, dueDate: string) => void;
-  onCancel: () => void;
-  projectMembers: any[];
-  autoFocus?: boolean;
-  hideDueDate?: boolean;
-}
-
+import type { InlineTaskCreatorProps } from '../../types/components.interface';
 export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
   onAdd,
   onCancel,
@@ -73,8 +68,8 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="bg-card p-2.5 rounded-xl border-2 border-blue-500 shadow-sm mt-2 flex flex-col gap-2 w-full">
-      <textarea
+    <div ref={containerRef} className="bg-card p-2.5 rounded-xl border-2 border-primary shadow-sm mt-2 flex flex-col gap-2 w-full">
+      <Textarea
         value={newTaskTitle}
         onChange={(e) => setNewTaskTitle(e.target.value)}
         onKeyDown={(e) => {
@@ -85,7 +80,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
           if (e.key === 'Escape') onCancel();
         }}
         placeholder="What needs to be done?"
-        className="w-full text-[13px] font-medium text-foreground placeholder:text-muted-foreground border-0 focus:ring-0 resize-none p-1 min-h-[40px] outline-none"
+        className="w-full text-[13px] font-medium text-foreground placeholder:text-muted-foreground border-0 focus-visible:ring-0 resize-none p-1 min-h-[40px] outline-none shadow-none"
         rows={2}
         autoFocus={autoFocus}
       />
@@ -143,7 +138,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                 onClick={() => {
                   try { dateInputRef.current?.showPicker(); } catch (e) { dateInputRef.current?.focus(); }
                 }}
-                className={`p-1 rounded transition-colors border ${newTaskDueDate ? 'bg-blue-50 text-blue-600 border-blue-200' : 'text-muted-foreground hover:text-foreground hover:bg-muted border-border'}`} title={newTaskDueDate ? `Due date: ${newTaskDueDate}` : 'Set due date'}>
+                className={`p-1 rounded transition-colors border ${newTaskDueDate ? 'bg-primary/10 text-primary border-primary/20' : 'text-muted-foreground hover:text-foreground hover:bg-muted border-border'}`} title={newTaskDueDate ? `Due date: ${newTaskDueDate}` : 'Set due date'}>
                 <Calendar size={14} />
               </button>
               <input type="date" ref={dateInputRef} value={newTaskDueDate} onChange={(e) => setNewTaskDueDate(e.target.value)} className="absolute opacity-0 pointer-events-none w-0 h-0" style={{ top: '100%', right: 0 }} />
@@ -160,7 +155,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                 else { setAssigneeDropdownPos({ top: rect.bottom + 4, left: rect.left }); }
                 setShowAssigneeDropdown(!showAssigneeDropdown);
               }}
-              className={`flex items-center justify-center w-6 h-6 rounded-full transition-colors border ${newTaskAssignee && newTaskAssignee !== 'automatic' ? 'border-blue-200' : 'border-border hover:bg-muted text-muted-foreground'}`} title={newTaskAssignee === 'automatic' ? 'Automatic' : newTaskAssignee ? newTaskAssignee.name : 'Unassigned'}
+              className={`flex items-center justify-center w-6 h-6 rounded-full transition-colors border ${newTaskAssignee && newTaskAssignee !== 'automatic' ? 'border-primary/20' : 'border-border hover:bg-muted text-muted-foreground'}`} title={newTaskAssignee === 'automatic' ? 'Automatic' : newTaskAssignee ? newTaskAssignee.name : 'Unassigned'}
             >
               {newTaskAssignee && newTaskAssignee !== 'automatic' ? (
                 <img  src={newTaskAssignee.avatar || defaultMan} alt={newTaskAssignee.name} className="w-full h-full rounded-full object-cover" />
@@ -181,13 +176,13 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                 </div>
                 <div className="max-h-[200px] overflow-y-auto py-1">
                   {(!assigneeSearch.trim() || 'unassigned'.includes(assigneeSearch.toLowerCase())) && (
-                    <button type="button" onClick={() => { setNewTaskAssignee(null); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left ${!newTaskAssignee ? 'bg-blue-50/50' : 'hover:bg-background'}`}>
+                    <button type="button" onClick={() => { setNewTaskAssignee(null); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left ${!newTaskAssignee ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
                       <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center shrink-0"><User size={12} className="text-muted-foreground" /></div>
-                      <span className={!newTaskAssignee ? 'text-blue-600 font-medium' : 'text-foreground'}>Unassigned</span>
+                      <span className={!newTaskAssignee ? 'text-primary font-medium' : 'text-foreground'}>Unassigned</span>
                     </button>
                   )}
                   {(!assigneeSearch.trim() || 'automatic'.includes(assigneeSearch.toLowerCase())) && (
-                    <button type="button" onClick={() => { setNewTaskAssignee('automatic'); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left border-b border-border pb-2 mb-1 ${newTaskAssignee === 'automatic' ? 'bg-blue-50/50 text-blue-600' : 'hover:bg-background text-foreground'}`}>
+                    <button type="button" onClick={() => { setNewTaskAssignee('automatic'); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left border-b border-border pb-2 mb-1 ${newTaskAssignee === 'automatic' ? 'bg-primary/10/50 text-primary' : 'hover:bg-background text-foreground'}`}>
                       <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center shrink-0"><User size={12} className="text-muted-foreground" /></div>
                       <span>Automatic</span>
                     </button>
@@ -195,7 +190,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                   {filteredMembers.map((m: any) => {
                     const isSelected = newTaskAssignee?.id === m.id;
                     return (
-                      <button type="button" key={m.id} onClick={() => { setNewTaskAssignee(m); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${isSelected ? 'bg-blue-50/50' : 'hover:bg-background'}`}>
+                      <button type="button" key={m.id} onClick={() => { setNewTaskAssignee(m); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${isSelected ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
                         <img  src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                         <div className="flex flex-col min-w-0">
                           <span className="truncate text-foreground font-medium">{m.name}</span>
@@ -210,15 +205,17 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
           </div>
         </div>
         
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={handleSubmit}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-blue-600 hover:text-white transition-colors text-xs font-medium"
+          className="h-7 text-xs"
         >
           Create
-          <div className="flex items-center justify-center w-4 h-4 rounded bg-slate-200/60 dark:bg-slate-700 text-current">
+          <div className="flex items-center justify-center w-4 h-4 rounded bg-background/50 ml-1.5 text-current">
             <CornerDownLeft size={10} />
           </div>
-        </button>
+        </Button>
       </div>
     </div>
   );

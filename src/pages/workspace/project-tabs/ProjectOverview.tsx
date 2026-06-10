@@ -2,6 +2,7 @@ import { Icons } from '../../../assets/icons';
 import defaultMan from '../../../assets/avatar_def_man.png';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { Button } from '@/components/ui/Button';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -109,7 +110,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
     { label: 'Highest', count: priorityCounts.Highest, icon: <Icons.chevronsUp size={14} className="text-red-500" />, color: 'linear-gradient(to top, #ef4444, #f87171)' },
     { label: 'High', count: priorityCounts.High, icon: <Icons.chevronUp size={14} className="text-orange-500" />, color: 'linear-gradient(to top, #f97316, #fb923c)' },
     { label: 'Medium', count: priorityCounts.Medium, icon: <Icons.equal size={14} strokeWidth={3} className="text-amber-500" />, color: 'linear-gradient(to top, #f59e0b, #fbbf24)' },
-    { label: 'Low', count: priorityCounts.Low, icon: <Icons.chevronDown size={14} className="text-blue-500" />, color: 'linear-gradient(to top, #3b82f6, #60a5fa)' },
+    { label: 'Low', count: priorityCounts.Low, icon: <Icons.chevronDown size={14} className="text-primary" />, color: 'linear-gradient(to top, #3b82f6, #60a5fa)' },
     { label: 'Lowest', count: priorityCounts.Lowest, icon: <Icons.chevronsDown size={14} className="text-muted-foreground" />, color: 'linear-gradient(to top, #94a3b8, #cbd5e1)' }
   ];
 
@@ -215,13 +216,13 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
   });
 
   return (
-    <div className="p-6 bg-[#F4F5F7] flex flex-col gap-6 overflow-y-auto h-full flex-1">
+    <div className="p-6 bg-slate-50 dark:bg-slate-900 flex flex-col gap-6 overflow-y-auto h-full flex-1">
       {/* Filter Bar Row */}
       <div className="flex items-center justify-between shrink-0">
-        <button className="flex items-center gap-1.5 bg-card border border-slate-300 hover:bg-background text-foreground px-3.5 py-1.5 rounded-[4px] text-[13px] font-bold transition-colors shadow-sm">
+        <Button variant="outline" size="sm" className="h-8 gap-1.5 text-[13px] font-bold rounded-[4px] shadow-sm">
           <Icons.filter size={13} className="text-muted-foreground" />
           <span>{t('overview.filter')}</span>
-        </button>
+        </Button>
       </div>
 
       {/* Metrics cards row */}
@@ -287,7 +288,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             <h3 className="text-[15px] font-bold text-foreground">{t('overview.status_overview')}</h3>
             <p className="text-[12px] text-muted-foreground font-medium mt-1">
               {t('overview.status_desc')} {" "}
-              <button onClick={() => setActiveTab('list')} className="text-blue-600 hover:underline font-bold">
+              <button onClick={() => setActiveTab('list')} className="text-primary hover:underline font-bold">
                 {t('overview.view_all_items')}
               </button>
             </p>
@@ -334,9 +335,9 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
                 {t('overview.recent_desc')}
               </p>
             </div>
-            <button className="p-1 text-muted-foreground hover:text-muted-foreground hover:bg-background rounded transition-colors shrink-0">
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground shrink-0 rounded-md">
               <Icons.maximize2 size={14} />
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto max-h-[200px] pr-2 flex flex-col gap-4 scrollbar-thin">
@@ -356,7 +357,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
                       {act.action}{" "}
                       <button 
                         onClick={() => setActiveTab('list')}
-                        className="font-bold text-blue-600 hover:underline inline-flex items-center gap-1 bg-background border border-border/60 rounded px-1 py-0.5 text-[10px] align-baseline uppercase"
+                        className="font-bold text-primary hover:underline inline-flex items-center gap-1 bg-background border border-border/60 rounded px-1 py-0.5 text-[10px] align-baseline uppercase"
                       >
                         {act.taskKey}
                       </button>
@@ -387,7 +388,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             <h3 className="text-[15px] font-bold text-foreground">{t('overview.priority_breakdown')}</h3>
             <p className="text-[12px] text-muted-foreground font-medium mt-1">
               {t('overview.priority_desc')}{" "}
-              <a href="#spaces" className="text-blue-600 hover:underline font-bold">
+              <a href="#spaces" className="text-primary hover:underline font-bold">
                 {t('overview.how_to_manage')}
               </a>
             </p>
@@ -436,7 +437,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
             <h3 className="text-[15px] font-bold text-foreground">{t('overview.types_of_work')}</h3>
             <p className="text-[12px] text-muted-foreground font-medium mt-1">
               {t('overview.types_desc')}{" "}
-              <button onClick={() => setActiveTab('list')} className="text-blue-600 hover:underline font-bold">
+              <button onClick={() => setActiveTab('list')} className="text-primary hover:underline font-bold">
                 {t('overview.view_all_items')}
               </button>
             </p>
@@ -474,7 +475,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
               {t('overview.team_desc')}
             </p>
           </div>
-          <button className="text-blue-600 hover:underline font-bold text-[12px]">
+          <button className="text-primary hover:underline font-bold text-[12px]">
             {t('overview.view_workload')}
           </button>
         </div>
@@ -494,7 +495,7 @@ export default function ProjectOverview({ currentProject, setActiveTab }: Projec
               </div>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                  className="h-full bg-primary rounded-full transition-all duration-500"
                   style={{ width: `${item.percentage}%` }}
                 />
               </div>

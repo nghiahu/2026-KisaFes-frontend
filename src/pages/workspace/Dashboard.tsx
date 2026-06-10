@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Icons } from '../../assets/icons';
 import type { User } from '../../types/user.interface';
 import defaultAvatar from '../../assets/avatar_def_man.png';
+import { Button } from '@/components/ui/Button';
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -56,7 +57,7 @@ export default function Dashboard() {
           <section className="flex flex-col gap-4 mb-8">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Recent Projects</h2>
-              <a href="#" className="text-[0.82rem] font-semibold text-blue-500 hover:underline">
+              <a href="#" className="text-[0.82rem] font-semibold text-primary hover:underline">
                 View All
               </a>
             </div>
@@ -65,14 +66,14 @@ export default function Dashboard() {
               {/* Project Card 1 */}
               <div className="bg-card p-5 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow group">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 text-blue-500">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary">
                     <Icons.leaf size={20} strokeWidth={2} />
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[0.7rem] font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                  <span className="px-2.5 py-0.5 rounded-full text-[0.7rem] font-bold bg-primary/10 text-primary border border-blue-100">
                     Active
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
                   Garden App Redesign
                 </h3>
                 <p className="text-[0.82rem] text-muted-foreground mb-5 line-clamp-2">
@@ -85,7 +86,7 @@ export default function Dashboard() {
                   </div>
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-500 rounded-full"
+                      className="h-full bg-primary rounded-full"
                       style={{ width: '75%' }}
                     />
                   </div>
@@ -143,12 +144,12 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Assigned to You</h2>
               <div className="flex items-center gap-1">
-                <button className="p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors" title="Filter">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="Filter">
                   <Icons.slidersHorizontal size={16} />
-                </button>
-                <button className="p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors" title="More">
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="More">
                   <Icons.moreHorizontal size={16} />
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -217,7 +218,7 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.82rem] text-muted-foreground leading-snug">
                     <strong className="text-foreground font-bold">Jordan</strong> commented on{' '}
-                    <a href="#" className="text-blue-500 font-bold hover:underline">User Flow</a>
+                    <a href="#" className="text-primary font-bold hover:underline">User Flow</a>
                   </p>
                   <p className="text-[0.78rem] text-muted-foreground italic pl-2 border-l-2 border-border mt-1">
                     "The transition feels so smooth now! Great work on the easing curves."
@@ -233,7 +234,7 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.82rem] text-muted-foreground leading-snug">
                     <strong className="text-foreground font-bold">Sarah</strong> completed{' '}
-                    <a href="#" className="text-blue-500 font-bold hover:underline">Icon Export</a>
+                    <a href="#" className="text-primary font-bold hover:underline">Icon Export</a>
                   </p>
                   <span className="block mt-2 text-[0.68rem] font-bold text-muted-foreground uppercase tracking-wider">
                     🔴 1 HOUR AGO
@@ -246,7 +247,7 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.82rem] text-muted-foreground leading-snug">
                     <strong className="text-foreground font-bold">Liam</strong> added a new file to{' '}
-                    <a href="#" className="text-blue-500 font-bold hover:underline">Nebula Assets</a>
+                    <a href="#" className="text-primary font-bold hover:underline">Nebula Assets</a>
                   </p>
                   <span className="block mt-2 text-[0.68rem] font-bold text-muted-foreground uppercase tracking-wider">
                     🔵 3 HOURS AGO
@@ -255,9 +256,9 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <button className="w-full mt-6 p-2.5 text-[0.82rem] font-semibold text-foreground bg-transparent border border-border rounded-xl hover:bg-background hover:border-slate-300 transition-all">
+            <Button variant="outline" className="w-full mt-6 rounded-xl text-[0.82rem] font-semibold h-10 border-border bg-transparent hover:bg-background">
               View History
-            </button>
+            </Button>
           </div>
 
           {/* Inspiration Corner */}

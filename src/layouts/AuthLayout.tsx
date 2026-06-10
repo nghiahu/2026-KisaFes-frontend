@@ -32,7 +32,7 @@ export default function AuthLayout() {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-3xl border-4 border-blue-500 shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-3xl border-4 border-primary shadow-2xl overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2">
               {/* Left Side - Blue Background with Features */}
               <BackgroundL />

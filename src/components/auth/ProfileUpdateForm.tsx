@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { clearRegistrationData } from "../../store/slices/authSlice";
 import type { RootState } from "../../store";
 import { useAuthActions } from "../../hooks/useAuthActions";
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function ProfileUpdateForm() {
   const navigate = useNavigate();
@@ -66,7 +69,7 @@ export default function ProfileUpdateForm() {
           <div className="grid grid-cols-1 gap-6 rounded-[24px] border border-slate-200 bg-slate-50 p-6 sm:grid-cols-[100px_1fr]">
             <div className="flex items-center justify-center">
               <div 
-                className="relative flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-2xl font-semibold text-white overflow-hidden cursor-pointer"
+                className="relative flex h-24 w-24 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-white overflow-hidden cursor-pointer"
                 onClick={handleAvatarClick}
               >
                 {avatarPreview ? (
@@ -76,7 +79,7 @@ export default function ProfileUpdateForm() {
                 )}
                 <button
                   type="button"
-                  className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm ring-1 ring-slate-200"
+                  className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-white text-primary shadow-sm ring-1 ring-slate-200"
                 >
                   +
                 </button>
@@ -101,12 +104,12 @@ export default function ProfileUpdateForm() {
               <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                 Tên công khai
               </label>
-              <input
+              <Input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="@tennguoidung"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="rounded-2xl px-4 h-12 shadow-sm text-sm"
               />
             </div>
 
@@ -114,34 +117,36 @@ export default function ProfileUpdateForm() {
               <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                 Tiểu sử
               </label>
-              <textarea
+              <Textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={5}
                 placeholder="Giới thiệu ngắn gọn về bản thân..."
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="rounded-2xl px-4 py-3 shadow-sm text-sm resize-none"
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-4">
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={loading}
               onClick={() => handleRegister(true)}
-              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+              className="rounded-2xl px-6 py-6 text-sm font-semibold sm:w-auto w-full"
             >
               Thiết lập sau
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="kisafres"
               disabled={loading}
               onClick={() => handleRegister(false)}
-              className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-2xl px-6 py-6 text-sm font-semibold sm:w-auto w-full flex items-center justify-center"
             >
               {loading ? 'Đang xử lý...' : 'Hoàn tất Đăng ký'}
               <span className="ml-2">→</span>
-            </button>
+            </Button>
           </div>
 
           <p className="text-center text-xs text-slate-400">

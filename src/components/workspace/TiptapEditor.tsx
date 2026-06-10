@@ -6,13 +6,9 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import { Icons } from '../../assets/icons';
 
-interface TiptapEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
-}
 
+
+import type { TiptapEditorProps } from '../../types/components.interface';
 const MenuBar = ({ editor }: { editor: any }) => {
   if (!editor) return null;
 
@@ -20,14 +16,14 @@ const MenuBar = ({ editor }: { editor: any }) => {
     <div className="flex items-center gap-1 border-b border-[#dfe1e6] p-1 px-2 bg-background/50 flex-wrap text-[#42526e]">
       <button 
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-xs ${editor.isActive('heading', { level: 1 }) ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-xs ${editor.isActive('heading', { level: 1 }) ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Heading 1"
       >
         H1
       </button>
       <button 
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-xs ${editor.isActive('heading', { level: 2 }) ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-xs ${editor.isActive('heading', { level: 2 }) ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Heading 2"
       >
         H2
@@ -35,21 +31,21 @@ const MenuBar = ({ editor }: { editor: any }) => {
       <div className="w-px h-4 bg-slate-300 mx-1"></div>
       <button 
         onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-sm ${editor.isActive('bold') ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-sm ${editor.isActive('bold') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Bold"
       >
         B
       </button>
       <button 
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif italic text-sm ${editor.isActive('italic') ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif italic text-sm ${editor.isActive('italic') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Italic"
       >
         I
       </button>
       <button 
         onClick={() => editor.chain().focus().toggleStrike().run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif text-sm line-through ${editor.isActive('strike') ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif text-sm line-through ${editor.isActive('strike') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Strikethrough"
       >
         S
@@ -77,28 +73,28 @@ const MenuBar = ({ editor }: { editor: any }) => {
       <div className="w-px h-4 bg-slate-300 mx-1"></div>
       <button 
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] ${editor.isActive('bulletList') ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] ${editor.isActive('bulletList') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Bullet List"
       >
         <Icons.listTodo size={14} />
       </button>
       <button 
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] font-bold text-xs ${editor.isActive('orderedList') ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] font-bold text-xs ${editor.isActive('orderedList') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Ordered List"
       >
         1.
       </button>
       <button 
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-sm ${editor.isActive('blockquote') ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-sm ${editor.isActive('blockquote') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Quote"
       >
         "
       </button>
       <button 
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        className={`p-1.5 rounded hover:bg-[#091e4214] ${editor.isActive('codeBlock') ? 'bg-[#091e4214] text-blue-600' : ''}`}
+        className={`p-1.5 rounded hover:bg-[#091e4214] ${editor.isActive('codeBlock') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Code Block"
       >
         <Icons.code size={14} />

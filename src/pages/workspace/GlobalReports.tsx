@@ -18,6 +18,7 @@ import {
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
 
 ChartJS.register(
   CategoryScale,
@@ -34,14 +35,14 @@ const getPriorityStyle = (priority: string) => {
   const p = (priority || '').toUpperCase();
   if (p === 'URGENT') return 'bg-rose-100 text-rose-600';
   if (p === 'HIGH') return 'bg-amber-100 text-amber-600';
-  if (p === 'MEDIUM') return 'bg-blue-100 text-blue-600';
+  if (p === 'MEDIUM') return 'bg-primary/20 text-primary';
   return 'bg-muted text-muted-foreground'; // LOW
 };
 
 const getStatusStyle = (statusLabel: string) => {
   const s = (statusLabel || '').toLowerCase();
   if (s.includes('done') || s.includes('hoàn thành')) return { text: 'text-emerald-600', dot: 'bg-emerald-500' };
-  if (s.includes('progress') || s.includes('đang làm')) return { text: 'text-blue-600', dot: 'bg-blue-500' };
+  if (s.includes('progress') || s.includes('đang làm')) return { text: 'text-primary', dot: 'bg-primary' };
   return { text: 'text-muted-foreground', dot: 'bg-slate-400' };
 };
 
@@ -237,10 +238,10 @@ export default function GlobalReports() {
               </select>
             </div>
 
-            <button className="flex items-center gap-2 px-5 py-3.5 hover:bg-background transition-colors text-muted-foreground">
+            <Button variant="ghost" className="flex items-center gap-2 px-5 h-full rounded-none hover:bg-background transition-colors text-muted-foreground">
               <Icons.filter size={14} />
               <span className="text-xs font-semibold">{t('reports.more_filters')}</span>
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -249,7 +250,7 @@ export default function GlobalReports() {
           {/* Card 1 */}
           <div className="bg-card rounded-[16px] border border-border p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                 <Icons.fileText size={18} />
               </div>
             </div>
@@ -348,10 +349,10 @@ export default function GlobalReports() {
               <div>
                 <div className="flex justify-between items-center mb-2.5">
                   <span className="text-[13px] font-semibold text-foreground">Kanban</span>
-                  <span className="text-[13px] font-bold text-blue-600">{stats.kanbanTasks} tasks</span>
+                  <span className="text-[13px] font-bold text-primary">{stats.kanbanTasks} tasks</span>
                 </div>
                 <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-600 rounded-full" style={{ width: `${kanbanPercent}%` }} />
+                  <div className="h-full bg-primary rounded-full" style={{ width: `${kanbanPercent}%` }} />
                 </div>
               </div>
 
@@ -366,8 +367,8 @@ export default function GlobalReports() {
               </div>
             </div>
 
-            <div className="mt-auto bg-blue-50 dark:bg-blue-950/50 rounded-xl p-4 flex gap-3">
-              <Icons.lightbulb className="text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" size={16} />
+            <div className="mt-auto bg-primary/10 dark:bg-blue-950/50 rounded-xl p-4 flex gap-3">
+              <Icons.lightbulb className="text-primary dark:text-primary/70 shrink-0 mt-0.5" size={16} />
               <p className="text-[11px] font-medium text-muted-foreground leading-relaxed">
                 {t('reports.distribution_ratio').replace('{kanbanPercent}', kanbanPercent.toString()).replace('{scrumPercent}', scrumPercent.toString())}
               </p>
@@ -378,7 +379,7 @@ export default function GlobalReports() {
           <div className="lg:col-span-2 bg-card rounded-[16px] border border-border shadow-sm flex flex-col overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6 border-b border-border flex justify-between items-center">
               <h3 className="text-[15px] font-bold text-foreground">{t('reports.recent_tasks_title')}</h3>
-              <button className="text-[13px] font-semibold text-blue-600 hover:text-blue-700">{t('reports.view_all')}</button>
+              <Button variant="link" className="text-[13px] font-semibold text-primary hover:text-blue-700 px-0">{t('reports.view_all')}</Button>
             </div>
             
             <div className="overflow-x-auto">

@@ -40,7 +40,7 @@ export default function PreferencesTab() {
             onClick={() => setTheme('light')}
             className={`flex flex-col items-center gap-4 group p-1`}
           >
-            <div className={`relative w-full aspect-[1.6/1] rounded-xl overflow-hidden flex flex-col transition-all bg-white ${theme === 'light' ? 'border border-blue-500 shadow-sm ring-1 ring-blue-500' : 'border border-slate-200 hover:border-slate-300 shadow-sm'}`}>
+            <div className={`relative w-full aspect-[1.6/1] rounded-xl overflow-hidden flex flex-col transition-all bg-white ${theme === 'light' ? 'border border-primary shadow-sm ring-1 ring-blue-500' : 'border border-slate-200 hover:border-slate-300 shadow-sm'}`}>
               
               {/* Checkmark */}
               {theme === 'light' && (
@@ -58,8 +58,8 @@ export default function PreferencesTab() {
               
               {/* Mockup Content */}
               <div className="flex-1 p-5 flex flex-col gap-3">
-                <div className="h-3 w-[85%] bg-blue-100/60 rounded-full"></div>
-                <div className="h-3 w-[55%] bg-blue-100/60 rounded-full"></div>
+                <div className="h-3 w-[85%] bg-primary/20/60 rounded-full"></div>
+                <div className="h-3 w-[55%] bg-primary/20/60 rounded-full"></div>
               </div>
             </div>
             
@@ -74,7 +74,7 @@ export default function PreferencesTab() {
             onClick={() => setTheme('dark')}
             className={`flex flex-col items-center gap-4 group p-1`}
           >
-            <div className={`relative w-full aspect-[1.6/1] rounded-xl overflow-hidden flex flex-col transition-all bg-[#1b1b1d] ${theme === 'dark' ? 'border border-blue-500 shadow-sm ring-1 ring-blue-500' : 'border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm'}`}>
+            <div className={`relative w-full aspect-[1.6/1] rounded-xl overflow-hidden flex flex-col transition-all bg-[#1b1b1d] ${theme === 'dark' ? 'border border-primary shadow-sm ring-1 ring-blue-500' : 'border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm'}`}>
               
               {/* Checkmark */}
               {theme === 'dark' && (
@@ -114,7 +114,7 @@ export default function PreferencesTab() {
           <div className="relative max-w-[320px]" ref={langDropdownRef}>
             <button 
               onClick={() => setIsLangOpen(!isLangOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-slate-300 transition-colors bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-slate-300 transition-colors bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <div className="flex items-center gap-3">
                 <div className={`w-6 h-[18px] ${currentLang.color} rounded flex items-center justify-center text-[10px] text-white font-bold leading-none`}>

@@ -4,11 +4,9 @@ import { useProjects } from '../../hooks/api/useProjects';
 import { useMyTasksQuery } from '../../hooks/api/useTasks';
 import { useNavigate } from 'react-router-dom';
 
-interface GlobalSearchDropdownProps {
-  searchTerm: string;
-  onClose: () => void;
-}
 
+
+import type { GlobalSearchDropdownProps } from '../../types/components.interface';
 export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSearchDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { data: projects = [] } = useProjects();
@@ -29,7 +27,7 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
   const getTaskIcon = (type: string) => {
     if (type?.toLowerCase() === 'epic') return <Icons.zap size={16} className="text-purple-500" />;
     if (type?.toLowerCase() === 'bug') return <Icons.alertCircle size={16} className="text-orange-500" />;
-    return <Icons.checkSquare size={16} className="text-blue-500" />;
+    return <Icons.checkSquare size={16} className="text-primary" />;
   };
 
   const filteredTasks = myTasks.filter((task: any) => 
@@ -65,7 +63,7 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
                   <div className="w-6 flex justify-center shrink-0">
                     {getTaskIcon(task.type)}
                   </div>
-                  <div className="text-[0.85rem] text-foreground truncate font-medium group-hover:text-blue-600 transition-colors">
+                  <div className="text-[0.85rem] text-foreground truncate font-medium group-hover:text-primary transition-colors">
                     <span className="text-muted-foreground mr-2 font-normal">{task.taskKey || task.id.substring(0, 8)}</span>
                     {task.title}
                   </div>
@@ -92,10 +90,10 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
                   className="flex items-center justify-between px-2 py-2 hover:bg-background rounded-lg text-left transition-colors w-full group"
                 >
                   <div className="flex items-center gap-3 truncate">
-                    <div className="w-6 h-6 shrink-0 bg-blue-100 rounded-md flex items-center justify-center text-blue-600">
+                    <div className="w-6 h-6 shrink-0 bg-primary/20 rounded-md flex items-center justify-center text-primary">
                       <Icons.kanbanSquare size={14} />
                     </div>
-                    <div className="text-[0.85rem] text-foreground truncate font-medium group-hover:text-blue-600 transition-colors">
+                    <div className="text-[0.85rem] text-foreground truncate font-medium group-hover:text-primary transition-colors">
                       {project.name}
                     </div>
                   </div>

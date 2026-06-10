@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 
-interface MassChangeStatusModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (statusId: string) => void;
-  statuses: { statusId: string; label: string }[];
-  isSubmitting: boolean;
-}
 
+
+import type { MassChangeStatusModalProps } from '../../types/components.interface';
 export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
   isOpen,
   onClose,
@@ -34,7 +29,7 @@ export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
             value={selectedStatusId}
             onChange={(e) => setSelectedStatusId(e.target.value)}
             disabled={isSubmitting}
-            className="w-full appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-[13px] hover:bg-[#34353B] transition-colors"
+            className="w-full appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-[13px] hover:bg-[#34353B] transition-colors"
           >
             <option value="" disabled>Select status</option>
             {statuses.map(s => (
@@ -61,7 +56,7 @@ export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
           <button
             disabled={!selectedStatusId || isSubmitting}
             onClick={() => onSubmit(selectedStatusId)}
-            className="px-3 py-1.5 text-[13px] font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/30 disabled:text-white/40 rounded-md transition-colors flex items-center gap-2"
+            className="px-3 py-1.5 text-[13px] font-medium text-white bg-primary hover:bg-primary/90 disabled:bg-primary/30 disabled:text-white/40 rounded-md transition-colors flex items-center gap-2"
           >
             {isSubmitting && (
               <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

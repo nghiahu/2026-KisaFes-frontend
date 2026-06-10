@@ -7,12 +7,13 @@ import { CSS } from '@dnd-kit/utilities';
 import { createPortal } from 'react-dom';
 import { useUpdateTaskTitleMutation, useUpdateTaskAssigneeMutation, useUpdateTaskPriorityMutation, useUpdateTaskDueDateMutation } from '../../../../hooks/api/useTasks';
 import { useLanguage } from '../../../../contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
 
 const PRIORITIES = [
   { label: 'Highest', icon: <Icons.chevronsUp size={12} className="text-rose-500" />, color: 'text-rose-600' },
   { label: 'High', icon: <Icons.chevronUp size={12} className="text-orange-500" />, color: 'text-orange-500' },
   { label: 'Medium', icon: <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />, color: 'text-amber-500' },
-  { label: 'Low', icon: <Icons.chevronDown size={12} className="text-blue-400" />, color: 'text-blue-400' },
+  { label: 'Low', icon: <Icons.chevronDown size={12} className="text-primary/70" />, color: 'text-primary/70' },
   { label: 'Lowest', icon: <Icons.chevronsDown size={12} className="text-muted-foreground" />, color: 'text-muted-foreground' },
 ];
 
@@ -146,7 +147,7 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
         {/* Due Date */}
         <div className="relative group/date">
           <div 
-            className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-blue-600 bg-background hover:bg-blue-50 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+            className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-primary bg-background hover:bg-primary/10 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
             onClick={(e) => {
               const input = e.currentTarget.parentElement?.querySelector('input[type="date"]') as HTMLInputElement;
               if (input) { try { input.showPicker(); } catch (err) { input.focus(); } }
@@ -166,17 +167,19 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
 
         {/* Actions Menu */}
         <div className="relative">
-          <button 
+          <Button 
+            variant="ghost"
+            size="icon"
             onPointerDown={e => e.stopPropagation()}
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               setActionsPos({ top: rect.bottom + 4, left: rect.left - 100 });
               setShowActions(true);
             }}
-            className="p-1 text-slate-300 hover:text-muted-foreground hover:bg-background rounded transition-colors"
+            className="h-6 w-6 text-slate-300 hover:text-muted-foreground hover:bg-background rounded"
           >
             <Icons.moreHorizontal size={14} />
-          </button>
+          </Button>
         </div>
       </div>
       
@@ -194,14 +197,14 @@ export const SortableTaskCard = ({ task, isOverlay = false, projectMembers = [],
             autoFocus
             className="flex-1 border border-blue-400 bg-card px-2 py-1 rounded-[3px] text-xs outline-none focus:ring-1 focus:ring-blue-400 min-w-0 font-bold"
           />
-          <button onClick={handleTitleSubmit} className="p-1 border border-border bg-card rounded shadow-sm hover:bg-background shrink-0"><Icons.check size={14} className="text-foreground" /></button>
-          <button onClick={() => { setIsEditingTitle(false); setTitleValue(task.title); }} className="p-1 border border-border bg-card rounded shadow-sm hover:bg-background shrink-0"><Icons.x size={14} className="text-foreground" /></button>
+          <Button variant="outline" size="icon" onClick={handleTitleSubmit} className="h-6 w-6 shrink-0"><Icons.check size={14} className="text-foreground" /></Button>
+          <Button variant="outline" size="icon" onClick={() => { setIsEditingTitle(false); setTitleValue(task.title); }} className="h-6 w-6 shrink-0"><Icons.x size={14} className="text-foreground" /></Button>
         </div>
       ) : (
         <h5 
           onClick={() => { setIsEditingTitle(true); setTitleValue(task.title); }}
           onPointerDown={e => e.stopPropagation()}
-          className="font-bold text-foreground text-sm leading-snug hover:text-blue-600 transition-colors cursor-pointer mb-2"
+          className="font-bold text-foreground text-sm leading-snug hover:text-primary transition-colors cursor-pointer mb-2"
         >
           {task.title}
         </h5>

@@ -75,7 +75,7 @@ export function BacklogSection({
           checked={isAllSelected}
           onChange={handleToggleAll}
           onClick={(e) => e.stopPropagation()}
-          className="w-3.5 h-3.5 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+          className="w-3.5 h-3.5 rounded-sm border-slate-300 text-primary focus:ring-primary cursor-pointer shrink-0"
         />
 
         <h3 className="font-bold text-foreground text-[13px] truncate">{t('backlog.backlog_label')}</h3>

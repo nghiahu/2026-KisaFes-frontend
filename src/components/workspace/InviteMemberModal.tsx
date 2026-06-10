@@ -9,11 +9,7 @@ import { teamService } from '../../services/team.service';
 import defaultMan from '../../assets/avatar_def_man.png';
 import { useQueryClient } from '@tanstack/react-query';
 
-interface InviteMemberModalProps {
-  onClose: () => void;
-  projectName: string;
-  projectId: string;
-}
+import type { InviteMemberModalProps } from '../../types/components.interface';
 
 const inviteSchema = z.object({
   query: z.string().min(1, 'Vui lòng nhập từ khóa tìm kiếm')
@@ -138,14 +134,14 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
         <div className="flex border-b border-border px-6 pt-4">
           <button
             type="button"
-            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'user' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'user' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('user')}
           >
             Mời cá nhân
           </button>
           <button
             type="button"
-            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'team' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'team' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('team')}
           >
             Thêm nhóm (Team)
@@ -173,13 +169,13 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                   if (searchResults.length > 0) setSearchDropdownOpen(true);
                 }}
                 placeholder={activeTab === 'user' ? "Nhập email hoặc tên của thành viên..." : "Nhập tên nhóm..."}
-                className={`w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:bg-card focus:ring-4 transition-all font-medium text-sm text-foreground animate-in ${errors.query ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10 bg-rose-50' : 'border-border focus:border-blue-500 focus:ring-blue-500/10 bg-background'}`}
+                className={`w-full pl-10 pr-10 py-2.5 border rounded-xl focus:outline-none focus:bg-card focus:ring-4 transition-all font-medium text-sm text-foreground animate-in ${errors.query ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/10 bg-rose-50' : 'border-border focus:border-primary focus:ring-primary/10 bg-background'}`}
                 disabled={isSending || success}
                 autoComplete="off"
               />
               {isSearching && (
                 <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
             </div>
@@ -193,11 +189,11 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
 
             {/* Selected Item Badge */}
             {selectedItem && (
-              <div className="flex items-center gap-2 mt-3 p-2 bg-blue-50/50 border border-blue-100 rounded-xl animate-in zoom-in-95">
+              <div className="flex items-center gap-2 mt-3 p-2 bg-primary/10/50 border border-blue-100 rounded-xl animate-in zoom-in-95">
                 <img  
                   src={selectedItem.avatar || defaultMan} 
                   alt={selectedItem.fullName || selectedItem.name} 
-                  className="w-7 h-7 rounded-full object-cover border border-blue-200" />
+                  className="w-7 h-7 rounded-full object-cover border border-primary/20" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold text-foreground truncate">{selectedItem.fullName || selectedItem.name}</div>
                   <div className="text-[10px] text-muted-foreground truncate">{selectedItem.email || `${selectedItem.members?.length || 0} thành viên`}</div>
@@ -261,7 +257,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             <button
               type="submit"
               disabled={isSending || success || !selectedItem}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center gap-2"
+              className="px-5 py-2 bg-primary hover:bg-primary/90 disabled:bg-blue-400 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center gap-2"
             >
               {isSending ? (
                 <>

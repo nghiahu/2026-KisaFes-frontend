@@ -5,13 +5,9 @@ import { z } from 'zod';
 import { Icons } from '../../assets/icons';
 import { sprintService, type Sprint, type SprintCreateRequest } from '../../services/sprint.service';
 
-interface SprintModalProps {
-  projectId: string;
-  sprint?: Sprint | null;
-  onClose: () => void;
-  onSuccess: (sprint: Sprint) => void;
-}
 
+
+import type { SprintModalProps } from '../../types/components.interface';
 const sprintSchema = z.object({
   name: z.string().min(1, 'Tên sprint không được để trống'),
   goal: z.string().optional(),

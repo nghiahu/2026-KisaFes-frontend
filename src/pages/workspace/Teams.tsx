@@ -7,6 +7,8 @@ import CreateTeamModal from '../../components/workspace/CreateTeamModal';
 import { Skeleton } from '../../components/ui/Skeleton';
 import defaultMan from '../../assets/avatar_def_man.png';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 const isValidImageUrl = (url: string | undefined | null) => {
   if (!url) return false;
@@ -51,22 +53,23 @@ export default function Teams() {
           <h1 className="text-2xl font-bold text-foreground tracking-tight">{t('teams.title')}</h1>
           <p className="text-muted-foreground text-sm mt-1">{t('teams.desc')}</p>
         </div>
-        <button
+        <Button
+          variant="kisafres"
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm shadow-blue-600/20 transition-all flex items-center justify-center gap-2"
+          className="rounded-xl shadow-sm shadow-blue-600/20 font-bold"
         >
           <Icons.plus size={18} strokeWidth={2.5} />
           {t('teams.create_team')}
-        </button>
+        </Button>
       </div>
 
       <div className="flex items-center gap-4 mb-8">
         <div className="relative flex-1 max-w-md">
           <Icons.search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
+          <Input
             type="text"
             placeholder={t('teams.search_placeholder')}
-            className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-10 pr-4 py-5 bg-card border-border rounded-xl text-sm"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -98,18 +101,18 @@ export default function Teams() {
             <div
               key={team.id}
               onClick={() => navigate(`/workspace/teams/${team.id}`)}
-              className="bg-card rounded-2xl p-6 border border-border shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer flex flex-col group h-[220px]"
+              className="bg-card rounded-2xl p-6 border border-border shadow-sm hover:shadow-md hover:border-primary/20 transition-all cursor-pointer flex flex-col group h-[220px]"
             >
               <div className="flex items-start gap-4 mb-3">
                 <div className="w-14 h-14 bg-muted rounded-xl flex items-center justify-center shrink-0 border border-border shadow-sm relative group overflow-hidden transition-all hover:scale-105">
                   {isValidImageUrl(team.avatar) ? (
                     <img  src={team.avatar} alt={team.name} className="w-full h-full object-cover rounded-xl" />
                   ) : (
-                    <Icons.users size={24} className="text-blue-500" />
+                    <Icons.users size={24} className="text-primary" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-foreground text-base truncate group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-bold text-foreground text-base truncate group-hover:text-primary transition-colors">
                     {team.name}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -154,12 +157,13 @@ export default function Teams() {
             {searchQuery ? t('teams.no_teams_search') : t('teams.no_teams_yet')}
           </p>
           {!searchQuery && (
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-colors"
+              className="rounded-xl"
             >
               {t('teams.create_first')}
-            </button>
+            </Button>
           )}
         </div>
       )}

@@ -67,7 +67,7 @@ export function ProjectListPagination() {
                     setIsItemsPerPageOpen(false);
                   }}
                   className={`w-full text-left px-3 py-1.5 text-[11px] transition-colors ${
-                    itemsPerPage === size ? 'bg-blue-50 text-blue-600 font-bold' : 'text-muted-foreground hover:bg-background font-medium'
+                    itemsPerPage === size ? 'bg-primary/10 text-primary font-bold' : 'text-muted-foreground hover:bg-background font-medium'
                   }`}
                 >
                   {size}{t('list.per_page')}
@@ -93,7 +93,7 @@ export function ProjectListPagination() {
           previousLinkClassName="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           nextLinkClassName="w-7 h-7 flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           breakLinkClassName="w-7 h-7 flex items-center justify-center text-[12px] font-medium text-muted-foreground"
-          activeLinkClassName="bg-blue-50 text-blue-600 hover:bg-blue-50 hover:text-blue-600 font-bold"
+          activeLinkClassName="bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary font-bold"
           disabledClassName="opacity-50 cursor-not-allowed"
           disabledLinkClassName="cursor-not-allowed"
         />

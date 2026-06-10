@@ -104,7 +104,7 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-blue-200 dark:shadow-none dark:shadow-none disabled:opacity-70"
+          className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-primary/20 dark:shadow-none dark:shadow-none disabled:opacity-70"
         >
           {isSaving ? t('project_settings.saving') : t('project_settings.save')}
         </button>
@@ -245,7 +245,7 @@ export default function ProjectSettings({ currentProject, onUpdate }: ProjectSet
                         key={st.statusId}
                         draggable
                         onDragStart={(e) => e.dataTransfer.setData('statusId', st.statusId)}
-                        className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold cursor-grab active:cursor-grabbing flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all"
+                        className="px-2 py-1 bg-primary/10 border border-primary/20 text-blue-700 rounded-lg text-[10px] font-bold cursor-grab active:cursor-grabbing flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all"
                       >
                         <div className={`w-1.5 h-1.5 rounded-full ${st.color || 'bg-slate-500'}`} />
                         {st.label}

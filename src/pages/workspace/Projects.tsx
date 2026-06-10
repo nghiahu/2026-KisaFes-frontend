@@ -15,6 +15,19 @@ import { Skeleton } from '../../components/ui/Skeleton';
 import { projectService } from '../../services/project.service';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { BaseDataTable } from '@/components/ui/BaseDataTable';
+import { EmptyState } from '@/components/ui/EmptyState';
+import type { ColumnDef } from '@tanstack/react-table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/DropdownMenu";
+
 const editProjectSchema = z.object({
   name: z.string().min(1, 'Tên dự án không được để trống'),
   categoryId: z.string().min(1, 'Category không được để trống'),
@@ -160,8 +173,19 @@ export default function Projects() {
       case 'ON HOLD': return 'bg-amber-100 text-amber-600 border-amber-200';
       case 'COMPLETED': return 'bg-muted text-muted-foreground border-border';
       case 'AT RISK': return 'bg-rose-100 text-rose-600 border-rose-200';
-      case 'PLANNING': return 'bg-blue-100 text-blue-600 border-blue-200';
+      case 'PLANNING': return 'bg-primary/20 text-primary border-primary/20';
       default: return 'bg-muted text-muted-foreground border-border';
+    }
+  };
+
+  const getStatusText = (status: ProjectStatus, t: any) => {
+    switch (status) {
+      case 'ACTIVE': return t('projects.status_active') || 'ACTIVE';
+      case 'ON HOLD': return t('projects.status_onhold') || 'ON HOLD';
+      case 'COMPLETED': return t('projects.status_completed') || 'COMPLETED';
+      case 'AT RISK': return t('projects.status_atrisk') || 'AT RISK';
+      case 'PLANNING': return t('projects.status_planning') || 'PLANNING';
+      default: return status;
     }
   };
 
@@ -169,10 +193,10 @@ export default function Projects() {
     switch (status) {
       case 'ACTIVE': return 'bg-emerald-500';
       case 'ON HOLD': return 'bg-amber-500';
-      case 'COMPLETED': return 'bg-blue-600';
+      case 'COMPLETED': return 'bg-primary';
       case 'AT RISK': return 'bg-rose-500';
-      case 'PLANNING': return 'bg-blue-500';
-      default: return 'bg-blue-500';
+      case 'PLANNING': return 'bg-primary';
+      default: return 'bg-primary';
     }
   };
 
@@ -213,6 +237,93 @@ export default function Projects() {
     }
   };
 
+  const columns = React.useMemo<ColumnDef<Project>[]>(() => [
+    {
+      accessorKey: "name",
+      header: t('projects.project_name'),
+      cell: ({ row }) => {
+        const p = row.original;
+        return (
+          <div className="flex flex-col min-w-[200px] cursor-pointer" onClick={() => navigate(`/workspace/projects/${p.id}`)}>
+             <div className="flex items-baseline gap-2 mb-1">
+               <span className="font-bold text-foreground hover:text-primary transition-colors truncate">{p.name}</span>
+               <span className="text-[11px] font-bold text-muted-foreground">{p.code}</span>
+             </div>
+             <div className="flex items-center gap-2 text-[12px] font-medium text-muted-foreground">
+               <span className="truncate">{p.category || 'Software Development'}</span>
+             </div>
+          </div>
+        )
+      }
+    },
+    {
+      accessorKey: "status",
+      header: t('projects.status') || "Trạng thái",
+      cell: ({ row }) => {
+        const p = row.original;
+        return (
+          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase ${getStatusColor(p.status)}`}>
+             {getStatusText(p.status, t)}
+          </span>
+        )
+      }
+    },
+    {
+      id: "tasks",
+      header: t('projects.tasks'),
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="text-[13px] font-bold text-foreground leading-tight">{row.original.totalTasksCount || 0}</span>
+          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">{t('projects.total_tasks') || 'Tasks'}</span>
+        </div>
+      )
+    },
+    {
+      id: "progress",
+      header: t('projects.progress') || "Tiến độ",
+      cell: ({ row }) => {
+        const p = row.original;
+        const pct = p.progress || 0;
+        return (
+          <div className="flex flex-col w-[120px]">
+            <div className="flex justify-between mb-1">
+               <span className="text-[11px] font-bold text-emerald-500">{p.completedTasksCount || 0} {t('projects.done')}</span>
+               <span className="text-[10px] font-bold text-muted-foreground">{pct}%</span>
+            </div>
+            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+               <div className={`h-full rounded-full transition-all bg-emerald-500`} style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+        )
+      }
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const p = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex shrink-0 items-center justify-center rounded-lg hover:bg-muted hover:text-foreground transition-colors size-8 outline-none">
+              <Icons.moreVertical size={16} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+               <DropdownMenuItem onClick={() => toggleFavorite(p.id)} className="cursor-pointer">
+                 <Icons.star size={14} className="mr-2" /> {p.isFavorite ? t('projects.remove_starred') || 'Bỏ yêu thích' : t('projects.add_starred') || 'Yêu thích'}
+               </DropdownMenuItem>
+               <DropdownMenuItem onClick={() => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} className="cursor-pointer">
+                 <Icons.settings size={14} className="mr-2" /> {t('common.edit') || 'Sửa'}
+               </DropdownMenuItem>
+               <DropdownMenuSeparator />
+               <DropdownMenuItem onClick={() => { setDeletingProject(p); setDeleteInput(''); }} className="text-destructive focus:bg-destructive focus:text-destructive-foreground cursor-pointer">
+                 <Icons.trash2 size={14} className="mr-2" /> {t('common.delete') || 'Xóa'}
+               </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
+    }
+  ], [navigate, setDeletingProject, setEditingProject, resetEditForm, t, toggleFavorite]);
+
   return (
     <div className="flex flex-col gap-8 p-6 animate-in fade-in duration-500">
       {/* Header Area */}
@@ -224,31 +335,34 @@ export default function Projects() {
 
         <div className="flex items-center gap-3">
           <div className="flex bg-muted/80 p-1 rounded-xl border border-border/50 backdrop-blur-sm">
-            <button
+            <Button
+              variant={viewType === 'grid' ? 'default' : 'ghost'}
+              size="sm"
               onClick={() => setViewType('grid')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${viewType === 'grid' ? 'bg-card text-blue-600 shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                }`}
+              className={`gap-2 rounded-lg ${viewType === 'grid' ? 'shadow-sm' : 'text-muted-foreground'}`}
             >
               <Icons.layoutDashboard size={16} />
               <span>{t('projects.view_grid')}</span>
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={viewType === 'list' ? 'default' : 'ghost'}
+              size="sm"
               onClick={() => setViewType('list')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${viewType === 'list' ? 'bg-card text-blue-600 shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                }`}
+              className={`gap-2 rounded-lg ${viewType === 'list' ? 'shadow-sm' : 'text-muted-foreground'}`}
             >
               <Icons.listChecks size={16} />
               <span>{t('projects.view_list')}</span>
-            </button>
+            </Button>
           </div>
 
-          <button
+          <Button
+            variant="kisafres"
             onClick={() => navigate('/workspace/projects/new')}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 dark:shadow-none dark:shadow-none hover:scale-[1.02] active:scale-95"
+            className="gap-2"
           >
             <Icons.plus size={18} />
             {t('projects.create_project')}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -256,10 +370,10 @@ export default function Projects() {
       <div className="flex flex-wrap items-center gap-4 bg-card/60 backdrop-blur-md p-4 rounded-2xl border border-border/80 shadow-sm">
         <div className="flex-1 min-w-[240px] relative">
           <Icons.search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-          <input
+          <Input
             type="text"
             placeholder={t('projects.search_placeholder')}
-            className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-foreground placeholder:text-muted-foreground"
+            className="w-full pl-10 pr-4 py-5"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -269,7 +383,7 @@ export default function Projects() {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="bg-background border border-border px-3 py-2.5 rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+            className="bg-background border border-border px-3 py-2.5 rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
           >
             <option value="All Statuses">{t('projects.all_statuses')}</option>
             <option value="Active">{t('projects.status_active')}</option>
@@ -280,7 +394,7 @@ export default function Projects() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-background border border-border px-3 py-2.5 rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+            className="bg-background border border-border px-3 py-2.5 rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
           >
             <option value="All Categories">{t('projects.all_categories')}</option>
             {categories.map(cat => (
@@ -293,7 +407,7 @@ export default function Projects() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-background border border-border px-3 py-2 text-sm font-bold text-blue-600 outline-none cursor-pointer"
+              className="bg-background border border-border px-3 py-2 text-sm font-bold text-primary outline-none cursor-pointer"
             >
               <option value="updatedAt-desc">{t('projects.sort_updated_desc')}</option>
               <option value="updatedAt-asc">{t('projects.sort_updated_asc')}</option>
@@ -374,16 +488,18 @@ export default function Projects() {
               <section className="flex flex-col gap-5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-bold text-muted-foreground tracking-[0.2em] uppercase">{t('projects.favorites')}</h2>
-                  <button className="text-sm font-bold text-blue-600 hover:underline">{t('projects.view_all')}</button>
+                  <button className="text-sm font-bold text-primary hover:underline">{t('projects.view_all')}</button>
                 </div>
 
-                <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
-                  {favoriteProjects.map(project => (
-                    viewType === 'grid'
-                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
-                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
-                  ))}
-                </div>
+                {viewType === 'grid' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {favoriteProjects.map(project => (
+                      <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
+                    ))}
+                  </div>
+                ) : (
+                  <BaseDataTable columns={columns} data={favoriteProjects} />
+                )}
               </section>
             )}
 
@@ -394,35 +510,22 @@ export default function Projects() {
               </div>
 
               {filteredAndSortedProjects.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 bg-card/50 backdrop-blur-sm rounded-[2rem] border border-border/50 shadow-sm text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-background flex items-center justify-center text-muted-foreground mb-4 shadow-inner">
-                    <Icons.folderKanban size={32} />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-1">{t('projects.no_projects')}</h3>
-                  <p className="text-sm text-muted-foreground max-w-sm mb-6">
-                    {t('projects.no_projects_desc')}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSelectedStatus('All Statuses');
-                      setSelectedCategory('All Categories');
-                    }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-100 transition-all hover:scale-[1.02] active:scale-95"
-                  >
-                    {t('projects.reset_filters')}
-                  </button>
-                </div>
-              ) : (
-                <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
-                  {otherProjects.map(project => (
-                    viewType === 'grid'
-                      ? <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
-                      : <ProjectListItem key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
-                  ))}
-
-                  {/* New Project Card (Only in Grid View) */}
-                  {viewType === 'grid' && (
+                <EmptyState
+                  title={t('projects.no_projects')}
+                  description={t('projects.no_projects_desc')}
+                  icon={<Icons.folderKanban size={32} className="text-muted-foreground" />}
+                  actionLabel={t('projects.reset_filters')}
+                  onAction={() => {
+                    setSearchQuery('');
+                    setSelectedStatus('All Statuses');
+                    setSelectedCategory('All Categories');
+                  }}
+                />
+              ) : viewType === 'grid' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {otherProjects.map(project => (
+                      <ProjectCard key={project.id} project={project} onToggleFavorite={toggleFavorite} getStatusColor={getStatusColor} getProgressColor={getProgressColor} activeDropdownProjectId={activeDropdownProjectId} setActiveDropdownProjectId={setActiveDropdownProjectId} setProjects={setProjects} setEditingProject={(p) => { setEditingProject(p); resetEditForm({ name: p.name, description: p.description || '', categoryId: (p as any).categoryId || '' }); }} setDeletingProject={(p) => { setDeletingProject(p); setDeleteInput(''); }} t={t} />
+                    ))}
                     <button
                       onClick={() => navigate('/workspace/projects/new')}
                       className="group flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-slate-300 hover:border-slate-400 hover:bg-background transition-all duration-200 h-full min-h-[300px]"
@@ -432,9 +535,10 @@ export default function Projects() {
                       </div>
                       <h3 className="font-medium text-muted-foreground group-hover:text-foreground text-lg">{t('projects.new_project')}</h3>
                     </button>
-                  )}
-                </div>
-              )}
+                  </div>
+                ) : (
+                  <BaseDataTable columns={columns} data={otherProjects} />
+                )}
             </section>
           </>
         )}
@@ -448,13 +552,13 @@ export default function Projects() {
             <form onSubmit={handleEditSubmitWrapper(onEditSubmit)} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-foreground">{t('projects.project_name')}</label>
-                <input type="text" className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.name ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-blue-500/20 focus:border-blue-500'}`}
+                <Input type="text" className={editErrors.name ? 'border-destructive focus-visible:ring-destructive' : ''}
                   {...registerEdit('name')} />
                 {editErrors.name && <p className="text-rose-500 text-xs font-medium">{editErrors.name.message}</p>}
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-foreground">{t('projects.category')}</label>
-                <select className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.categoryId ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-blue-500/20 focus:border-blue-500'}`}
+                <select className={`bg-background border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.categoryId ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-primary/20 focus:border-primary'}`}
                   {...registerEdit('categoryId')}>
                   <option value="" disabled>{t('projects.select_category')}</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -463,14 +567,16 @@ export default function Projects() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-foreground">{t('projects.description')}</label>
-                <textarea className="border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" rows={3}
+                <textarea className="bg-background border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none" rows={3}
                   {...registerEdit('description')} />
               </div>
               <div className="flex items-center justify-end gap-3 mt-4">
-                <button type="button" onClick={() => setEditingProject(null)} className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">{t('common.cancel')}</button>
-                <button type="submit" disabled={isUpdating} className="px-4 py-2 text-sm font-bold bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                <Button type="button" variant="ghost" onClick={() => setEditingProject(null)} className="px-4 py-2">
+                  {t('common.cancel')}
+                </Button>
+                <Button type="submit" variant="kisafres" disabled={isUpdating} className="px-4 py-2">
                   {isUpdating ? t('projects.saving') : t('common.save')}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -492,13 +598,15 @@ export default function Projects() {
             }}>
             </p>
             <form onSubmit={handleDeleteSubmit} className="flex flex-col gap-4">
-              <input required type="text" className="border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+              <Input required type="text" className="mb-2"
                 placeholder={`delete ${deletingProject.code}`} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} />
               <div className="flex items-center justify-end gap-3 mt-2">
-                <button type="button" onClick={() => { setDeletingProject(null); setDeleteInput(''); }} className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">{t('common.cancel')}</button>
-                <button type="submit" disabled={deleteInput !== `delete ${deletingProject.code}`} className="px-4 py-2 text-sm font-bold bg-rose-600 text-white rounded-xl hover:bg-rose-700 disabled:opacity-50 transition-colors">
+                <Button type="button" variant="ghost" onClick={() => { setDeletingProject(null); setDeleteInput(''); }} className="px-4 py-2">
+                  {t('common.cancel')}
+                </Button>
+                <Button type="submit" variant="destructive" disabled={deleteInput !== `delete ${deletingProject.code}`} className="px-4 py-2">
                   {t('projects.confirm_delete')}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -661,177 +769,4 @@ function ProjectCard({
   );
 }
 
-function ProjectListItem({
-  project,
-  onToggleFavorite,
-  getStatusColor,
-  getProgressColor,
-  activeDropdownProjectId,
-  setActiveDropdownProjectId,
-  setProjects,
-  setEditingProject,
-  setDeletingProject,
-  t
-}: ProjectViewProps) {
-  const navigate = useNavigate();
-  if (typeof getProgressColor === 'function') { }
 
-  // Dynamic metrics
-  const completedTasks = project.completedTasksCount ?? 0;
-  const totalTasks = project.totalTasksCount ?? 0;
-  const blockedCount = project.blockedTasksCount ?? 0;
-  const percentage = project.progress ?? 0;
-  const issuesCount = project.openIssuesCount ?? 0;
-
-  const sprintName = project.activeSprintName && project.activeSprintName !== 'No active sprint'
-    ? project.activeSprintName : 'Sprint';
-  const isScrum = project.methodology === 'SCRUM';
-
-  // Custom format for deadline
-  let deadlineDisplay = project.deadlineDisplay;
-  if (!deadlineDisplay || deadlineDisplay === 'Not set') {
-    deadlineDisplay = isScrum ? 'Not set' : 'Continuous';
-  } else if (deadlineDisplay.includes('Ends in')) {
-    deadlineDisplay = deadlineDisplay;
-  } else {
-    deadlineDisplay = deadlineDisplay;
-  }
-
-  return (
-    <div
-      onClick={() => navigate(`/workspace/projects/${project.id}`)}
-      className="group bg-card rounded-2xl px-6 py-4 border border-border hover:border-border hover:shadow-sm transition-all duration-200 flex items-center justify-between gap-8 cursor-pointer"
-    >
-      {/* 1. Badges */}
-      <div className="flex flex-col items-start gap-2 shrink-0 w-[80px]">
-        <span className="px-2.5 py-1 rounded-full text-[9px] font-black tracking-widest bg-emerald-50 text-emerald-600">
-          {project.status.toUpperCase()}
-        </span>
-        <span className={`px-2.5 py-1 rounded-full text-[9px] font-black tracking-widest ${isScrum
-          ? 'bg-indigo-50 text-indigo-500'
-          : 'bg-teal-50 text-teal-500'
-          }`}>
-          {isScrum ? 'SCRUM' : 'KANBAN'}
-        </span>
-      </div>
-
-      {/* 2. Main Info (Title, Code, Category, Sprint) */}
-      <div className="flex flex-col flex-1 min-w-[200px]">
-        <div className="flex items-baseline gap-2 mb-1">
-          <h3 className="text-base font-bold text-foreground group-hover:text-blue-600 transition-colors truncate">
-            {project.name}
-          </h3>
-          <span className="text-[11px] font-bold text-muted-foreground">
-            {project.code}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-[12px] font-medium text-muted-foreground">
-          <span className="truncate">{project.category || 'Software Development'}</span>
-          <span className="w-1 h-1 rounded-full bg-slate-300" />
-          <span className={isScrum ? 'text-muted-foreground' : ''}>
-            {isScrum ? sprintName : 'Active Board'}
-          </span>
-        </div>
-      </div>
-
-      {/* 3. Task Stats (Vertical text) */}
-      <div className="flex flex-col justify-center items-start shrink-0 w-[80px] border-l border-border pl-6 h-10">
-        <span className="text-[13px] font-bold text-foreground leading-tight">{totalTasks} {t('projects.total')}</span>
-        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{t('projects.tasks')}</span>
-      </div>
-
-      {/* 4. Progress / Blocked */}
-      <div className="flex flex-col shrink-0 w-[140px] pl-4">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[11px] font-bold text-emerald-500">{completedTasks} {t('projects.done')}</span>
-          <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
-        </div>
-        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-700 ${isScrum ? 'bg-slate-800' : 'bg-teal-500'}`}
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-      </div>
-
-      {/* 5. Clock & Deadline */}
-      <div className="flex items-center gap-2 shrink-0 w-[120px] pl-6 text-muted-foreground">
-        <Icons.clock size={14} className="text-muted-foreground shrink-0" />
-        <span className="text-[12px] font-medium leading-tight">
-          {deadlineDisplay.includes('Ends in') ? (
-            <>
-              Ends in <br /> {deadlineDisplay.split('Ends in ')[1]}
-            </>
-          ) : deadlineDisplay.includes('Starts in') ? (
-            <>
-              Starts in <br /> {deadlineDisplay.split('Starts in ')[1]}
-            </>
-          ) : (
-            deadlineDisplay
-          )}
-        </span>
-      </div>
-
-      {/* 6. Avatars */}
-      <div className="flex items-center -space-x-2 shrink-0 w-[80px]">
-        {project.members.slice(0, 2).map(member => (
-          <img 
-            key={member.id}
-            src={member.avatar}
-            alt={member.name}
-            className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm"
-            title={member.name} />
-        ))}
-        {project.members.length > 2 && (
-          <div className="w-8 h-8 rounded-full bg-muted border-2 border-white flex items-center justify-center text-[9px] font-bold text-muted-foreground shadow-sm">
-            +{project.members.length - 2}
-          </div>
-        )}
-      </div>
-
-      {/* 7. Actions */}
-      <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={() => onToggleFavorite(project.id)}
-          className={`p-2 rounded-xl transition-colors ${project.isFavorite ? 'text-amber-400' : 'text-slate-300 hover:text-muted-foreground hover:bg-background'}`}
-        >
-          <Icons.star size={18} fill={project.isFavorite ? 'currentColor' : 'none'} />
-        </button>
-        <div className="relative">
-          <button
-            onClick={() => setActiveDropdownProjectId(activeDropdownProjectId === project.id ? null : project.id)}
-            className={`p-2 rounded-xl transition-colors ${activeDropdownProjectId === project.id ? 'text-blue-600 bg-muted' : 'text-slate-300 hover:text-muted-foreground hover:bg-background'}`}
-          >
-            <Icons.moreVertical size={18} />
-          </button>
-
-          {activeDropdownProjectId === project.id && (
-            <>
-              <div className="absolute right-0 top-full mt-2 w-52 bg-card rounded-xl shadow-xl border border-border py-1 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-150">
-                <button onClick={() => { onToggleFavorite(project.id); setActiveDropdownProjectId(null); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5">
-                  <Icons.star size={13} className={project.isFavorite ? 'text-amber-400' : 'text-muted-foreground'} fill={project.isFavorite ? 'currentColor' : 'none'} />
-                  <span>{project.isFavorite ? 'Remove from starred' : 'Add to starred'}</span>
-                </button>
-                <button onClick={() => { setActiveDropdownProjectId(null); setEditingProject(project); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5">
-                  <Icons.settings size={13} className="text-muted-foreground" />
-                  <span>Edit project</span>
-                </button>
-                <div className="h-px bg-muted my-1" />
-                <button onClick={() => {
-                  setActiveDropdownProjectId(null);
-                  setDeletingProject(project);
-                }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5">
-                  <Icons.alertCircle size={13} className="text-rose-500" />
-                  <span>Delete project</span>
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}

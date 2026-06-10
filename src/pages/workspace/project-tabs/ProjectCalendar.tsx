@@ -296,7 +296,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
             
             <div className="flex items-center gap-3">
               <div className="relative">
-                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                   value={assigneeFilter} onChange={e => setAssigneeFilter(e.target.value)}>
                   <option value="">{t('calendar.assignee')}</option>
                   {members.map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}
@@ -304,7 +304,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                 <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               </div>
               <div className="relative">
-                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                   value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
                   <option value="">{t('calendar.type')}</option>
                   {types.map(t => <option key={t} value={t}>{t}</option>)}
@@ -312,7 +312,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                 <Icons.chevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               </div>
               <div className="relative">
-                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                <select className="appearance-none bg-background border border-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                   value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                   <option value="">{t('calendar.status')}</option>
                   {statuses.map((s: any) => <option key={s.statusId} value={s.statusId}>{s.label}</option>)}
@@ -336,7 +336,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
 
               <button 
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className={`p-1.5 rounded-lg border transition-colors shadow-sm flex items-center justify-center ${isSidebarOpen ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-card border-border text-muted-foreground hover:bg-background'}`}
+                className={`p-1.5 rounded-lg border transition-colors shadow-sm flex items-center justify-center ${isSidebarOpen ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-card border-border text-muted-foreground hover:bg-background'}`}
                 title={t('calendar.toggle_unscheduled')}
               >
                 {isSidebarOpen ? <Icons.panelRightClose size={18} /> : <Icons.panelRightOpen size={18} />}
@@ -373,7 +373,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                       key={idx} 
                     className={`group relative min-h-[140px] border-r border-b border-border p-2 flex flex-col transition-colors
                         ${!cell.isCurrentMonth ? 'bg-background/50' : 'bg-card'}
-                        ${dragOverCell === dateStr ? '!bg-blue-50 ring-2 ring-inset ring-blue-400' : ''}
+                        ${dragOverCell === dateStr ? '!bg-primary/10 ring-2 ring-inset ring-blue-400' : ''}
                         ${cell.isCurrentMonth && dragOverCell !== dateStr ? 'hover:bg-background/30' : ''}
                         ${(idx + 1) % 7 === 0 ? 'border-r-0' : ''}
                         ${idx >= grid.length - 7 ? 'border-b-0' : ''}
@@ -385,7 +385,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold 
-                            ${isToday ? 'bg-blue-600 text-white shadow-sm' : cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
+                            ${isToday ? 'bg-primary text-white shadow-sm' : cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
                           `}
                         >
                           {cell.date.getDate()}
@@ -467,7 +467,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
               <input 
                 type="text" 
                 placeholder={t('calendar.search_unscheduled')} 
-                className="w-full border border-border rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-card"
+                className="w-full border border-border rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-card"
                 value={unscheduledSearch}
                 onChange={(e) => setUnscheduledSearch(e.target.value)}
               />
@@ -482,7 +482,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
               {unscheduledTasks.length === 0 ? (
                 <div 
                   className={`border border-dashed rounded-xl p-6 text-center transition-colors ${
-                    dragOverSidebar ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-300' : 'bg-muted/50 border-slate-300'
+                    dragOverSidebar ? 'bg-primary/10 border-blue-400 ring-2 ring-blue-300' : 'bg-muted/50 border-slate-300'
                   }`}
                 >
                   <p className="font-bold text-sm text-foreground mb-2">{t('calendar.all_scheduled')}</p>
@@ -491,7 +491,7 @@ export default function ProjectCalendar({ currentProject, projectId }: ProjectCa
               ) : (
                 <div 
                   className={`flex flex-col gap-2 min-h-full rounded-xl p-2 transition-colors ${
-                    dragOverSidebar ? 'bg-blue-50 ring-2 ring-blue-300' : ''
+                    dragOverSidebar ? 'bg-primary/10 ring-2 ring-blue-300' : ''
                   }`}
                 >
                   {unscheduledTasks.map((t: any) => <div key={t.id}>{renderTaskCard(t)}</div>)}

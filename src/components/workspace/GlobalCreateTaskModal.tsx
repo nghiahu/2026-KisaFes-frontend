@@ -6,14 +6,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createPortal } from 'react-dom';
 import defaultMan from '../../assets/avatar_def_man.png';
 
-interface GlobalCreateTaskModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
+
+import type { GlobalCreateTaskModalProps } from '../../types/components.interface';
 const TASK_TYPES = [
   { id: 'epic', label: 'Epic', icon: <Icons.zap size={14} className="text-purple-500 fill-current" /> },
-  { id: 'task', label: 'Task', icon: <Icons.checkSquare size={14} className="text-blue-500" /> },
+  { id: 'task', label: 'Task', icon: <Icons.checkSquare size={14} className="text-primary" /> },
   { id: 'incident', label: 'Incident', icon: <Icons.alertCircle size={14} className="text-rose-500" /> },
   { id: 'service', label: 'Service Request', icon: <Icons.helpCircle size={14} className="text-orange-500" /> },
   { id: 'support', label: 'Support', icon: <Icons.settings size={14} className="text-fuchsia-500" /> },
@@ -119,7 +117,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                 onClick={() => setShowProjectDropdown(!showProjectDropdown)}
                 className="flex items-center gap-2 p-1.5 hover:bg-slate-200 rounded-md transition-colors"
               >
-                <div className="w-5 h-5 bg-blue-500 rounded text-white flex items-center justify-center shrink-0">
+                <div className="w-5 h-5 bg-primary rounded text-white flex items-center justify-center shrink-0">
                   <Icons.cloud size={12} className="fill-white" />
                 </div>
                 <Icons.chevronDown size={14} className="text-muted-foreground" />
@@ -135,7 +133,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                         value={projectSearch}
                         onChange={e => setProjectSearch(e.target.value)}
                         placeholder="Search spaces" 
-                        className="w-full text-xs pl-8 pr-3 py-1.5 bg-background border border-border rounded outline-none focus:border-blue-500"
+                        className="w-full text-xs pl-8 pr-3 py-1.5 bg-background border border-border rounded outline-none focus:border-primary"
                       />
                     </div>
                   </div>
@@ -151,9 +149,9 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                           setShowProjectDropdown(false);
                           setAssigneeId(null);
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-left transition-colors ${selectedProjectId === p.id ? 'bg-blue-50 text-blue-700' : 'hover:bg-background text-foreground'}`}
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-left transition-colors ${selectedProjectId === p.id ? 'bg-primary/10 text-blue-700' : 'hover:bg-background text-foreground'}`}
                       >
-                        <div className="w-5 h-5 bg-blue-500 rounded text-white flex items-center justify-center shrink-0">
+                        <div className="w-5 h-5 bg-primary rounded text-white flex items-center justify-center shrink-0">
                           <Icons.cloud size={12} className="fill-white" />
                         </div>
                         <span className="truncate">{p.name} ({p.key || p.name.substring(0,2).toUpperCase()})</span>
@@ -180,7 +178,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                     <button
                       key={type.id}
                       onClick={() => { setSelectedType(type); setShowTypeDropdown(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors ${selectedType.id === type.id ? 'bg-blue-50 text-blue-700 border-l-2 border-blue-500' : 'hover:bg-background text-foreground border-l-2 border-transparent'}`}
+                      className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors ${selectedType.id === type.id ? 'bg-primary/10 text-blue-700 border-l-2 border-primary' : 'hover:bg-background text-foreground border-l-2 border-transparent'}`}
                     >
                       {type.icon}
                       {type.label}
@@ -295,7 +293,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
               type="checkbox" 
               checked={createAnother}
               onChange={e => setCreateAnother(e.target.checked)}
-              className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary"
             />
             Create another
           </label>
@@ -308,7 +306,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
           <button 
             onClick={handleCreate}
             disabled={!title.trim() || !selectedProjectId || isSubmitting}
-            className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             {isSubmitting ? 'Creating...' : 'Create'}
           </button>

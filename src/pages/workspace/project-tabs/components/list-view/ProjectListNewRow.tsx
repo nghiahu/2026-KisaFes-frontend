@@ -98,7 +98,7 @@ export function ProjectListNewRow() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsCreatingTask(true)}
-              className="flex items-center gap-1 text-muted-foreground hover:text-blue-600 font-bold text-xs transition-colors py-1 px-2 hover:bg-blue-50/50 rounded-lg"
+              className="flex items-center gap-1 text-muted-foreground hover:text-primary font-bold text-xs transition-colors py-1 px-2 hover:bg-primary/10/50 rounded-lg"
             >
               <Icons.plus size={14} />
               <span>{t('list.create')}</span>
@@ -159,7 +159,7 @@ export function ProjectListNewRow() {
               <div className="relative flex items-center">
                 <button
                   onClick={() => { try { dateInputRef.current?.showPicker(); } catch (e) { dateInputRef.current?.focus(); } }}
-                  className={`p-1.5 rounded-[3px] transition-colors ${newTaskDueDate ? 'bg-blue-50 text-blue-600' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                  className={`p-1.5 rounded-[3px] transition-colors ${newTaskDueDate ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                   title={newTaskDueDate ? `${t('list.due_date_prefix')} ${newTaskDueDate}` : t('list.set_due_date')}
                 >
                   <Icons.calendar size={15} />
@@ -180,7 +180,7 @@ export function ProjectListNewRow() {
                     }
                     setShowNewTaskAssigneeDropdown(!showNewTaskAssigneeDropdown);
                   }}
-                  className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors border ${newTaskAssignee && newTaskAssignee !== 'automatic' ? 'border-blue-200' : 'border-transparent hover:bg-muted text-muted-foreground'}`}
+                  className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors border ${newTaskAssignee && newTaskAssignee !== 'automatic' ? 'border-primary/20' : 'border-transparent hover:bg-muted text-muted-foreground'}`}
                   title={newTaskAssignee ? (newTaskAssignee === 'automatic' ? `${t('list.assignee_prefix')} ${t('list.automatic')}` : `${t('list.assignee_prefix')} ${newTaskAssignee.name}`) : t('list.assign')}
                 >
                   {newTaskAssignee && newTaskAssignee !== 'automatic' ? (
@@ -204,7 +204,7 @@ export function ProjectListNewRow() {
                         <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground"><Icons.userX size={12} /></div> {t('list.unassigned')}
                       </button>
                       <button onClick={() => { setNewTaskAssignee('automatic'); setShowNewTaskAssigneeDropdown(false); }} className="w-full flex items-center gap-3 px-3 py-1.5 text-[13px] rounded-[3px] text-left text-foreground hover:bg-background font-medium">
-                        <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><Icons.settings size={12} /></div> {t('list.automatic')}
+                        <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center"><Icons.settings size={12} /></div> {t('list.automatic')}
                       </button>
                       {projectMembers.map((member: any) => (
                         <button key={member.id} onClick={() => { setNewTaskAssignee(member); setShowNewTaskAssigneeDropdown(false); }} className="w-full flex items-center gap-3 px-3 py-1.5 text-[13px] rounded-[3px] text-left text-foreground hover:bg-background font-medium">
@@ -220,7 +220,7 @@ export function ProjectListNewRow() {
 
               <button
                 onClick={handleCreateTask}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-blue-600 hover:text-white transition-colors text-xs font-medium ml-1"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-primary hover:text-white transition-colors text-xs font-medium ml-1"
               >
                 Create
                 <div className="flex items-center justify-center w-4 h-4 rounded bg-slate-200/60 dark:bg-slate-700 text-current">

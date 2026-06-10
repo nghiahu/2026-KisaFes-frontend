@@ -38,7 +38,7 @@ export default function BlogDetail() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Icons.refreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+        <Icons.refreshCw className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -49,7 +49,7 @@ export default function BlogDetail() {
         <Icons.fileText className="w-16 h-16 text-slate-300 mb-4" />
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Blog not found</h1>
         <p className="text-slate-500 mb-6 text-center">The article you are looking for does not exist or has been removed.</p>
-        <Link to="/software/kisa" className="text-blue-600 font-semibold hover:underline flex items-center gap-2">
+        <Link to="/software/kisa" className="text-primary font-semibold hover:underline flex items-center gap-2">
           <Icons.chevronLeft className="w-4 h-4" /> {t('landing.blogDetail.back')}
         </Link>
       </div>
@@ -64,13 +64,13 @@ export default function BlogDetail() {
         <div className="absolute top-0 left-0 w-full h-[60%] md:h-[50%] bg-[#ffecb3] -skew-y-2 origin-top-left -z-10 opacity-30" />
         
         <div className="container-custom max-w-4xl mx-auto relative z-10">
-          <Link to="/software/kisa" className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors mb-8">
+          <Link to="/software/kisa" className="inline-flex items-center text-sm font-semibold text-primary hover:text-blue-700 transition-colors mb-8">
             <Icons.chevronLeft className="w-4 h-4 mr-1" /> {t('landing.blogDetail.back')}
           </Link>
           
           <div className="flex items-center gap-3 mb-6">
             {blog.tags?.map(tag => (
-              <span key={tag} className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
+              <span key={tag} className="px-3 py-1 bg-primary/20 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
                 {tag}
               </span>
             ))}
@@ -111,7 +111,7 @@ export default function BlogDetail() {
               wrapperElement={{
                 "data-color-mode": "light"
               }}
-              className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-xl prose-img:shadow-md"
+              className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-primary hover:prose-a:text-blue-700 prose-img:rounded-xl prose-img:shadow-md"
             />
           ) : (
             <p className="text-slate-500 italic text-center py-8">Content is empty.</p>

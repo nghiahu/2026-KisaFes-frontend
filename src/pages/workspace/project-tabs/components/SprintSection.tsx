@@ -7,6 +7,7 @@ import defaultMan from '../../../../assets/avatar_def_man.png';
 import { DraggableTaskRow } from './DraggableTaskRow';
 import { InlineTaskCreator } from '../../../../components/workspace/InlineTaskCreator';
 import { useLanguage } from '../../../../contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
 
 // ─── Sprint Section ────────────────────────────────────────────────────────
 export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, onEdit, onDelete, onStart, onComplete, onMoveToSprint, onDeleteTask, allSprints, selectedTaskIds, onToggleTask, onTaskUpdated, onCreateTask, onTaskClick }: any) {
@@ -50,7 +51,7 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
 
   const statusBadge: Record<string, string> = {
     ACTIVE: 'bg-emerald-500 text-white',
-    PLANNING: 'bg-blue-500 text-white',
+    PLANNING: 'bg-primary text-white',
     COMPLETED: 'bg-slate-400 text-white',
   };
 
@@ -61,25 +62,25 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
       {/* Sprint Header */}
       <div className={`flex items-center gap-2 px-2 py-1.5 bg-background cursor-pointer select-none transition-colors group border border-border rounded-sm ${isExpanded ? 'border-b-0 rounded-b-none' : ''}`}
         onClick={onToggle}>
-        <button className="text-muted-foreground hover:bg-slate-200 p-0.5 rounded transition-colors shrink-0 w-5 flex items-center justify-center">
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground shrink-0 rounded">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        </button>
+        </Button>
 
         <input
           type="checkbox"
           checked={isAllSelected}
           onChange={handleToggleAll}
           onClick={e => e.stopPropagation()}
-          className="w-3.5 h-3.5 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+          className="w-3.5 h-3.5 rounded-sm border-slate-300 text-primary focus:ring-primary cursor-pointer shrink-0"
         />
 
         <h3 className="font-bold text-foreground text-[13px] truncate">{sprint.name}</h3>
 
         <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
-          <button className="flex items-center gap-1 hover:bg-slate-200 px-1.5 py-0.5 rounded transition-colors" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
+          <Button variant="ghost" className="h-6 px-1.5 flex items-center gap-1 rounded font-normal" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
             <Pencil size={11} />
             {sprint.startDate && sprint.endDate ? `${new Date(sprint.startDate).toLocaleDateString()} - ${new Date(sprint.endDate).toLocaleDateString()}` : t('sprint_section.add_dates')}
-          </button>
+          </Button>
           <span>{sprintTasks.length === 1 ? t('backlog.work_item').replace('{count}', String(sprintTasks.length)) : t('backlog.work_items').replace('{count}', String(sprintTasks.length))}</span>
           {daysLeft !== null && sprint.status === 'ACTIVE' && (
             <span className={`px-1.5 ${daysLeft < 0 ? 'text-rose-500' : 'text-muted-foreground'}`}>
@@ -93,24 +94,24 @@ export function SprintSection({ sprint, tasks, project, isExpanded, onToggle, on
         <div className="flex items-center gap-2 shrink-0 text-[11px] font-bold">
           <div onClick={e => e.stopPropagation()} className="flex items-center gap-1 ml-2">
             {sprint.status === 'PLANNING' && (
-              <button onClick={onStart}
-                className="bg-muted hover:bg-slate-200 text-foreground px-3 py-1 rounded font-semibold transition-colors">
+              <Button variant="secondary" size="sm" onClick={onStart}
+                className="h-7 px-3 text-[11px] font-semibold">
                 {t('sprint_section.start_sprint')}
-              </button>
+              </Button>
             )}
             {sprint.status === 'ACTIVE' && (
-              <button onClick={onComplete}
-                className="bg-muted hover:bg-slate-200 text-foreground px-3 py-1 rounded font-semibold transition-colors">
+              <Button variant="secondary" size="sm" onClick={onComplete}
+                className="h-7 px-3 text-[11px] font-semibold">
                 {t('sprint_section.complete_sprint')}
-              </button>
+              </Button>
             )}
             <div className="relative" ref={menuRef}>
-              <button 
+              <Button variant="ghost" size="icon"
                 onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
-                className="p-1 text-muted-foreground hover:bg-slate-200 rounded transition-colors"
+                className="h-6 w-6 text-muted-foreground rounded"
               >
                 <MoreHorizontal size={16} />
-              </button>
+              </Button>
               {showMenu && (
                 <div className="absolute right-0 mt-1 w-40 bg-card rounded-lg shadow-xl border border-border py-1 z-50">
                   <button 

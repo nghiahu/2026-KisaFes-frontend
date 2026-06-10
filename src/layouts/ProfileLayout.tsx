@@ -9,10 +9,10 @@ export default function ProfileLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <Header />
       
-      <main className="flex-1 w-full bg-[#f8f9fa] dark:bg-slate-900">
+      <main className="flex-1 w-full bg-slate-50 dark:bg-slate-900">
         <Outlet />
       </main>
     </div>

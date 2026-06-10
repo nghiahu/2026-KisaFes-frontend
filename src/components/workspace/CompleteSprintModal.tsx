@@ -2,14 +2,9 @@ import { useState } from 'react';
 import { ArchiveRestore, X } from 'lucide-react';
 import { sprintService, type Sprint } from '../../services/sprint.service';
 
-interface CompleteSprintModalProps {
-  projectId: string;
-  sprint: Sprint;
-  sprints: Sprint[]; // Available PLANNING sprints as destination
-  onClose: () => void;
-  onSuccess: () => void;
-}
 
+
+import type { CompleteSprintModalProps } from '../../types/components.interface';
 export default function CompleteSprintModal({ projectId, sprint, sprints, onClose, onSuccess }: CompleteSprintModalProps) {
   const [isCompleting, setIsCompleting] = useState(false);
   const incompleteTasks = sprint.totalTasks - sprint.completedTasks;

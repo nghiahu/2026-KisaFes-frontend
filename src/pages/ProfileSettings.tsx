@@ -3,6 +3,7 @@ import { Icons } from '../assets/icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import ProfileTab from './settings/ProfileTab';
 import PreferencesTab from './settings/PreferencesTab';
+import { Button } from '@/components/ui/Button';
 
 type Tab = 'profile' | 'preferences' | 'notifications' | 'security';
 
@@ -30,18 +31,19 @@ export default function ProfileSettings() {
         <div className="w-full lg:w-64 shrink-0">
           <div className="flex flex-col gap-1 sticky top-24">
             {tabs.map((tab) => (
-              <button
+              <Button
+                variant="ghost"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
+                className={`flex justify-start items-center gap-3 px-4 py-6 rounded-lg text-sm font-semibold transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'
+                    ? 'bg-primary/10 text-blue-700 dark:bg-blue-900/30 dark:text-primary/70'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                 }`}
               >
                 {tab.icon}
                 {tab.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

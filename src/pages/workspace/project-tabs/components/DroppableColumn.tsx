@@ -3,6 +3,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableTaskCard } from './SortableTaskCard';
 import { Icons } from '../../../../assets/icons';
+import { Button } from '@/components/ui/Button';
 
 export const DroppableColumn = ({ column, tasks, children, projectMembers, onTaskUpdate }: any) => {
   const { setNodeRef } = useDroppable({
@@ -19,9 +20,9 @@ export const DroppableColumn = ({ column, tasks, children, projectMembers, onTas
             {tasks.length}
           </span>
         </div>
-        <button className="text-muted-foreground hover:text-muted-foreground">
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-muted-foreground">
           <Icons.moreHorizontal size={16} />
-        </button>
+        </Button>
       </div>
 
       <div ref={setNodeRef} className="flex flex-col gap-2 flex-1 overflow-y-auto scrollbar-none pr-1">

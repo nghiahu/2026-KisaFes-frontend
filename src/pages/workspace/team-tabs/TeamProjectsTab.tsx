@@ -51,7 +51,7 @@ export default function TeamProjectsTab({ teamId }: Props) {
         <p className="text-muted-foreground text-sm">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-3 text-sm text-blue-600 hover:underline"
+          className="mt-3 text-sm text-primary hover:underline"
         >
           Retry
         </button>
@@ -62,7 +62,7 @@ export default function TeamProjectsTab({ teamId }: Props) {
   if (projects.length === 0) {
     return (
       <div className="p-12 flex flex-col items-center justify-center text-center">
-        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-400 mb-4">
+        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary/70 mb-4">
           <Icons.folder size={32} />
         </div>
         <h3 className="text-base font-bold text-foreground mb-1">No projects yet</h3>
@@ -87,7 +87,7 @@ export default function TeamProjectsTab({ teamId }: Props) {
                 {project.name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-sm text-foreground truncate group-hover:text-blue-600 transition-colors">
+                <h3 className="font-bold text-sm text-foreground truncate group-hover:text-primary transition-colors">
                   {project.name}
                 </h3>
                 <p className="text-xs text-muted-foreground truncate">
@@ -104,7 +104,7 @@ export default function TeamProjectsTab({ teamId }: Props) {
                <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
                  <Icons.folder size={14} /> View Project
                </span>
-               <Icons.arrowRight size={14} className="text-muted-foreground group-hover:text-blue-600 transition-colors" />
+               <Icons.arrowRight size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
           </div>
         ))}

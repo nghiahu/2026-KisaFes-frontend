@@ -1,18 +1,9 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 
-interface MassEditFieldsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: {
-    assigneeId?: string | null;
-    priority?: string;
-    dueDate?: string | null;
-  }) => void;
-  members: any[];
-  isSubmitting: boolean;
-}
 
+
+import type { MassEditFieldsModalProps } from '../../types/components.interface';
 export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
   isOpen,
   onClose,
@@ -62,7 +53,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-[13px] hover:bg-[#34353B] transition-colors"
+                className="w-full appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-[13px] hover:bg-[#34353B] transition-colors"
               >
                 <option value="">Don't change</option>
                 <option value="unassigned">Unassigned (Clear)</option>
@@ -84,7 +75,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-[13px] hover:bg-[#34353B] transition-colors"
+                className="w-full appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-[13px] hover:bg-[#34353B] transition-colors"
               >
                 <option value="">Don't change</option>
                 {['Highest', 'High', 'Medium', 'Low', 'Lowest'].map(p => (
@@ -106,7 +97,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
                 value={dueDate !== 'clear' ? dueDate : ''}
                 onChange={(e) => setDueDate(e.target.value)}
                 disabled={isSubmitting || dueDate === 'clear'}
-                className="flex-1 appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-[13px] hover:bg-[#34353B] transition-colors [color-scheme:dark] disabled:opacity-50"
+                className="flex-1 appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-[13px] hover:bg-[#34353B] transition-colors [color-scheme:dark] disabled:opacity-50"
               />
               <button
                 type="button"
@@ -131,7 +122,7 @@ export const MassEditFieldsModal: React.FC<MassEditFieldsModalProps> = ({
           <button
             disabled={!hasAnyUpdate || isSubmitting}
             onClick={handleSubmit}
-            className="px-3 py-1.5 text-[13px] font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/30 disabled:text-white/40 rounded-md transition-colors flex items-center gap-2"
+            className="px-3 py-1.5 text-[13px] font-medium text-white bg-primary hover:bg-primary/90 disabled:bg-primary/30 disabled:text-white/40 rounded-md transition-colors flex items-center gap-2"
           >
             {isSubmitting && (
               <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

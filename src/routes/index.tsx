@@ -32,7 +32,7 @@ const NetworkError = React.lazy(() => import('../pages/NetworkError'))
 
 const SuspenseLoader = () => (
   <div className="flex h-screen w-screen items-center justify-center bg-[#F4F5F7]">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
   </div>
 );
 

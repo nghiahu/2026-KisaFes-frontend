@@ -97,7 +97,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
     { label: 'Highest', icon: <Icons.chevronsUp size={12} className="text-rose-500" />, color: 'text-rose-600' },
     { label: 'High', icon: <Icons.chevronUp size={12} className="text-orange-500" />, color: 'text-orange-500' },
     { label: 'Medium', icon: <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />, color: 'text-amber-500' },
-    { label: 'Low', icon: <Icons.chevronDown size={12} className="text-blue-400" />, color: 'text-blue-400' },
+    { label: 'Low', icon: <Icons.chevronDown size={12} className="text-primary/70" />, color: 'text-primary/70' },
     { label: 'Lowest', icon: <Icons.chevronsDown size={12} className="text-muted-foreground" />, color: 'text-muted-foreground' },
   ];
 
@@ -120,7 +120,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
       case 'bug': return { icon: <Icons.alertCircle size={10} />, bg: 'bg-rose-100', color: 'text-rose-600', label: t('list.incident_label') };
       case 'service request': return { icon: <Icons.alertCircle size={10} />, bg: 'bg-amber-100', color: 'text-amber-600', label: t('list.service_request_label') };
       case 'task':
-      default: return { icon: <Icons.checkSquare size={10} />, bg: 'bg-blue-100', color: 'text-blue-600', label: t('list.task_label') };
+      default: return { icon: <Icons.checkSquare size={10} />, bg: 'bg-primary/20', color: 'text-primary', label: t('list.task_label') };
     }
   };
 
@@ -191,7 +191,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                 type="checkbox"
                 checked={isAllSelected ? !excludedTaskIds.has(task.id) : selectedTaskIds.has(task.id)}
                 onChange={() => handleTaskCheckboxToggle(task.id)}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                className="rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
               />
             </td>
           );
@@ -206,7 +206,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                     e.stopPropagation();
                     setSelectedTask(task);
                   }}
-                  className="text-blue-600 hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap"
+                  className="text-primary hover:underline cursor-pointer font-bold shrink-0 whitespace-nowrap"
                 >
                   {task.taskKey || `ISSUE-${String(startIndex + index + 1).padStart(2, '0')}`}
                 </span>
@@ -228,7 +228,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                   </div>
                 ) : (
                   <span
-                    className="text-foreground group-hover:text-blue-600 transition-colors truncate flex-1 cursor-pointer"
+                    className="text-foreground group-hover:text-primary transition-colors truncate flex-1 cursor-pointer"
                     title={task.title}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -266,7 +266,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                     setIsAssigneeOpen(true);
                   }
                 }}
-                className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-all hover:bg-muted cursor-pointer group/assignee w-full text-left overflow-hidden ${isAssigneeOpen ? 'bg-blue-50 ring-1 ring-blue-200' : ''}`}
+                className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-all hover:bg-muted cursor-pointer group/assignee w-full text-left overflow-hidden ${isAssigneeOpen ? 'bg-primary/10 ring-1 ring-blue-200' : ''}`}
               >
                 {hasAssignee ? (
                   <img  src={task.assigneeAvatar || defaultAvatar} alt={task.assigneeName} className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
@@ -291,10 +291,10 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                   </div>
                   <div className="max-h-[220px] overflow-y-auto py-1">
                     {(!assigneeSearch.trim() || 'unassigned'.includes(assigneeSearch.toLowerCase())) && (
-                      <button onClick={() => handleAssigneeSelect(null)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${!hasAssignee ? 'bg-blue-50 text-blue-600' : 'text-muted-foreground hover:bg-background'}`}>
+                      <button onClick={() => handleAssigneeSelect(null)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${!hasAssignee ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-background'}`}>
                         <div className="w-6 h-6 rounded-full bg-muted border border-dashed border-slate-300 flex items-center justify-center text-muted-foreground shrink-0"><Icons.user size={11} /></div>
                         <span>{t('list.unassigned')}</span>
-                        {!hasAssignee && <Icons.check size={12} className="ml-auto text-blue-500 shrink-0" />}
+                        {!hasAssignee && <Icons.check size={12} className="ml-auto text-primary shrink-0" />}
                       </button>
                     )}
                     {filteredMembers.length > 0 && (
@@ -303,13 +303,13 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                         {filteredMembers.map((member: any) => {
                           const isSelected = task.assigneeId === member.id;
                           return (
-                            <button key={member.id} onClick={() => handleAssigneeSelect(member)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-foreground hover:bg-background'}`}>
+                            <button key={member.id} onClick={() => handleAssigneeSelect(member)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-background'}`}>
                               <img  src={member.avatar || defaultAvatar} alt={member.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                               <div className="flex flex-col min-w-0">
                                 <span className="truncate font-semibold">{member.name}</span>
                                 {member.email && <span className="truncate text-[10px] text-muted-foreground font-normal">{member.email}</span>}
                               </div>
-                              {isSelected && <Icons.check size={12} className="ml-auto text-blue-500 shrink-0" />}
+                              {isSelected && <Icons.check size={12} className="ml-auto text-primary shrink-0" />}
                             </button>
                           );
                         })}
@@ -347,7 +347,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                   }
                 }}
                 title={task.type === 'epic' ? t('list.epic_tooltip') : undefined}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all w-full text-left overflow-hidden ${task.type === 'epic' ? 'cursor-default opacity-70' : 'hover:bg-muted cursor-pointer group/priority'} ${isPriorityOpen ? 'bg-blue-50 ring-1 ring-blue-200' : ''}`}
+                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all w-full text-left overflow-hidden ${task.type === 'epic' ? 'cursor-default opacity-70' : 'hover:bg-muted cursor-pointer group/priority'} ${isPriorityOpen ? 'bg-primary/10 ring-1 ring-blue-200' : ''}`}
               >
                 <span className={`flex items-center justify-center shrink-0 ${getPriorityColor(task.priority)}`}>{getPriorityIcon(task.priority)}</span>
                 <span className={`truncate flex-1 ${getPriorityColor(task.priority)}`}>{task.priority || 'Medium'}</span>
@@ -358,10 +358,10 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                   {PRIORITIES.map((p) => {
                     const isSelected = (task.priority || 'Medium').toLowerCase() === p.label.toLowerCase();
                     return (
-                      <button key={p.label} onClick={() => handlePrioritySelect(p.label)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-foreground hover:bg-background'}`}>
+                      <button key={p.label} onClick={() => handlePrioritySelect(p.label)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-background'}`}>
                         <span className="shrink-0">{p.icon}</span>
                         <span>{p.label}</span>
-                        {isSelected && <Icons.check size={11} className="ml-auto text-blue-500 shrink-0" />}
+                        {isSelected && <Icons.check size={11} className="ml-auto text-primary shrink-0" />}
                       </button>
                     );
                   })}
@@ -388,7 +388,7 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                       setIsStatusOpen(true);
                     }
                   }}
-                  className={`flex items-center gap-1 px-2 py-0.5 border rounded text-[9px] font-black tracking-wider uppercase transition-colors shadow-sm max-w-full ${displayStatus === 'Done' || displayStatus?.toLowerCase().includes('done') || displayStatus?.toLowerCase().includes('hoàn thành') ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100' : displayStatus === 'In Progress' || displayStatus?.toLowerCase().includes('progress') || displayStatus?.toLowerCase().includes('đang') ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' : 'bg-background border-border text-muted-foreground hover:bg-muted'}`}
+                  className={`flex items-center gap-1 px-2 py-0.5 border rounded text-[9px] font-black tracking-wider uppercase transition-colors shadow-sm max-w-full ${displayStatus === 'Done' || displayStatus?.toLowerCase().includes('done') || displayStatus?.toLowerCase().includes('hoàn thành') ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100' : displayStatus === 'In Progress' || displayStatus?.toLowerCase().includes('progress') || displayStatus?.toLowerCase().includes('đang') ? 'bg-primary/10 border-primary/20 text-blue-700 hover:bg-primary/20' : 'bg-background border-border text-muted-foreground hover:bg-muted'}`}
                 >
                   <span className="truncate">{displayStatus}</span>
                   <span className="text-[7px] text-muted-foreground shrink-0">▼</span>
@@ -409,8 +409,8 @@ export function ProjectListRow({ task, index }: ProjectListRowProps) {
                             } catch (err) {
                               console.error("Failed to update status:", err);
                             }
-                          }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] font-semibold rounded-[3px] text-left transition-colors ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-foreground hover:bg-background'}`}>
-                            <div className="w-4 flex items-center justify-center shrink-0">{isSelected && <Icons.check size={12} className="text-blue-600" />}</div>
+                          }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] font-semibold rounded-[3px] text-left transition-colors ${isSelected ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-background'}`}>
+                            <div className="w-4 flex items-center justify-center shrink-0">{isSelected && <Icons.check size={12} className="text-primary" />}</div>
                             <span className="truncate">{statusObj.label}</span>
                           </button>
                         );

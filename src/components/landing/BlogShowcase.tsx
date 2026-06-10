@@ -56,7 +56,7 @@ export default function BlogShowcase() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[400px]">
             <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 flex items-center justify-center col-span-1 md:col-span-2">
-              <Icons.refreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+              <Icons.refreshCw className="w-8 h-8 text-primary animate-spin" />
             </div>
           </div>
         ) : (
@@ -77,19 +77,19 @@ export default function BlogShowcase() {
               <div className="p-8 md:p-10 flex flex-col justify-center md:w-2/5">
                 <div className="flex items-center gap-3 mb-4">
                   {blogs[0].tags?.[0] && (
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                    <span className="px-3 py-1 bg-primary/20 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
                       {blogs[0].tags[0]}
                     </span>
                   )}
                   <span className="text-sm font-medium text-slate-500">{formatDate(blogs[0].publishAt)}</span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 group-hover:text-primary transition-colors">
                   {blogs[0].title}
                 </h3>
                 <p className="text-slate-600 line-clamp-3 mb-6">
                   {blogs[0].excerpt || "Read more to find out what our team has been working on..."}
                 </p>
-                <div className="mt-auto flex items-center text-blue-600 font-bold group-hover:translate-x-1 transition-transform">
+                <div className="mt-auto flex items-center text-primary font-bold group-hover:translate-x-1 transition-transform">
                   {t('landing.blogshowcase.readArticle')} <Icons.arrowRight className="w-4 h-4 ml-2" />
                 </div>
               </div>
@@ -114,19 +114,19 @@ export default function BlogShowcase() {
                 <div className="p-8 flex flex-col flex-1">
                   <div className="flex items-center gap-3 mb-4">
                     {blog.tags?.[0] && (
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                      <span className="px-3 py-1 bg-primary/20 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
                         {blog.tags[0]}
                       </span>
                     )}
                     <span className="text-sm font-medium text-slate-500">{formatDate(blog.publishAt)}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary transition-colors line-clamp-2">
                     {blog.title}
                   </h3>
                   <p className="text-slate-600 line-clamp-2 mb-6">
                     {blog.excerpt || "Read more about this exciting update."}
                   </p>
-                  <div className="mt-auto flex items-center text-blue-600 font-bold group-hover:translate-x-1 transition-transform">
+                  <div className="mt-auto flex items-center text-primary font-bold group-hover:translate-x-1 transition-transform">
                     {t('landing.blogshowcase.readArticle')} <Icons.arrowRight className="w-4 h-4 ml-2" />
                   </div>
                 </div>

@@ -56,7 +56,7 @@ export default function Features() {
                 key={card.id}
                 className={`rounded-2xl p-8 transition-all duration-200 ${
                   card.highlight
-                    ? "bg-blue-600 text-white shadow-xl lg:col-span-1 lg:row-span-2 flex flex-col justify-between"
+                    ? "bg-primary text-white shadow-xl lg:col-span-1 lg:row-span-2 flex flex-col justify-between"
                     : "bg-white border border-gray-200 hover:shadow-lg"
                 }`}
               >
@@ -71,7 +71,7 @@ export default function Features() {
                 </div>
                 {card.link && (
                   <div className="mt-6">
-                    <a href="#" className={card.highlight ? "text-white font-semibold hover:text-blue-100" : "text-blue-600 font-semibold hover:text-blue-700"}>
+                    <a href="#" className={card.highlight ? "text-white font-semibold hover:text-blue-100" : "text-primary font-semibold hover:text-blue-700"}>
                       {card.link}
                     </a>
                   </div>
@@ -83,7 +83,7 @@ export default function Features() {
           <div className="bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-lg transition-all duration-200 flex items-center justify-center">
             <div className="text-center">
               <div className="mb-4">
-                <Icons.badgePlus className="w-12 h-12 mx-auto text-blue-600" />
+                <Icons.badgePlus className="w-12 h-12 mx-auto text-primary" />
               </div>
               <p className="text-gray-600 font-semibold">{t('landing.features.add_more')}</p>
             </div>

@@ -13,10 +13,10 @@ export default function CTA() {
             {t('landing.cta.desc')}
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition duration-200">
+            <button className="px-8 py-4 bg-white text-primary font-semibold rounded-lg hover:bg-primary/10 transition duration-200">
               {t('landing.cta.btn_create')}
             </button>
-            <button className="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200">
+            <button className="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-primary/90 transition duration-200">
               {t('landing.cta.btn_sales')}
             </button>
           </div>

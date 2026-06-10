@@ -3,14 +3,9 @@ import { Icons } from '../../assets/icons';
 import { createPortal } from 'react-dom';
 import type { AiTaskEditAction } from '../../services/task.service';
 
-interface GlobalEditTaskModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  edits: AiTaskEditAction[];
-  onConfirm: (confirmedEdits: AiTaskEditAction[]) => void;
-  isSubmitting: boolean;
-}
 
+
+import type { GlobalEditTaskModalProps } from '../../types/components.interface';
 export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm, isSubmitting }: GlobalEditTaskModalProps) {
   const [selectedEdits, setSelectedEdits] = useState<Set<number>>(new Set(edits.map((_, i) => i)));
 
@@ -38,9 +33,9 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-blue-50/50">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-primary/10/50">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
               <Icons.sparkles size={16} />
             </div>
             <div>
@@ -73,7 +68,7 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
                         setSelectedEdits(new Set());
                       }
                     }}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
                   />
                   Select All ({edits.length} tasks)
                 </label>
@@ -83,7 +78,7 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
                   key={idx}
                   className={`flex items-start gap-4 p-4 rounded-lg border cursor-pointer transition-colors ${
                     selectedEdits.has(idx) 
-                      ? 'border-blue-200 bg-blue-50/30' 
+                      ? 'border-primary/20 bg-primary/10/30' 
                       : 'border-border hover:bg-muted/50'
                   }`}
                 >
@@ -92,7 +87,7 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
                       type="checkbox"
                       checked={selectedEdits.has(idx)}
                       onChange={() => toggleEdit(idx)}
-                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -136,7 +131,7 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
             <button 
               onClick={handleConfirm}
               disabled={selectedEdits.size === 0 || isSubmitting}
-              className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+              className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center gap-2"
             >
               {isSubmitting ? 'Applying...' : 'Apply Changes'}
             </button>

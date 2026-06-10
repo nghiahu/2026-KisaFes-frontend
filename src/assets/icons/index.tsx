@@ -59,6 +59,8 @@ import {
   ChevronUp,
   ChevronDown,
   ChevronsDown,
+  ChevronsLeft,
+  ChevronsRight,
   Timer,
   Ban,
   Columns,
@@ -109,7 +111,8 @@ import {
   CheckCircle,
   Moon,
   Tag,
-  Target
+  Target,
+  LogOut
 } from 'lucide-react';
 
 export const Icons = {
@@ -175,6 +178,8 @@ export const Icons = {
   chevronUp: ChevronUp,
   chevronDown: ChevronDown,
   chevronsDown: ChevronsDown,
+  chevronsLeft: ChevronsLeft,
+  chevronsRight: ChevronsRight,
   gitCommit: GitCommit,
   timer: Timer,
   ban: Ban,
@@ -224,4 +229,5 @@ export const Icons = {
   moon: Moon,
   tag: Tag,
   target: Target,
+  logOut: LogOut,
 };

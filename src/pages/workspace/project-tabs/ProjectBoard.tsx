@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useTasksQuery, useCreateTaskMutation, useUpdateTaskStatusMutation, useDeleteTaskMutation } from '../../../hooks/api/useTasks';
 import defaultMan from '../../../assets/avatar_def_man.png';
+import { Button } from '@/components/ui/Button';
 
 import {
   DndContext,
@@ -181,13 +182,14 @@ export default function ProjectBoard({ currentProject }: ProjectBoardProps) {
                     projectMembers={currentProject?.members || []}
                   />
               ) : (
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setShowAddTask(columnId)}
-                  className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/20 rounded-2xl text-muted-foreground hover:text-blue-600 text-xs font-bold transition-all mt-2"
+                  className="w-full gap-1.5 border-dashed rounded-2xl mt-2 text-xs font-bold"
                 >
                   <Icons.plus size={14} />
                   <span>{t('board.add_issue')}</span>
-                  </button>
+                </Button>
                 )}
               </div>
             </DroppableColumn>

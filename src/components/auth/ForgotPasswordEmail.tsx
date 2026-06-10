@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useAuthActions } from '../../hooks/useAuthActions';
 import { setResetPasswordData } from '../../store/slices/authSlice';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/Form';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 const emailSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
@@ -17,12 +20,9 @@ export default function ForgotPasswordEmail() {
   const dispatch = useDispatch();
   const { loading, errorMsg, sendResetPasswordOtp } = useAuthActions();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<EmailFormValues>({
+  const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
+    defaultValues: { email: '' }
   });
 
   const onSubmit = async (data: EmailFormValues) => {
@@ -44,32 +44,38 @@ export default function ForgotPasswordEmail() {
 
       {errorMsg && <div className="mb-3 p-2 bg-red-100 text-red-600 text-sm rounded">{errorMsg}</div>}
 
-      <form className="space-y-4 mt-4" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-            EMAIL ADDRESS
-          </label>
-          <input
-            type="email"
-            placeholder="name@company.com"
-            {...register('email')}
-            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+      <Form {...form}>
+        <form className="space-y-4 mt-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="space-y-1.5">
+                <FormLabel className="text-xs font-semibold text-gray-700">EMAIL ADDRESS</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="name@company.com" {...field} className={form.formState.errors.email ? "border-destructive focus-visible:ring-destructive" : ""} />
+                </FormControl>
+                {form.formState.errors.email && (
+                  <p className="text-destructive text-xs font-medium">{form.formState.errors.email.message}</p>
+                )}
+              </FormItem>
+            )}
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-        </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition duration-200 mt-1"
-        >
-          {loading ? 'Sending...' : 'Send Verification Code'}
-        </button>
-      </form>
+          <Button
+            type="submit"
+            variant="kisafres"
+            disabled={loading}
+            className="w-full mt-2"
+          >
+            {loading ? 'Sending...' : 'Send Verification Code'}
+          </Button>
+        </form>
+      </Form>
 
       <p className="mt-5 text-center text-gray-600 text-xs">
         Remember your password?{' '}
-        <a href="/login" className="text-blue-600 font-semibold hover:text-blue-700">
+        <a href="/login" className="text-primary font-semibold hover:text-blue-700">
           Back to Login
         </a>
       </p>

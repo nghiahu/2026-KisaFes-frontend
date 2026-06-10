@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
 import { taskService } from '../../services/task.service';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
 
 export default function MyTasks() {
   const { t } = useLanguage();
@@ -92,7 +93,7 @@ export default function MyTasks() {
     const p = (priority || '').toUpperCase();
     if (p === 'URGENT') return <span className="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 text-[10px] font-bold uppercase tracking-wider rounded-md border border-rose-100 dark:border-rose-900/50 shrink-0">Urgent</span>;
     if (p === 'HIGH') return <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider rounded-md border border-amber-100 dark:border-amber-900/50 shrink-0">High</span>;
-    if (p === 'MEDIUM') return <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-md border border-blue-100 dark:border-blue-900/50 shrink-0">Medium</span>;
+    if (p === 'MEDIUM') return <span className="px-2.5 py-1 bg-primary/10 dark:bg-blue-950/50 text-primary dark:text-primary/70 text-[10px] font-bold uppercase tracking-wider rounded-md border border-blue-100 dark:border-blue-900/50 shrink-0">Medium</span>;
     return <span className="px-2.5 py-1 bg-background text-muted-foreground text-[10px] font-bold uppercase tracking-wider rounded-md border border-border shrink-0">Low</span>;
   };
 
@@ -105,11 +106,11 @@ export default function MyTasks() {
   const renderTaskRow = (task: any, isOverdue = false, isToday = false) => (
     <div key={task.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-4 hover:bg-background transition-colors group cursor-pointer">
       <div className="flex-1 min-w-0 flex items-start gap-3">
-        <button className="w-5 h-5 mt-0.5 shrink-0 rounded border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-transparent hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+        <Button variant="outline" size="icon" className="w-5 h-5 mt-0.5 shrink-0 rounded border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-transparent hover:border-primary dark:hover:border-blue-400 hover:text-primary dark:hover:text-primary/70 transition-colors">
           <Icons.check size={14} strokeWidth={3} />
-        </button>
+        </Button>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+          <p className="text-sm font-bold text-foreground group-hover:text-primary dark:group-hover:text-primary/70 transition-colors truncate">
             <span className="text-muted-foreground font-normal mr-1.5 shrink-0">[{task.projectCode}-{task.taskKey?.split('-')[1]}]</span>
             {task.title}
           </p>
@@ -135,7 +136,7 @@ export default function MyTasks() {
       {/* Header */}
       <div className="px-6 py-5 bg-card border-b border-border shrink-0">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Icons.layoutDashboard size={26} className="text-blue-600" />
+          <Icons.layoutDashboard size={26} className="text-primary" />
           {t('tasks.dashboard_title')}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">{t('tasks.dashboard_desc')}</p>
@@ -147,7 +148,7 @@ export default function MyTasks() {
           {/* Stat Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 bg-primary/10 dark:bg-blue-950/50 text-primary dark:text-primary/70 rounded-xl flex items-center justify-center shrink-0">
                 <Icons.listTodo size={24} />
               </div>
               <div>
@@ -268,7 +269,7 @@ export default function MyTasks() {
               {projectWorkloads.length > 0 && (
                 <div className="w-full lg:w-96 shrink-0 bg-card rounded-3xl border border-border shadow-sm p-6">
                   <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-                    <Icons.pieChart size={20} className="text-blue-500" />
+                    <Icons.pieChart size={20} className="text-primary" />
                     {t('tasks.workload_title')}
                   </h3>
                   
@@ -279,7 +280,7 @@ export default function MyTasks() {
                         <div key={pw.id} className="group cursor-pointer">
                           <div className="flex justify-between items-end mb-2">
                             <div>
-                              <p className="text-sm font-bold text-foreground group-hover:text-blue-600 transition-colors">{pw.name}</p>
+                              <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{pw.name}</p>
                               <p className="text-xs font-semibold text-muted-foreground mt-0.5">{pw.total - pw.done} {t('tasks.pending_suffix')}</p>
                             </div>
                             <span className="text-xs font-black text-foreground bg-muted px-2 py-1 rounded-lg">
@@ -289,7 +290,7 @@ export default function MyTasks() {
                           {/* Progress bar */}
                           <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden flex">
                             <div 
-                              className={`h-full rounded-full transition-all duration-500 ${percent === 100 ? 'bg-emerald-500' : 'bg-blue-500'}`}
+                              className={`h-full rounded-full transition-all duration-500 ${percent === 100 ? 'bg-emerald-500' : 'bg-primary'}`}
                               style={{ width: `${percent}%` }}
                             />
                           </div>

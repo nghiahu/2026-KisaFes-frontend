@@ -30,6 +30,7 @@ import { Icons } from '../../../assets/icons';
 import { useTasksQuery, useUpdateTaskStatusMutation, useDeleteTaskMutation, useCreateTaskMutation } from '../../../hooks/api/useTasks';
 import { InlineTaskCreator } from '../../../components/workspace/InlineTaskCreator';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function ProjectSprint({ projectId, currentProject }: ProjectSprintProps) {
@@ -305,13 +306,14 @@ export default function ProjectSprint({ projectId, currentProject }: ProjectSpri
                         projectMembers={currentProject?.members || []}
                       />
                   ) : (
-                      <button
-                      onClick={() => setShowAddTask(columnId)}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-slate-300 hover:border-blue-400 hover:bg-blue-50/20 rounded-2xl text-muted-foreground hover:text-blue-600 text-xs font-bold transition-all mt-2"
-                    >
-                      <Icons.plus size={14} />
-                      <span>{t('board.add_issue')}</span>
-                      </button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowAddTask(columnId)}
+                        className="w-full gap-1.5 border-dashed rounded-2xl mt-2 text-xs font-bold"
+                      >
+                        <Icons.plus size={14} />
+                        <span>{t('board.add_issue')}</span>
+                      </Button>
                     )}
                   </div>
                 </DroppableColumn>

@@ -255,6 +255,8 @@ Respect the existing design system:
 
 - Reuse existing components
 - Reuse spacing, colors, typography, icons, modal/sheet/toast patterns
+- **Semantic Colors Only:** NEVER hardcode colors using hex/hash codes (e.g., `text-[#3B82F6]`) or raw framework defaults (e.g., `bg-blue-600`) if the project uses a semantic theme system. ALWAYS use the project's semantic variables (e.g., `bg-primary`, `text-muted`, `border-border`).
+- **Type Separation:** For React/TypeScript projects, NEVER define component `Props` interfaces inline. ALWAYS extract them into a separate `.interface.ts` file in the `types/` folder to keep components clean.
 - Support responsive layouts if the app supports multiple screen sizes
 - Maintain accessibility basics: labels, focus, keyboard navigation, ARIA where relevant
 - Do not duplicate components with the same responsibility
@@ -664,12 +666,14 @@ A task is **done** only when:
 
 ### 1. Tech Stack & Architecture
 - **Framework:** React + Vite + TypeScript.
-- **Styling:** Tailwind CSS + custom UI components (Slate/Blue palette, `text-[#3B82F6]`, `bg-[#EEF2FF]`).
+- **Styling:** Tailwind CSS + Shadcn UI. **CRITICAL: NEVER USE HARDCODED HASH COLORS (e.g., `#0066ff`).** Always use Tailwind theme semantic variables (e.g., `bg-primary`, `text-primary`, `text-muted-foreground`, `border-border`).
 - **State Management:** Redux Toolkit (`store/slices/`) for global state, `useState` for UI state.
 - **API & Networking:** Axios with custom `axiosClient` interceptors (`services/axiosClient.ts`). Do not call `axios` directly from components.
 - **Icons:** `lucide-react`, centrally exported via `src/assets/icons/index.tsx`. Use `<Icons.user />` pattern.
 
-### 2. Reusable UI Components
+### 2. Reusable UI Components & Design System
+- **Base Components (CRITICAL):** ALWAYS use standard Base Components from `src/components/ui/` (e.g., `<Button>`, `<Input>`, `<Card>`, `<BaseDataTable>`). **DO NOT** use raw HTML tags like `<button>` or `<input>`.
+- **Button Variant:** For Primary Call-To-Action buttons, use `<Button variant="kisafres">`. For Icon buttons, use `<Button variant="ghost" size="icon">`.
 - **Modals:** Use `ConfirmModal.tsx`, `PermissionDeniedToast.tsx`, `SessionExpiredModal.tsx` from `src/components/common/`.
 - **Dropdowns:** Use `UserDropdown.tsx`. Implement `handleClickOutside` listeners. Use `createPortal` for dropdown menus to prevent clipping.
 

@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Icons } from '../../assets/icons';
 import { projectService } from '../../services/project.service';
 
+import type { CreateRoleModalProps } from '../../types/components.interface';
 const roleSchema = z.object({
   name: z.string().min(1, 'Tên Role không được để trống'),
   permissions: z.array(z.string()).min(1, 'Vui lòng chọn ít nhất 1 quyền cho role này.')
@@ -12,12 +13,7 @@ const roleSchema = z.object({
 
 type RoleFormValues = z.infer<typeof roleSchema>;
 
-interface CreateRoleModalProps {
-  projectId: string;
-  onClose: () => void;
-  onSuccess: () => void;
-  roleToEdit?: any;
-}
+
 
 const PERMISSION_GROUPS = [
   {
@@ -181,7 +177,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
       <div className="bg-card w-full max-w-3xl rounded-2xl shadow-xl border border-border overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
         <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-card shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
               <Icons.shield size={20} />
             </div>
             <div>
@@ -207,13 +203,13 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
               {/* Tên Role */}
               <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
                 <label className="block text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                  <Icons.pencil size={16} className="text-blue-500" />
+                  <Icons.pencil size={16} className="text-primary" />
                   Tên Role
                 </label>
                 <input
                   type="text"
                   placeholder="VD: Senior Developer"
-                  className={`w-full px-4 py-3 bg-background border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all font-medium ${errors.name ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20' : 'border-border focus:border-blue-500 focus:ring-blue-500/20'}`}
+                  className={`w-full px-4 py-3 bg-background border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all font-medium ${errors.name ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20' : 'border-border focus:border-primary focus:ring-primary/20'}`}
                   {...register('name')}
                 />
                 {errors.name && <p className="text-rose-500 text-xs mt-2 font-medium">{errors.name.message}</p>}
@@ -222,7 +218,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
               {/* Mẫu có sẵn */}
               <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
                 <label className="block text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                  <Icons.layers size={16} className="text-blue-500" />
+                  <Icons.layers size={16} className="text-primary" />
                   Mẫu nhanh
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -233,7 +229,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                       onClick={() => setSelectedPreset(preset.id)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
                         selectedPreset === preset.id
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          ? 'border-primary bg-primary/10 text-blue-700'
                           : 'border-border bg-card text-muted-foreground hover:border-slate-300 hover:bg-background'
                       }`}
                     >
@@ -248,7 +244,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
             <div>
               <div className="flex items-center justify-between mb-4">
                 <label className="text-base font-bold text-foreground flex items-center gap-2">
-                  <Icons.checkSquare size={18} className="text-blue-500" />
+                  <Icons.checkSquare size={18} className="text-primary" />
                   Chi tiết phân quyền
                 </label>
                 <div className="flex items-center gap-3">
@@ -273,7 +269,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                           type="button"
                           onClick={() => handleToggleGroup(groupPermIds)}
                           className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
-                            allIncluded ? 'bg-blue-100 text-blue-700' : 
+                            allIncluded ? 'bg-primary/20 text-blue-700' : 
                             someIncluded ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground hover:bg-slate-200'
                           }`}
                         >
@@ -290,7 +286,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                               className="flex items-center gap-3 cursor-pointer group"
                             >
                               <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                                isChecked ? 'bg-blue-600 border-blue-600' : 'bg-card border-slate-300 group-hover:border-blue-400'
+                                isChecked ? 'bg-primary border-primary' : 'bg-card border-slate-300 group-hover:border-blue-400'
                               }`}>
                                 {isChecked && <Icons.check size={12} className="text-white" />}
                               </div>
@@ -328,7 +324,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
             type="submit"
             form="create-role-form"
             disabled={isSubmitting}
-            className="px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-600/20"
+            className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-600/20"
           >
             {isSubmitting ? (
               <>

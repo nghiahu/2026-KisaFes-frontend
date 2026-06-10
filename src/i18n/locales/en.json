@@ -16,7 +16,12 @@
     "edit": "Edit",
     "create": "Create",
     "permission_denied_title": "Action Blocked",
-    "permission_denied_msg": "You do not have permission to perform this action or change this setting."
+    "permission_denied_msg": "You do not have permission to perform this action or change this setting.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "no_data": "No data."
   },
   "settings": {
     "title": "Settings",
@@ -159,9 +164,13 @@
     "create_project": "Create Project",
     "search_placeholder": "Search by name, code or description...",
     "all_statuses": "All Statuses",
+    "status": "Status",
+    "progress": "Progress",
     "status_active": "Active",
     "status_onhold": "On Hold",
     "status_completed": "Completed",
+    "status_atrisk": "At Risk",
+    "status_planning": "Planning",
     "all_categories": "All Categories",
     "sort_by": "Sort by:",
     "sort_updated_desc": "Recently Updated",
@@ -191,6 +200,7 @@
     "add_starred": "Add to starred",
     "total": "Total",
     "tasks": "Tasks",
+    "total_tasks": "TASKS",
     "done": "Done",
     "no_description": "No description provided."
   },

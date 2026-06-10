@@ -54,7 +54,7 @@ export default function Header() {
         {/* Search Action */}
         <div className="flex items-center gap-4">
           {searchOpen ? (
-            <div className="flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-800 bg-background px-3 py-2 shadow-sm transition-all duration-300 lg:w-[32%] w-[32vw] max-w-[420px] min-w-[240px]">
+            <div className="flex items-center gap-2 rounded-full border border-primary/20 dark:border-blue-800 bg-background px-3 py-2 shadow-sm transition-all duration-300 lg:w-[32%] w-[32vw] max-w-[420px] min-w-[240px]">
               <SearchIcon className="h-5 w-5 text-gray-500" />
 
               <input
@@ -81,7 +81,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-200 dark:border-blue-800 bg-background text-blue-600 dark:text-blue-400 shadow-sm transition hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/20 dark:border-blue-800 bg-background text-primary dark:text-primary/70 shadow-sm transition hover:border-blue-400 dark:hover:border-primary hover:shadow-md"
             >
               <SearchIcon className="h-5 w-5" />
             </button>
@@ -91,7 +91,7 @@ export default function Header() {
 
           {user ? (
             <div className="flex items-center gap-3">
-              <Link to="/workspace" className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+              <Link to="/workspace" className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-primary/90">
                 {t('landing.header.go_to_app')}
               </Link>
 
@@ -101,7 +101,7 @@ export default function Header() {
           ) : (
             <Link
               to="/login"
-              className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition duration-200"
+              className="text-sm font-semibold text-primary hover:text-blue-700 transition duration-200"
             >
               {t('landing.header.sign_in')}
             </Link>

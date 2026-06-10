@@ -326,7 +326,7 @@ export default function CreateProject() {
               <>
                 <div className="relative w-20 h-20">
                   <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
-                  <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                  <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
                 </div>
                 <div className="text-center">
                   <h3 className="text-xl font-black text-foreground">Creating Project</h3>
@@ -354,7 +354,7 @@ export default function CreateProject() {
         <div className="flex items-center gap-6">
           <button
             onClick={() => navigate('/workspace/projects')}
-            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-card border border-border text-muted-foreground hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm group"
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-card border border-border text-muted-foreground hover:text-primary hover:border-primary/20 transition-all shadow-sm group"
           >
             <Icons.chevronLeft size={24} className="group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -373,7 +373,7 @@ export default function CreateProject() {
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 dark:shadow-none dark:shadow-none hover:scale-[1.02]"
+            className="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 dark:shadow-none dark:shadow-none hover:scale-[1.02]"
           >
             Save & Launch
           </button>
@@ -497,7 +497,7 @@ export default function CreateProject() {
                         if (errors.categoryId) setErrors({ ...errors, categoryId: '' });
                       }}
                       className={`w-full p-4 rounded-2xl outline-none focus:ring-2 transition-all font-semibold appearance-none cursor-pointer pr-12
-                        ${errors.categoryId ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500 text-foreground' : 'bg-background border border-border focus:ring-blue-500/10 focus:border-blue-500'}
+                        ${errors.categoryId ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500 text-foreground' : 'bg-background border border-border focus:ring-primary/10 focus:border-primary'}
                         ${!formData.categoryId && !errors.categoryId ? "text-muted-foreground" : "text-foreground"}`}
                     >
                       <option value="" disabled>Select project category...</option>
@@ -507,7 +507,7 @@ export default function CreateProject() {
                         </option>
                       ))}
                     </select>
-                    <Icons.chevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none group-hover:text-blue-500 transition-colors" />
+                    <Icons.chevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors" />
                   </div>
                   {errors.categoryId && <span className="text-xs font-bold text-rose-500 mt-1 ml-1 flex items-center gap-1"><Icons.alertCircle size={12} /> {errors.categoryId}</span>}
                   {categories.length === 0 && (
@@ -521,7 +521,7 @@ export default function CreateProject() {
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Project Description</label>
                 <textarea
                   rows={4}
-                  className="bg-background border border-border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-foreground resize-none"
+                  className="bg-background border border-border p-4 rounded-2xl outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-medium text-foreground resize-none"
                   placeholder="Describe your project goals..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -537,14 +537,14 @@ export default function CreateProject() {
               <div className="flex border-b border-border mb-2">
                 <button
                   type="button"
-                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'user' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'user' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                   onClick={() => { setActiveSearchTab('user'); setSearchResults([]); setEmailInput(''); }}
                 >
                   Mời cá nhân
                 </button>
                 <button
                   type="button"
-                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'team' ? 'border-blue-600 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                  className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeSearchTab === 'team' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                   onClick={() => { setActiveSearchTab('team'); setSearchResults([]); setEmailInput(''); }}
                 >
                   Thêm nhóm (Team)
@@ -558,7 +558,7 @@ export default function CreateProject() {
                   </div>
                   <input
                     type="text"
-                    className="w-full bg-background border border-border pl-11 pr-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold"
+                    className="w-full bg-background border border-border pl-11 pr-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all font-semibold"
                     placeholder={activeSearchTab === 'user' ? "Search users by name or email..." : "Search teams by name..."}
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
@@ -571,7 +571,7 @@ export default function CreateProject() {
                   />
                   {isSearching && (
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   )}
 
@@ -593,7 +593,7 @@ export default function CreateProject() {
                                   {item.avatar ? (
                                     <img  src={item.avatar} alt={item.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
                                   ) : (
-                                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                                    <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">
                                       {item.fullName?.charAt(0) || item.email?.charAt(0)}
                                     </div>
                                   )}
@@ -638,7 +638,7 @@ export default function CreateProject() {
                           {member.avatar ? (
                             <img  src={member.avatar} alt={member.fullName} className="w-10 h-10 rounded-full object-cover bg-muted border border-border" />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">
                               {member.fullName?.charAt(0) || member.email?.charAt(0)}
                             </div>
                           )}
@@ -695,7 +695,7 @@ export default function CreateProject() {
                       onClick={() => setActiveRoleIndex(idx)}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                         activeRoleIndex === idx 
-                          ? 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-none dark:shadow-none' 
+                          ? 'bg-primary text-white shadow-md shadow-primary/20 dark:shadow-none dark:shadow-none' 
                           : 'bg-card text-muted-foreground border border-border hover:bg-background hover:text-foreground'
                       }`}
                     >
@@ -708,7 +708,7 @@ export default function CreateProject() {
                       setRoles([...roles, { name: 'New Role', permissions: [] }]);
                       setActiveRoleIndex(roles.length);
                     }}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 border border-dashed border-slate-300 rounded-xl text-muted-foreground font-bold hover:border-blue-400 hover:text-blue-500 transition-all whitespace-nowrap bg-background"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 border border-dashed border-slate-300 rounded-xl text-muted-foreground font-bold hover:border-blue-400 hover:text-primary transition-all whitespace-nowrap bg-background"
                   >
                     <Icons.plus size={16} />
                     Add Role
@@ -720,11 +720,11 @@ export default function CreateProject() {
                   <div className="bg-background/50 border border-border rounded-3xl p-6">
                     <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center">
                           <Icons.pencil size={20} />
                         </div>
                         <input
-                          className="text-lg font-bold bg-transparent outline-none border-b border-transparent focus:border-blue-500 px-1"
+                          className="text-lg font-bold bg-transparent outline-none border-b border-transparent focus:border-primary px-1"
                           value={roles[activeRoleIndex].name}
                           placeholder="Role Name"
                           onChange={(e) => {
@@ -757,7 +757,7 @@ export default function CreateProject() {
                                 type="button"
                                 onClick={() => toggleGroupPermissions(activeRoleIndex, groupPermIds)}
                                 className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
-                                  allIncluded ? 'bg-blue-100 text-blue-700' : 
+                                  allIncluded ? 'bg-primary/20 text-blue-700' : 
                                   someIncluded ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground hover:bg-slate-200'
                                 }`}
                               >
@@ -770,7 +770,7 @@ export default function CreateProject() {
                                 return (
                                   <label key={perm.id} onClick={() => togglePermission(activeRoleIndex, perm.id)} className="flex items-center gap-3 cursor-pointer group">
                                     <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                                      isChecked ? 'bg-blue-600 border-blue-600' : 'bg-card border-slate-300 group-hover:border-blue-400'
+                                      isChecked ? 'bg-primary border-primary' : 'bg-card border-slate-300 group-hover:border-blue-400'
                                     }`}>
                                       {isChecked && <Icons.check size={12} className="text-white" />}
                                     </div>
@@ -926,7 +926,7 @@ export default function CreateProject() {
                                 key={st.statusId}
                                 draggable
                                 onDragStart={(e) => e.dataTransfer.setData('statusId', st.statusId)}
-                                className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-[10px] font-bold cursor-grab active:cursor-grabbing flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all"
+                                className="px-2 py-1 bg-primary/10 border border-primary/20 text-blue-700 rounded-lg text-[10px] font-bold cursor-grab active:cursor-grabbing flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all"
                               >
                                 <div className={`w-1.5 h-1.5 rounded-full ${st.color || 'bg-slate-500'}`} />
                                 {st.label}
@@ -952,13 +952,13 @@ export default function CreateProject() {
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-3xl p-6 border border-blue-100 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-blue-500 text-white flex items-center justify-center shrink-0">
+              <div className="bg-primary/10 rounded-3xl p-6 border border-blue-100 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center shrink-0">
                   <Icons.helpCircle size={20} />
                 </div>
                 <div>
                   <h4 className="font-bold text-blue-900">Flow Strategy</h4>
-                  <p className="text-sm text-blue-600 leading-relaxed mt-1">
+                  <p className="text-sm text-primary leading-relaxed mt-1">
                     Your statuses will automatically map to your Kanban board columns. You can refine column mapping later in Project Settings.
                   </p>
                 </div>
@@ -983,7 +983,7 @@ export default function CreateProject() {
               </div>
             )}
             {alertConfig.type === 'info' && (
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center">
                 <Info size={32} />
               </div>
             )}
@@ -996,7 +996,7 @@ export default function CreateProject() {
               className={`w-full py-3.5 rounded-2xl font-bold transition-all text-white shadow-lg active:scale-95 ${
                 alertConfig.type === 'error' ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-200' :
                 alertConfig.type === 'warning' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-200' :
-                'bg-blue-600 hover:bg-blue-700 shadow-blue-200 dark:shadow-none dark:shadow-none'
+                'bg-primary hover:bg-primary/90 shadow-primary/20 dark:shadow-none dark:shadow-none'
               }`}
             >
               Đã hiểu
@@ -1014,7 +1014,7 @@ function NavItem({ active, onClick, icon, label }: { active: boolean; onClick: (
     <button
       onClick={onClick}
       className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all text-sm ${active
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none dark:shadow-none scale-[1.02]'
+        ? 'bg-primary text-white shadow-lg shadow-primary/20 dark:shadow-none dark:shadow-none scale-[1.02]'
         : 'bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground border border-transparent hover:border-border'
         }`}
     >
@@ -1040,7 +1040,7 @@ function InputGroup({ label, value, onChange, placeholder, error }: { label: str
       <label className={`text-xs font-bold uppercase tracking-widest ml-1 ${error ? 'text-rose-500' : 'text-muted-foreground'}`}>{label}</label>
       <input
         type="text"
-        className={`p-4 rounded-2xl outline-none focus:ring-2 transition-all font-semibold text-foreground placeholder:text-slate-300 ${error ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500' : 'bg-background border border-border focus:ring-blue-500/10 focus:border-blue-500'}`}
+        className={`p-4 rounded-2xl outline-none focus:ring-2 transition-all font-semibold text-foreground placeholder:text-slate-300 ${error ? 'bg-rose-50/30 border border-rose-400 focus:ring-rose-500/10 focus:border-rose-500' : 'bg-background border border-border focus:ring-primary/10 focus:border-primary'}`}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}

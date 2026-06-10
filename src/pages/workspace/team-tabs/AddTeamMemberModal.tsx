@@ -82,14 +82,14 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
             <input
               type="text"
               autoFocus
-              className="w-full bg-background border border-border pl-11 pr-5 py-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-sm"
+              className="w-full bg-background border border-border pl-11 pr-5 py-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-sm"
               placeholder="Search users by name or email..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
             {isSearching && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
           </div>
@@ -115,7 +115,7 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
                       {(user.avatar || user.avatarUrl) ? (
                         <img  src={user.avatar || user.avatarUrl} alt={user.fullName} className="w-10 h-10 rounded-full object-cover bg-muted" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">
                           {user.fullName?.charAt(0) || user.email?.charAt(0)}
                         </div>
                       )}
@@ -130,7 +130,7 @@ export default function AddTeamMemberModal({ team, onClose, onSuccess }: AddTeam
                       className={`px-4 py-1.5 font-bold rounded-lg transition-colors text-xs ${
                         invitedUsers.has(user.id)
                           ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                          : 'bg-primary/10 text-blue-700 hover:bg-primary/20'
                       }`}
                     >
                       {invitedUsers.has(user.id) ? 'Đã mời' : 'Mời'}

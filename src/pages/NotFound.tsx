@@ -21,7 +21,7 @@ export default function NotFound() {
       </p>
       <button 
         onClick={() => navigate('/workspace')} 
-        className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors"
+        className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg shadow-md transition-colors"
       >
         {t('not_found.go_home') || 'Go to Dashboard'}
       </button>

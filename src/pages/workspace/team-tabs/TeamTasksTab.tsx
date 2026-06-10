@@ -14,7 +14,7 @@ const getPriorityColor = (priority: string) => {
     case 'HIGH': return 'text-orange-600 bg-orange-50 border-orange-200';
     case 'MEDIUM': return 'text-amber-600 bg-amber-50 border-amber-200';
     case 'LOW': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-    case 'LOWEST': return 'text-blue-600 bg-blue-50 border-blue-200';
+    case 'LOWEST': return 'text-primary bg-primary/10 border-primary/20';
     default: return 'text-muted-foreground bg-background border-border';
   }
 };
@@ -63,7 +63,7 @@ export default function TeamTasksTab({ teamId }: Props) {
         <p className="text-muted-foreground text-sm">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-3 text-sm text-blue-600 hover:underline"
+          className="mt-3 text-sm text-primary hover:underline"
         >
           Retry
         </button>
@@ -74,7 +74,7 @@ export default function TeamTasksTab({ teamId }: Props) {
   if (tasks.length === 0) {
     return (
       <div className="p-12 flex flex-col items-center justify-center text-center">
-        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-400 mb-4">
+        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary/70 mb-4">
           <Icons.checkSquare size={32} />
         </div>
         <h3 className="text-base font-bold text-foreground mb-1">No tasks assigned</h3>
@@ -96,7 +96,7 @@ export default function TeamTasksTab({ teamId }: Props) {
           >
             <div className="flex items-center gap-4 min-w-0 flex-1">
               {/* Icon/Type */}
-              <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center text-muted-foreground border border-border shrink-0 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center text-muted-foreground border border-border shrink-0 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-blue-100 transition-colors">
                 <Icons.checkSquare size={20} />
               </div>
               
@@ -106,7 +106,7 @@ export default function TeamTasksTab({ teamId }: Props) {
                   <span className="text-xs font-mono font-semibold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                     {task.taskKey}
                   </span>
-                  <h3 className="font-bold text-sm text-foreground truncate group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-bold text-sm text-foreground truncate group-hover:text-primary transition-colors">
                     {task.title}
                   </h3>
                 </div>

@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
 import { Check, Info, AlertTriangle, Send } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
 
 const timeAgo = (dateStr: string, t: any) => {
   try {
@@ -125,32 +126,35 @@ export default function Inbox() {
             <h1 className="text-xl font-bold text-foreground tracking-tight">{t('inbox.title')}</h1>
 
             <div className="flex items-center gap-3">
-              {/* Pill Tabs */}
               <div className="flex p-0.5 bg-background rounded-lg border border-border">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setFilter('ALL')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${filter === 'ALL' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  className={`px-3 h-7 text-xs font-semibold rounded-md transition-all ${filter === 'ALL' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
                     }`}
                 >
                   {t('inbox.filter_all')}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => setFilter('UNREAD')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${filter === 'UNREAD' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  className={`px-3 h-7 text-xs font-semibold rounded-md transition-all ${filter === 'UNREAD' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
                     }`}
                 >
                   {t('inbox.filter_unread')}
-                </button>
+                </Button>
               </div>
 
               {/* Mark all as read */}
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => markAllAsReadMutation.mutate()}
-                className="p-1.5 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                className="w-8 h-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
                 title={t('inbox.mark_all_read')}
               >
                 <Check size={18} strokeWidth={2.5} />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -158,7 +162,7 @@ export default function Inbox() {
           <div className="flex-1 overflow-y-auto overflow-x-hidden">
             {loading && filteredNotifications.length === 0 ? (
               <div className="p-8 flex items-center justify-center text-muted-foreground">
-                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="p-12 flex flex-col items-center justify-center text-center">
@@ -283,28 +287,30 @@ export default function Inbox() {
                   return (
                     <>
                       {effectiveStatus === 'PENDING' && (
-                        <div className="mt-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-between">
+                        <div className="mt-6 p-4 bg-primary/10/50 rounded-xl border border-blue-100 flex items-center justify-between">
                           <div>
                             <h4 className="font-bold text-foreground text-sm">{t('inbox.invitation_title')}</h4>
                             <p className="text-xs text-muted-foreground mt-0.5">{t('inbox.invitation_desc')}</p>
                           </div>
                           <div className="flex gap-2">
-                            <button
+                            <Button
+                              variant="kisafres"
                               onClick={(e) => handleAccept(selectedItem.id, e)}
                               disabled={!!actioningId}
-                              className="px-4 py-1.5 bg-[#2563EB] hover:bg-blue-700 disabled:opacity-60 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                              className="px-4 h-8 rounded-lg text-xs font-bold shadow-sm"
                             >
                               {actioningId === selectedItem.id ? (
                                 <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                               ) : t('inbox.accept')}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              variant="outline"
                               onClick={(e) => handleDecline(selectedItem.id, e)}
                               disabled={!!actioningId}
-                              className="px-4 py-1.5 bg-card border border-border hover:bg-background disabled:opacity-60 text-foreground rounded-lg text-xs font-bold transition-all"
+                              className="px-4 h-8 rounded-lg text-xs font-bold"
                             >
                               {t('inbox.decline')}
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       )}

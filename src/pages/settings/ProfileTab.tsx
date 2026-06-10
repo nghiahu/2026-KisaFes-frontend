@@ -143,7 +143,7 @@ export default function ProfileTab() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
+    return <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   }
 
   return (
@@ -156,7 +156,7 @@ export default function ProfileTab() {
             <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-muted dark:border-slate-700 dark:bg-slate-700">
               {uploadingAvatar ? (
                 <div className="h-full w-full flex items-center justify-center bg-muted dark:bg-slate-700">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
                 <img 
@@ -221,7 +221,7 @@ export default function ProfileTab() {
                   <input
                     type="text"
                     {...register('fullName')}
-                    className={`w-full px-4 py-2.5 rounded-xl border ${errors.fullName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors dark:text-white`}
+                    className={`w-full px-4 py-2.5 rounded-xl border ${errors.fullName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors dark:text-white`}
                   />
                   {errors.fullName && <p className="mt-1.5 text-xs text-red-500">{errors.fullName.message}</p>}
                 </div>
@@ -233,7 +233,7 @@ export default function ProfileTab() {
                     <input
                       type="text"
                       {...register('userName')}
-                      className={`w-full pl-8 pr-4 py-2.5 rounded-xl border ${errors.userName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors dark:text-white`}
+                      className={`w-full pl-8 pr-4 py-2.5 rounded-xl border ${errors.userName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors dark:text-white`}
                     />
                   </div>
                   {errors.userName && <p className="mt-1.5 text-xs text-red-500">{errors.userName.message}</p>}
@@ -256,7 +256,7 @@ export default function ProfileTab() {
                 <textarea
                   {...register('bio')}
                   rows={4}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.bio ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors resize-none dark:text-white`}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.bio ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none dark:text-white`}
                   placeholder={t('settings.profile.bio.placeholder')}
                 ></textarea>
                 <div className="flex justify-between items-center mt-1.5">
@@ -289,7 +289,7 @@ export default function ProfileTab() {
               form="profile-form"
               type="submit"
               disabled={saving}
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 rounded-xl shadow-sm transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {saving && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
               {t('settings.profile.save')}
@@ -311,7 +311,7 @@ export default function ProfileTab() {
               role="switch"
               aria-checked={isPublic}
               onClick={() => setIsPublic(!isPublic)}
-              className={`${isPublic ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-600'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2`}
+              className={`${isPublic ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-600'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2`}
             >
               <span className="sr-only">Chế độ công khai</span>
               <span className={`${isPublic ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-card shadow ring-0 transition duration-200 ease-in-out`}></span>
@@ -320,7 +320,7 @@ export default function ProfileTab() {
 
           <div className="px-6 pb-6">
             <div className="bg-background rounded-xl p-4 flex gap-4 dark:bg-slate-700/50">
-              <div className="mt-0.5 text-blue-600 dark:text-blue-400">
+              <div className="mt-0.5 text-primary dark:text-primary/70">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

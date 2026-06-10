@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Icons } from '../../assets/icons';
 import { taskService } from '../../services/task.service';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/Button';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -106,7 +107,7 @@ export default function GlobalCalendar() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Icons.calendar size={26} className="text-blue-600" />
+              <Icons.calendar size={26} className="text-primary" />
               Calendar
             </h1>
             <p className="text-sm text-muted-foreground mt-1">Lịch biểu tổng quát chứa tất cả các công việc của bạn.</p>
@@ -118,24 +119,29 @@ export default function GlobalCalendar() {
               {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
             </h2>
             <div className="flex items-center bg-card border border-border rounded-lg shadow-sm overflow-hidden shrink-0">
-              <button 
+              <Button 
+                variant="ghost"
+                size="icon"
                 onClick={handlePrevMonth}
-                className="p-2 hover:bg-background text-muted-foreground transition-colors border-r border-border"
+                className="w-10 h-10 rounded-none border-r border-border text-muted-foreground"
               >
                 <Icons.chevronLeft size={20} />
-              </button>
-              <button 
+              </Button>
+              <Button 
+                variant="ghost"
                 onClick={handleToday}
-                className="px-4 py-2 text-sm font-semibold text-foreground hover:bg-background transition-colors"
+                className="px-4 h-10 rounded-none text-sm font-semibold text-foreground"
               >
                 Today
-              </button>
-              <button 
+              </Button>
+              <Button 
+                variant="ghost"
+                size="icon"
                 onClick={handleNextMonth}
-                className="p-2 hover:bg-background text-muted-foreground transition-colors border-l border-border"
+                className="w-10 h-10 rounded-none border-l border-border text-muted-foreground"
               >
                 <Icons.chevronRight size={20} />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -151,9 +157,9 @@ export default function GlobalCalendar() {
               <Icons.alertTriangle size={24} />
             </div>
             <p className="text-muted-foreground text-sm">Failed to load tasks</p>
-            <button onClick={() => refetch()} className="mt-3 text-sm text-blue-600 hover:underline">
+            <Button variant="link" onClick={() => refetch()} className="mt-3 text-sm text-primary px-0">
               Retry
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="flex-1 flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
@@ -186,7 +192,7 @@ export default function GlobalCalendar() {
                     <div className="flex justify-between items-start mb-1.5">
                       <div 
                         className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-semibold 
-                          ${isToday ? 'bg-blue-600 text-white shadow-sm' : cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
+                          ${isToday ? 'bg-primary text-white shadow-sm' : cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
                         `}
                       >
                         {cell.date.getDate()}
@@ -204,7 +210,7 @@ export default function GlobalCalendar() {
                             className={`text-xs border rounded-md px-2 py-1.5 truncate cursor-pointer transition-colors shadow-sm
                               ${isDone 
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100' 
-                                : 'bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100 hover:border-blue-200'}
+                                : 'bg-primary/10 text-blue-700 border-blue-100 hover:bg-primary/20 hover:border-primary/20'}
                             `}
                             title={task.title}
                           >

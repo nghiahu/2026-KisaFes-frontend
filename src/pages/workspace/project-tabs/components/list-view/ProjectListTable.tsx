@@ -39,7 +39,7 @@ export function ProjectListTable() {
                   onDragOver={(e) => !col.unmovable && handleDragOver(e, col.id)}
                   onDrop={(e) => !col.unmovable && handleDrop(e, col.id)}
                   style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }}
-                  className={`py-3 px-4 relative ${col.unmovable ? '' : 'cursor-move hover:bg-muted/80'} ${dragOverColId === col.id ? 'bg-blue-50/50 border-l-2 border-l-blue-400' : ''}`}
+                  className={`py-3 px-4 relative ${col.unmovable ? '' : 'cursor-move hover:bg-muted/80'} ${dragOverColId === col.id ? 'bg-primary/10/50 border-l-2 border-l-blue-400' : ''}`}
                 >
                   <div className="flex items-center h-full w-full">
                     {col.id === 'checkbox' ? (
@@ -48,7 +48,7 @@ export function ProjectListTable() {
                           type="checkbox"
                           checked={isAllSelected}
                           onChange={handleMasterCheckboxToggle}
-                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          className="rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
                         />
                       </div>
                     ) : col.id === 'actions' ? (
@@ -62,7 +62,7 @@ export function ProjectListTable() {
                   {col.id !== 'checkbox' && col.id !== 'actions' && (
                     <div
                       onMouseDown={(e) => handleResizeStart(e, col.id, col.width as number)}
-                      className={`absolute right-0 top-0 bottom-0 w-[5px] cursor-col-resize hover:bg-blue-400 z-10 ${resizingColId === col.id ? 'bg-blue-500' : ''}`}
+                      className={`absolute right-0 top-0 bottom-0 w-[5px] cursor-col-resize hover:bg-blue-400 z-10 ${resizingColId === col.id ? 'bg-primary' : ''}`}
                       title="Drag to resize"
                     />
                   )}

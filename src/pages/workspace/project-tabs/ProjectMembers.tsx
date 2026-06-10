@@ -279,7 +279,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
                           <button 
                             key={role.id}
                             onClick={() => handleChangeRole(member.id, role.id)}
-                            className={`w-full text-left px-4 py-2 text-sm hover:bg-background transition-colors flex items-center justify-between ${member.roleId === role.id ? 'text-blue-600 font-bold' : 'text-foreground'}`}
+                            className={`w-full text-left px-4 py-2 text-sm hover:bg-background transition-colors flex items-center justify-between ${member.roleId === role.id ? 'text-primary font-bold' : 'text-foreground'}`}
                           >
                             {role.name}
                             {member.roleId === role.id && <Icons.check size={14} />}
@@ -315,7 +315,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
                           setMemberToRestore(member);
                           setShowRoleMenu(null);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors text-blue-600 hover:bg-blue-50"
+                        className="w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 transition-colors text-primary hover:bg-primary/10"
                       >
                         <Icons.refreshCw size={14} /> {t('members.restore_member')}
                       </button>
@@ -395,7 +395,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Icons.shield size={20} className="text-blue-600" />
+              <Icons.shield size={20} className="text-primary" />
               {t('members.roles_title')}
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">{t('members.roles_subtitle')}</p>
@@ -408,10 +408,10 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                    <Icons.shield size={16} className="text-blue-500" />
+                    <Icons.shield size={16} className="text-primary" />
                     {role.name}
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                     {t('members.permissions_count').replace('{count}', String(role.permissions?.length || 0))}
                   </span>
                 </div>
@@ -436,7 +436,7 @@ export default function ProjectMembers({ currentProject, onUpdate, onOpenInviteM
                 {role.name?.toLowerCase().includes("owner") ? null : (
                   <button
                     onClick={() => handleOpenEditRole(role)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-colors"
                   >
                     <Icons.pencil size={12} />
                     {t('members.edit_permissions')}

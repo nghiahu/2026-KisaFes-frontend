@@ -22,7 +22,7 @@ export default function ProjectIssues() {
             <input
               type="text"
               placeholder="Search issues"
-              className="pl-8 pr-3 py-1.5 w-44 bg-background/50 border border-border hover:border-slate-300 focus:border-blue-500 focus:bg-card rounded-lg text-xs font-semibold text-foreground outline-none transition-all shadow-sm"
+              className="pl-8 pr-3 py-1.5 w-44 bg-background/50 border border-border hover:border-slate-300 focus:border-primary focus:bg-card rounded-lg text-xs font-semibold text-foreground outline-none transition-all shadow-sm"
             />
           </div>
           <button className="flex items-center gap-1.5 bg-background hover:bg-muted border border-border px-3 py-1.5 rounded-lg text-xs font-bold text-muted-foreground transition-colors shadow-sm">
@@ -56,7 +56,7 @@ export default function ProjectIssues() {
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3 bg-background/50 rounded-3xl border border-dashed border-border">
             <Icons.alertCircle size={32} className="text-slate-300" />
             <span className="text-sm font-bold text-muted-foreground">No active issues found</span>
-            <button className="text-xs font-bold text-blue-600 hover:underline">Report an issue</button>
+            <button className="text-xs font-bold text-primary hover:underline">Report an issue</button>
           </div>
         )}
       </div>

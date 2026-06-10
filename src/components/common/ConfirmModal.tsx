@@ -1,20 +1,9 @@
 import React, { type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Icons } from '../../assets/icons';
+import { Button } from '@/components/ui/Button';
 
-interface ConfirmModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: ReactNode;
-  confirmText?: string;
-  cancelText?: string;
-  isDestructive?: boolean;
-  isLoading?: boolean;
-  showCancel?: boolean;
-}
-
+import type { ConfirmModalProps } from '../../types/components.interface';
 export default function ConfirmModal({
   isOpen,
   onClose,
@@ -35,7 +24,7 @@ export default function ConfirmModal({
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-card rounded-xl shadow-xl z-[10000] animate-in fade-in zoom-in-95 duration-200">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className={`p-3 rounded-full shrink-0 ${isDestructive ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+            <div className={`p-3 rounded-full shrink-0 ${isDestructive ? 'bg-red-100 text-red-600' : 'bg-primary/20 text-primary'}`}>
               {isDestructive ? <Icons.alertCircle size={24} /> : <Icons.helpCircle size={24} />}
             </div>
             <div className="flex-1">
@@ -48,26 +37,22 @@ export default function ConfirmModal({
           
           <div className="mt-6 flex items-center justify-end gap-3">
             {showCancel && (
-              <button
+              <Button
+                variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors"
               >
                 {cancelText}
-              </button>
+              </Button>
             )}
-            <button
+            <Button
+              variant={isDestructive ? 'destructive' : 'kisafres'}
               onClick={onConfirm}
               disabled={isLoading}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-bold text-white rounded-lg transition-colors ${
-                isDestructive 
-                  ? 'bg-red-600 hover:bg-red-700 disabled:bg-red-400' 
-                  : 'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400'
-              }`}
             >
-              {isLoading && <Icons.refreshCw size={14} className="animate-spin" />}
+              {isLoading && <Icons.refreshCw size={14} className="animate-spin mr-2" />}
               {confirmText}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

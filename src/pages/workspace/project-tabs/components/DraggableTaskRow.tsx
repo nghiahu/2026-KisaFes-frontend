@@ -16,7 +16,7 @@ const getTypeInfo = (type?: string) => {
     case 'bug': return { icon: <AlertCircle size={10} />, bg: 'bg-rose-100', color: 'text-rose-600', label: 'Incident' };
     case 'service request': return { icon: <AlertCircle size={10} />, bg: 'bg-amber-100', color: 'text-amber-600', label: 'Service Request' };
     case 'task':
-    default: return { icon: <CheckSquare size={10} />, bg: 'bg-blue-100', color: 'text-blue-600', label: 'Task' };
+    default: return { icon: <CheckSquare size={10} />, bg: 'bg-primary/20', color: 'text-primary', label: 'Task' };
   }
 };
 
@@ -78,7 +78,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
       <div
         ref={setNodeRef}
         style={{ ...style, height: '44px' }}
-        className="border-2 border-dashed border-blue-400 bg-blue-50/50 rounded-md my-0.5 opacity-50 transition-all duration-200"
+        className="border-2 border-dashed border-blue-400 bg-primary/10/50 rounded-md my-0.5 opacity-50 transition-all duration-200"
       />
     );
   }
@@ -101,7 +101,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
         type="checkbox"
         checked={!!isSelected}
         onChange={() => onToggle?.(task.id)}
-        className="w-3.5 h-3.5 border-slate-300 rounded-[2px] text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0 group-hover:border-blue-400"
+        className="w-3.5 h-3.5 border-slate-300 rounded-[2px] text-primary focus:ring-primary cursor-pointer shrink-0 group-hover:border-blue-400"
       />
 
       <span className="shrink-0 flex items-center justify-center">
@@ -131,7 +131,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
             type="text"
             value={titleValue}
             onChange={(e) => setTitleValue(e.target.value)}
-            className="flex-1 text-[13px] text-foreground border-2 border-blue-500 rounded-[3px] px-2 py-1 outline-none min-w-0 bg-card"
+            className="flex-1 text-[13px] text-foreground border-2 border-primary rounded-[3px] px-2 py-1 outline-none min-w-0 bg-card"
             autoFocus
             onKeyDown={async (e) => {
               if (e.key === 'Enter') {
@@ -212,7 +212,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
             className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-black tracking-wider uppercase transition-colors shadow-sm cursor-pointer ${task.status === 'Done' || task.status?.toLowerCase().includes('done') || task.status?.toLowerCase().includes('hoàn thành')
               ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
               : task.status === 'In Progress' || task.status?.toLowerCase().includes('progress') || task.status?.toLowerCase().includes('đang')
-                ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+                ? 'bg-primary/10 border-primary/20 text-blue-700 hover:bg-primary/20'
                 : 'bg-background border-border text-muted-foreground hover:bg-muted'
               }`}
           >
@@ -233,7 +233,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
                         onTaskUpdated?.();
                       } catch (e) { console.error(e); }
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-[12px] font-semibold rounded-[3px] hover:bg-background ${s.statusId === task.statusId ? 'text-blue-600 bg-blue-50' : 'text-foreground'}`}
+                    className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-[12px] font-semibold rounded-[3px] hover:bg-background ${s.statusId === task.statusId ? 'text-primary bg-primary/10' : 'text-foreground'}`}
                   >
                     <span className="truncate">{s.label}</span>
                   </button>
@@ -264,7 +264,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
                 type="number"
                 value={storyPointValue}
                 onChange={e => setStoryPointValue(e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full text-center text-[12px] font-bold text-foreground border border-slate-300 rounded px-1 py-1 focus:outline-none focus:border-blue-500"
+                className="w-full text-center text-[12px] font-bold text-foreground border border-slate-300 rounded px-1 py-1 focus:outline-none focus:border-primary"
                 autoFocus
                 onKeyDown={async (e) => {
                   if (e.key === 'Enter') {
@@ -357,13 +357,13 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
                         onTaskUpdated?.();
                       } catch (e) { console.error(e); }
                     }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${!task.assigneeId ? 'bg-blue-50 text-blue-600' : 'text-muted-foreground hover:bg-background'}`}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${!task.assigneeId ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-background'}`}
                   >
                     <div className="w-6 h-6 rounded-full bg-muted border border-dashed border-slate-300 flex items-center justify-center text-muted-foreground shrink-0">
                       <User size={11} />
                     </div>
                     <span>{t('backlog.unassigned')}</span>
-                    {!task.assigneeId && <Check size={12} className="ml-auto text-blue-500 shrink-0" />}
+                    {!task.assigneeId && <Check size={12} className="ml-auto text-primary shrink-0" />}
                   </button>
                 )}
 
@@ -387,14 +387,14 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
                               onTaskUpdated?.();
                             } catch (e) { console.error(e); }
                           }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-foreground hover:bg-background'}`}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium transition-colors text-left ${isSelected ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-background'}`}
                         >
                           <img  src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                           <div className="flex flex-col min-w-0">
                             <span className={`truncate ${isSelected ? 'font-bold' : 'font-semibold'}`}>{m.name}</span>
                             {m.email && <span className="truncate text-[10px] text-muted-foreground font-normal">{m.email}</span>}
                           </div>
-                          {isSelected && <Check size={12} className="ml-auto text-blue-500 shrink-0" />}
+                          {isSelected && <Check size={12} className="ml-auto text-primary shrink-0" />}
                         </button>
                       );
                     })}
@@ -424,7 +424,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
           <div className="absolute right-0 top-6 z-20 bg-card border border-border rounded-xl shadow-lg py-1.5 w-36 text-sm" onClick={() => setShowMenu(false)}>
             <button
               onClick={(e) => { e.stopPropagation(); setShowMoveModal(true); setShowMenu(false); }}
-              className="w-full px-3 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 mb-1"
+              className="w-full px-3 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-primary/10 hover:text-primary flex items-center gap-2 mb-1"
             >
               <MoveRight size={11} />
               {t('backlog.move')}
@@ -450,7 +450,7 @@ export function DraggableTaskRow({ task, project, onMoveToSprint, onDeleteTask, 
             <div className="p-3 max-h-[350px] overflow-y-auto flex flex-col gap-1.5">
               <button 
                 onClick={() => { onMoveToSprint?.(task.id, null); setShowMoveModal(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all ${!task.sprintId ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-200' : 'text-foreground hover:bg-muted'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all ${!task.sprintId ? 'bg-primary/10 text-primary ring-1 ring-blue-200' : 'text-foreground hover:bg-muted'}`}
               >
                 <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border/60">
                   <CheckSquare size={14} />

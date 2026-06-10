@@ -98,7 +98,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             {/* Images Section */}
             <div className="relative mb-16">
           {/* Cover */}
-          <label className="block w-full h-32 bg-background rounded-xl border-2 border-dashed border-border hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer overflow-hidden group relative">
+          <label className="block w-full h-32 bg-background rounded-xl border-2 border-dashed border-border hover:border-blue-400 hover:bg-primary/10/50 transition-colors cursor-pointer overflow-hidden group relative">
             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
@@ -114,7 +114,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             {coverPreview ? (
               <img src={coverPreview} className="w-full h-full object-cover group-hover:opacity-75 transition-opacity" />
             ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground group-hover:text-blue-500">
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground group-hover:text-primary">
                 <Icons.image size={24} className="mb-2" />
                 <span className="text-xs font-semibold">Upload Cover Image</span>
               </div>
@@ -129,7 +129,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
           </label>
 
           {/* Avatar */}
-          <label className="absolute -bottom-6 left-6 w-20 h-20 bg-card rounded-xl shadow-sm border border-border hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer overflow-hidden group z-10 flex items-center justify-center">
+          <label className="absolute -bottom-6 left-6 w-20 h-20 bg-card rounded-xl shadow-sm border border-border hover:border-blue-400 hover:bg-primary/10/50 transition-colors cursor-pointer overflow-hidden group z-10 flex items-center justify-center">
             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
@@ -145,7 +145,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             {avatarPreview ? (
               <img  src={avatarPreview} className="w-full h-full object-cover group-hover:opacity-75 transition-opacity" />
             ) : (
-              <Icons.camera size={24} className="text-muted-foreground group-hover:text-blue-500" />
+              <Icons.camera size={24} className="text-muted-foreground group-hover:text-primary" />
             )}
             {avatarPreview && (
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -161,7 +161,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
           <label className="block text-sm font-semibold text-foreground mb-1.5">Team Name</label>
           <input
             type="text"
-            className={`w-full px-4 py-2.5 bg-background border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${errors.name ? 'border-rose-500 focus:ring-rose-500/20' : 'border-border focus:border-blue-500 focus:ring-blue-500/20'}`}
+            className={`w-full px-4 py-2.5 bg-background border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${errors.name ? 'border-rose-500 focus:ring-rose-500/20' : 'border-border focus:border-primary focus:ring-primary/20'}`}
             {...register('name')}
           />
           {errors.name && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.name.message}</p>}
@@ -171,7 +171,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
           <label className="block text-sm font-semibold text-foreground mb-1.5">Description</label>
           <textarea
             rows={4}
-            className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
+            className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
             {...register('description')}
           />
         </div>
@@ -201,7 +201,7 @@ export default function TeamSettings({ team, onUpdate, onClose }: TeamSettingsPr
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-600/20"
+              className="px-8 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-600/20"
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>

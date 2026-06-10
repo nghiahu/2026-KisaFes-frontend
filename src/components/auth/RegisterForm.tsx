@@ -5,6 +5,9 @@ import { useAuthActions } from '../../hooks/useAuthActions';
 import { Icons } from '../../assets/icons';
 import { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/Form';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 const registerSchema = z.object({
   fullName: z.string().min(2, 'fullname_short'),
@@ -20,12 +23,10 @@ export default function RegisterForm() {
   const { loading, errorMsg, registerInit } = useAuthActions();
   const [showPassword, setShowPassword] = useState(false);
   const { t } = useLanguage();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterFormValues>({
+  
+  const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: { fullName: '', email: '', password: '', agreeTerms: false }
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -41,72 +42,93 @@ export default function RegisterForm() {
 
       {errorMsg && <div className="mb-3 p-2 bg-red-100 text-red-600 text-sm rounded">{errorMsg}</div>}
 
-      <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-            {t('auth.register.full_name')}
-          </label>
-          <input
-            type="text"
-            placeholder={t('auth.register.full_name_placeholder')}
-            {...register('fullName')}
-            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+      <Form {...form}>
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            name="fullName"
+            render={({ field }) => (
+              <FormItem className="space-y-1.5">
+                <FormLabel className="text-xs font-semibold text-gray-700">{t('auth.register.full_name')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('auth.register.full_name_placeholder')} {...field} className={form.formState.errors.fullName ? "border-destructive focus-visible:ring-destructive" : ""} />
+                </FormControl>
+                {form.formState.errors.fullName && (
+                  <p className="text-destructive text-xs font-medium">{t(`auth.register.${form.formState.errors.fullName.message}`)}</p>
+                )}
+              </FormItem>
+            )}
           />
-          {errors.fullName && <p className="text-red-500 text-xs mt-1">{t(`auth.register.${errors.fullName.message}`)}</p>}
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-            {t('auth.register.email')}
-          </label>
-          <input
-            type="email"
-            placeholder={t('auth.register.email_placeholder')}
-            {...register('email')}
-            className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="space-y-1.5">
+                <FormLabel className="text-xs font-semibold text-gray-700">{t('auth.register.email')}</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder={t('auth.register.email_placeholder')} {...field} className={form.formState.errors.email ? "border-destructive focus-visible:ring-destructive" : ""} />
+                </FormControl>
+                {form.formState.errors.email && (
+                  <p className="text-destructive text-xs font-medium">{t(`auth.register.${form.formState.errors.email.message}`)}</p>
+                )}
+              </FormItem>
+            )}
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{t(`auth.register.${errors.email.message}`)}</p>}
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">{t('auth.register.password')}</label>
-          <div className="relative">
-           <input type={showPassword ? "text" : "password"} placeholder="••••••••"
-              {...register('password')}
-              className={`w-full px-3 py-2 pr-10 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-                errors.password ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            <button type="button"onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-              {showPassword ? (<Icons.eyeOff size={18} />) : (<Icons.eye size={18} />)}
-            </button>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="space-y-1.5">
+                <FormLabel className="text-xs font-semibold text-gray-700">{t('auth.register.password')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      className={`pr-10 ${form.formState.errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                      {...field}
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors">
+                      {showPassword ? (<Icons.eyeOff size={18} />) : (<Icons.eye size={18} />)}
+                    </button>
+                  </div>
+                </FormControl>
+                {form.formState.errors.password && (
+                  <p className="text-destructive text-xs font-medium">{t(`auth.register.${form.formState.errors.password.message}`)}</p>
+                )}
+              </FormItem>
+            )}
+          />
+
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer mt-1">
+              <input type="checkbox" {...form.register('agreeTerms')} className="w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary" />
+              <span className="text-xs font-medium text-gray-600">
+                {t('auth.register.agree_terms')}{' '}
+                <a href="#" className="text-primary hover:underline">
+                  {t('auth.register.terms')}
+                </a>
+                {' '}{t('auth.register.and')}{' '}
+                <a href="#" className="text-primary hover:underline">
+                  {t('auth.register.privacy_policy')}
+                </a>
+              </span>
+            </label>
+            {form.formState.errors.agreeTerms && <p className="text-destructive text-xs mt-1 font-medium">{t(`auth.register.${form.formState.errors.agreeTerms.message}`)}</p>}
           </div>
-          {errors.password && (<p className="text-red-500 text-xs mt-1">{t(`auth.register.${errors.password.message}`)}</p>)}
-        </div>
 
-        <label className="flex items-center gap-2">
-          <input type="checkbox" {...register('agreeTerms')} className="w-3 h-3 rounded border-gray-300" />
-          <span className="text-xs text-gray-600">
-            {t('auth.register.agree_terms')}{' '}
-            <a href="#" className="text-blue-600 hover:underline">
-              {t('auth.register.terms')}
-            </a>
-            {' '}{t('auth.register.and')}{' '}
-            <a href="#" className="text-blue-600 hover:underline">
-              {t('auth.register.privacy_policy')}
-            </a>
-          </span>
-        </label>
-        {errors.agreeTerms && <p className="text-red-500 text-xs">{t(`auth.register.${errors.agreeTerms.message}`)}</p>}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition duration-200 mt-1"
-        >
-          {loading ? t('auth.register.creating_btn') : t('auth.register.create_btn')}
-        </button>
-      </form>
+          <Button
+            type="submit"
+            variant="kisafres"
+            disabled={loading}
+            className="w-full mt-2"
+          >
+            {loading ? t('auth.register.creating_btn') : t('auth.register.create_btn')}
+          </Button>
+        </form>
+      </Form>
 
       <div className="mt-4">
         <div className="relative mb-3">
@@ -119,20 +141,20 @@ export default function RegisterForm() {
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/google'}>
+          <Button variant="outline" className="text-xs font-medium" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/google'}>
             <span>G</span>
             <span className="hidden sm:inline">Google</span>
-          </button>
-          <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-xs font-medium text-gray-700" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/github'}>
+          </Button>
+          <Button variant="outline" className="text-xs font-medium" onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/github'}>
             <span>⚫</span>
             <span className="hidden sm:inline">GitHub</span>
-          </button>
+          </Button>
         </div>
       </div>
 
       <p className="mt-3 text-center text-gray-600 text-xs">
         {t('auth.register.already_have_account')}{' '}
-        <a href="/login" className="text-blue-600 font-semibold hover:text-blue-700">
+        <a href="/login" className="text-primary font-semibold hover:text-blue-700">
           {t('auth.register.log_in')}
         </a>
       </p>

@@ -11,10 +11,9 @@ import { useNotificationWebSocket } from '../../hooks/api/useNotificationWebSock
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-interface WorkspaceHeaderProps {
-  onOpenMobileMenu?: () => void;
-}
 
+
+import type { WorkspaceHeaderProps } from '../../types/components.interface';
 export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
@@ -62,8 +61,8 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
         </button>
 
         <div className="relative flex-1 max-w-[280px]">
-          <div className={`flex items-center bg-muted dark:bg-slate-700/50 rounded-lg px-3 py-1.5 transition-all ${isSearchFocused ? 'w-full sm:w-96 ring-2 ring-blue-500/20 bg-card dark:bg-slate-700 border-blue-500' : 'w-full sm:w-64 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'} border`}>
-            <Icons.search size={16} className={`${isSearchFocused ? 'text-blue-500' : 'text-muted-foreground dark:text-muted-foreground'}`} />
+          <div className={`flex items-center bg-muted dark:bg-slate-700/50 rounded-lg px-3 py-1.5 transition-all ${isSearchFocused ? 'w-full sm:w-96 ring-2 ring-primary/20 bg-card dark:bg-slate-700 border-primary' : 'w-full sm:w-64 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'} border`}>
+            <Icons.search size={16} className={`${isSearchFocused ? 'text-primary' : 'text-muted-foreground dark:text-muted-foreground'}`} />
             <input
               type="text"
               value={searchTerm}
@@ -84,7 +83,7 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
       <div className="flex items-center justify-end gap-1.5 sm:gap-3 md:gap-4 shrink-0">
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-2 py-2 sm:px-4 sm:py-2 rounded-lg text-[0.85rem] font-bold transition-all shadow-sm shadow-blue-200 dark:shadow-none dark:shadow-none dark:shadow-none shrink-0"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-2 py-2 sm:px-4 sm:py-2 rounded-lg text-[0.85rem] font-bold transition-all shadow-sm shadow-primary/20 dark:shadow-none dark:shadow-none dark:shadow-none shrink-0"
         >
           <Icons.plus size={16} />
           <span className="hidden sm:inline">{t('common.create') || 'Create'}</span>

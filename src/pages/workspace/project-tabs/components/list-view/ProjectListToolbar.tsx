@@ -46,7 +46,7 @@ export function ProjectListToolbar() {
     { label: 'Highest', icon: <Icons.chevronsUp size={12} className="text-rose-500" />, color: 'text-rose-600' },
     { label: 'High', icon: <Icons.chevronUp size={12} className="text-orange-500" />, color: 'text-orange-500' },
     { label: 'Medium', icon: <Icons.equal size={12} strokeWidth={3} className="text-amber-500" />, color: 'text-amber-500' },
-    { label: 'Low', icon: <Icons.chevronDown size={12} className="text-blue-400" />, color: 'text-blue-400' },
+    { label: 'Low', icon: <Icons.chevronDown size={12} className="text-primary/70" />, color: 'text-primary/70' },
     { label: 'Lowest', icon: <Icons.chevronsDown size={12} className="text-muted-foreground" />, color: 'text-muted-foreground' },
   ];
 
@@ -94,7 +94,7 @@ export function ProjectListToolbar() {
               setSearchKeyword(e.target.value);
               setCurrentPage(1);
             }}
-            className="pl-8 pr-3 py-1.5 w-44 bg-background/50 border border-border hover:border-slate-300 focus:border-blue-500 focus:bg-card rounded-lg text-xs font-semibold text-foreground outline-none transition-all shadow-sm"
+            className="pl-8 pr-3 py-1.5 w-44 bg-background/50 border border-border hover:border-slate-300 focus:border-primary focus:bg-card rounded-lg text-xs font-semibold text-foreground outline-none transition-all shadow-sm"
           />
         </div>
 
@@ -105,14 +105,14 @@ export function ProjectListToolbar() {
             onClick={() => { setShowFilterPanel(v => !v); setShowGroupDropdown(false); }}
             className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all shadow-sm ${
               totalActiveFilters > 0
-                ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'
+                ? 'bg-primary/10 border-blue-300 text-blue-700 hover:bg-primary/20'
                 : 'bg-background border-border hover:bg-muted text-foreground'
             }`}
           >
-            <Icons.filter size={13} className={totalActiveFilters > 0 ? 'text-blue-500' : 'text-muted-foreground'} />
+            <Icons.filter size={13} className={totalActiveFilters > 0 ? 'text-primary' : 'text-muted-foreground'} />
             <span>{t('list.filter')}</span>
             {totalActiveFilters > 0 && (
-              <span className="ml-0.5 bg-blue-600 text-white text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center leading-none">
+              <span className="ml-0.5 bg-primary text-white text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center leading-none">
                 {totalActiveFilters}
               </span>
             )}
@@ -138,13 +138,13 @@ export function ProjectListToolbar() {
                       onClick={() => setActiveFilterCategory(cat.id)}
                       className={`w-full flex items-center justify-between px-3 py-2 text-[12px] font-medium text-left transition-colors ${
                         activeFilterCategory === cat.id
-                          ? 'bg-card text-blue-700 border-l-2 border-blue-600 shadow-sm'
+                          ? 'bg-card text-blue-700 border-l-2 border-primary shadow-sm'
                           : 'text-muted-foreground hover:bg-card/70 border-l-2 border-transparent'
                       }`}
                     >
                       <span>{cat.label}</span>
                       {cat.count > 0 && (
-                        <span className="bg-blue-600 text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center shrink-0">{cat.count}</span>
+                        <span className="bg-primary text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center shrink-0">{cat.count}</span>
                       )}
                     </button>
                   ))}
@@ -183,7 +183,7 @@ export function ProjectListToolbar() {
                                 type="checkbox"
                                 checked={checked}
                                 onChange={() => setFilterAssignees(prev => checked ? prev.filter(x => x !== member.id) : [...prev, member.id])}
-                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+                                className="rounded border-slate-300 text-primary focus:ring-primary w-3.5 h-3.5"
                               />
                               {member.avatar
                                 ? <img  src={member.avatar} alt={member.name} className="w-5 h-5 rounded-full object-cover border border-border shrink-0" />
@@ -198,11 +198,11 @@ export function ProjectListToolbar() {
                   )}
                   {activeFilterCategory === 'Work type' && (
                     <div className="space-y-0.5">
-                      {[{ v: 'Epic', color: 'text-violet-600' }, { v: 'Task', color: 'text-blue-600' }, { v: 'Incident', color: 'text-rose-600' }, { v: 'Service Request', color: 'text-amber-600' }].map(({ v, color }) => {
+                      {[{ v: 'Epic', color: 'text-violet-600' }, { v: 'Task', color: 'text-primary' }, { v: 'Incident', color: 'text-rose-600' }, { v: 'Service Request', color: 'text-amber-600' }].map(({ v, color }) => {
                         const checked = filterTypes.includes(v);
                         return (
                           <label key={v} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-background cursor-pointer">
-                            <input type="checkbox" checked={checked} onChange={() => setFilterTypes(prev => checked ? prev.filter(x => x !== v) : [...prev, v])} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5" />
+                            <input type="checkbox" checked={checked} onChange={() => setFilterTypes(prev => checked ? prev.filter(x => x !== v) : [...prev, v])} className="rounded border-slate-300 text-primary focus:ring-primary w-3.5 h-3.5" />
                             <span className={`text-[12px] font-semibold ${color}`}>{v}</span>
                           </label>
                         );
@@ -215,7 +215,7 @@ export function ProjectListToolbar() {
                         const checked = filterStatuses.includes(s.statusId);
                         return (
                           <label key={s.statusId} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-background cursor-pointer">
-                            <input type="checkbox" checked={checked} onChange={() => setFilterStatuses(prev => checked ? prev.filter(x => x !== s.statusId) : [...prev, s.statusId])} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5" />
+                            <input type="checkbox" checked={checked} onChange={() => setFilterStatuses(prev => checked ? prev.filter(x => x !== s.statusId) : [...prev, s.statusId])} className="rounded border-slate-300 text-primary focus:ring-primary w-3.5 h-3.5" />
                             <span className="text-[12px] font-medium text-foreground">{s.label}</span>
                           </label>
                         );
@@ -228,7 +228,7 @@ export function ProjectListToolbar() {
                         const checked = filterPriorities.includes(priority);
                         return (
                           <label key={priority} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-background cursor-pointer">
-                            <input type="checkbox" checked={checked} onChange={() => setFilterPriorities(prev => checked ? prev.filter(x => x !== priority) : [...prev, priority])} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5" />
+                            <input type="checkbox" checked={checked} onChange={() => setFilterPriorities(prev => checked ? prev.filter(x => x !== priority) : [...prev, priority])} className="rounded border-slate-300 text-primary focus:ring-primary w-3.5 h-3.5" />
                             <span className="flex items-center gap-1.5">
                               {getPriorityIcon(priority)}
                               <span className={`text-[12px] font-medium ${getPriorityColor(priority)}`}>{priority}</span>
@@ -253,7 +253,7 @@ export function ProjectListToolbar() {
                 </button>
                 <button
                   onClick={() => setShowFilterPanel(false)}
-                  className="text-[11px] font-bold px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="text-[11px] font-bold px-3 py-1 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   {t('list.filter_done')}
                 </button>
@@ -269,11 +269,11 @@ export function ProjectListToolbar() {
             onClick={() => { setShowGroupDropdown(v => !v); setShowFilterPanel(false); }}
             className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all shadow-sm ${
               groupBy
-                ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'
+                ? 'bg-primary/10 border-blue-300 text-blue-700 hover:bg-primary/20'
                 : 'bg-background border-border hover:bg-muted text-foreground'
             }`}
           >
-            <Icons.layers size={13} className={groupBy ? 'text-blue-500' : 'text-muted-foreground'} />
+            <Icons.layers size={13} className={groupBy ? 'text-primary' : 'text-muted-foreground'} />
             <span>{t('list.group')}{groupBy ? `: ${GROUP_OPTIONS.find(g => g.id === groupBy)?.label}` : ''}</span>
           </button>
 
@@ -305,11 +305,11 @@ export function ProjectListToolbar() {
                     key={opt.id}
                     onClick={() => { setGroupBy(groupBy === opt.id ? null : opt.id); setShowGroupDropdown(false); setGroupSearch(''); }}
                     className={`w-full flex items-center justify-between px-3 py-2 text-[13px] font-medium transition-colors text-left ${
-                      groupBy === opt.id ? 'bg-blue-50 text-blue-700' : 'text-foreground hover:bg-background'
+                      groupBy === opt.id ? 'bg-primary/10 text-blue-700' : 'text-foreground hover:bg-background'
                     }`}
                   >
                     <span>{opt.label}</span>
-                    {groupBy === opt.id && <Icons.check size={13} className="text-blue-600 shrink-0" />}
+                    {groupBy === opt.id && <Icons.check size={13} className="text-primary shrink-0" />}
                   </button>
                 ))}
               </div>

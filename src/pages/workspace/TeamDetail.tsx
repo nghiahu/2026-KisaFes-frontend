@@ -138,7 +138,7 @@ export default function TeamDetail() {
                 {isValidImageUrl(team.avatar) ? (
                   <img  src={team.avatar} alt={team.name} className="w-full h-full object-cover" />
                 ) : (
-                  <Icons.users size={40} className="text-blue-500" />
+                  <Icons.users size={40} className="text-primary" />
                 )}
               </div>
               <h1 className="text-3xl font-bold text-foreground">{team.name}</h1>
@@ -160,29 +160,29 @@ export default function TeamDetail() {
           <div className="flex items-center gap-6 border-b border-border mb-6">
             <button
               onClick={() => setActiveTab('members')}
-              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'members' ? 'text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'members' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
             >
               Members
               {activeTab === 'members' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
               )}
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'projects' ? 'text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'projects' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
             >
               Projects
               {activeTab === 'projects' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
               )}
             </button>
             <button
               onClick={() => setActiveTab('tasks')}
-              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'tasks' ? 'text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`pb-3 text-sm font-bold transition-colors relative ${activeTab === 'tasks' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
             >
               Work
               {activeTab === 'tasks' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
               )}
             </button>
           </div>
@@ -199,12 +199,12 @@ export default function TeamDetail() {
                       placeholder="Find members..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-all" 
+                      className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:border-primary transition-all" 
                     />
                   </div>
                   <button 
                     onClick={() => setIsAddingMember(true)}
-                    className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm font-bold rounded-xl transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 text-sm font-bold rounded-xl transition-colors flex items-center gap-2"
                   >
                     <Icons.userPlus size={16} />
                     Add Member
@@ -227,7 +227,7 @@ export default function TeamDetail() {
                       <tr key={member.id} className="border-b border-slate-50 hover:bg-background/50 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+                            <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
                               {isValidImageUrl(member.avatar) ? <img  src={member.avatar} alt={member.name} className="w-full h-full object-cover" /> : member.name.charAt(0)}
                             </div>
                             <span className="font-semibold text-foreground text-sm">{member.name}</span>

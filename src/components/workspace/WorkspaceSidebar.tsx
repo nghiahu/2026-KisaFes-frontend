@@ -5,6 +5,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { useProjects } from '../../hooks/api/useProjects';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+import type { WorkspaceSidebarProps } from '../../types/components.interface';
 const getProjectColor = (name: string) => {
   const colors = ['#3B82F6', '#22C55E', '#F97316', '#A855F7', '#EC4899', '#06B6D4', '#EAB308'];
   let hash = 0;
@@ -14,12 +15,7 @@ const getProjectColor = (name: string) => {
   return colors[Math.abs(hash % colors.length)];
 };
 
-interface WorkspaceSidebarProps {
-  collapsed: boolean;
-  onToggle: () => void;
-  mobileOpen?: boolean;
-  onCloseMobile?: () => void;
-}
+
 
 export default function WorkspaceSidebar({
   collapsed,
@@ -142,7 +138,7 @@ export default function WorkspaceSidebar({
                         to={item.path}
                         className={`relative flex items-center gap-[12px] h-[34px] px-3 rounded-[8px] font-medium text-[13px] transition-all duration-200 group ${
                           isItemActive
-                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'
+                            ? 'bg-primary/10 text-blue-700 dark:bg-blue-900/40 dark:text-primary/70'
                             : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white'
                         } ${collapsed ? 'justify-center px-0' : ''}`}
                         title={collapsed ? item.label : undefined}
@@ -155,7 +151,7 @@ export default function WorkspaceSidebar({
                         <item.icon 
                           size={16} 
                           className={`shrink-0 ${
-                            isItemActive ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground group-hover:text-muted-foreground dark:group-hover:text-slate-300'
+                            isItemActive ? 'text-primary dark:text-primary/70' : 'text-muted-foreground group-hover:text-muted-foreground dark:group-hover:text-slate-300'
                           }`} 
                         />
                         
@@ -208,7 +204,7 @@ export default function WorkspaceSidebar({
                       to={projectPath}
                       className={`relative w-full flex items-center gap-[12px] h-[36px] px-3 rounded-[8px] hover:bg-muted hover:text-foreground dark:hover:bg-slate-700/50 dark:hover:text-white transition-all duration-200 group ${
                         collapsed ? 'justify-center px-0' : ''
-                      } ${isProjActive ? 'bg-blue-50 !text-blue-700 dark:bg-blue-900/40 dark:!text-blue-400' : 'text-muted-foreground dark:text-slate-300'}`}
+                      } ${isProjActive ? 'bg-primary/10 !text-blue-700 dark:bg-blue-900/40 dark:!text-primary/70' : 'text-muted-foreground dark:text-slate-300'}`}
                       title={collapsed ? project.name : undefined}
                     >
                       {/* Active Left Border Indicator */}
@@ -224,7 +220,7 @@ export default function WorkspaceSidebar({
                         {displayInitials}
                       </div>
                       {!collapsed && (
-                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-blue-700 dark:!text-blue-400' : 'text-muted-foreground group-hover:text-foreground dark:text-slate-300 dark:group-hover:text-white'}`}>
+                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-blue-700 dark:!text-primary/70' : 'text-muted-foreground group-hover:text-foreground dark:text-slate-300 dark:group-hover:text-white'}`}>
                           {project.name}
                         </span>
                       )}

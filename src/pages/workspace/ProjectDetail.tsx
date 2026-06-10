@@ -26,6 +26,15 @@ import ProjectSettings from './project-tabs/ProjectSettings';
 import InviteMemberModal from '../../components/workspace/InviteMemberModal';
 import { Skeleton } from '../../components/ui/Skeleton';
 import AiChatWidget from '../../components/workspace/AiChatWidget';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/DropdownMenu";
 
 type TabType = 'overview' | 'list' | 'board' | 'calendar' | 'members' | 'forms' | 'backlog' | 'sprint' | 'settings';
 
@@ -106,7 +115,6 @@ export default function ProjectDetail() {
       await projectService.updateProjectName(currentProject.id, trimmed);
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
     } catch {
-      // axiosClient interceptor shows permission-denied toast for 403
     } finally {
       setIsSavingName(false);
       setIsEditingName(false);
@@ -145,8 +153,7 @@ export default function ProjectDetail() {
       alert(t('project_detail.confirm_delete_type').replace('{code}', currentProject.code));
       return;
     }
-    // Perform deletion
-    // TODO: Call API to delete project here
+
     navigate('/workspace/projects');
   };
 
@@ -257,7 +264,7 @@ export default function ProjectDetail() {
         </div>
         {/* Title row skeleton */}
         <div className="flex items-center gap-3 px-6 pt-4 pb-2 shrink-0">
-          <Skeleton className="w-8 h-8 rounded-lg bg-blue-100" />
+          <Skeleton className="w-8 h-8 rounded-lg bg-primary/20" />
           <Skeleton className="h-7 w-48 bg-slate-200" />
           <Skeleton className="h-5 w-16 rounded-full bg-muted" />
         </div>
@@ -280,12 +287,13 @@ export default function ProjectDetail() {
       <div className="flex flex-col items-center justify-center min-h-[450px] gap-4">
         <Icons.alertCircle className="text-rose-500" size={48} />
         <span className="text-base font-bold text-foreground">{t('project_detail.no_project')}</span>
-        <button
+        <Button
           onClick={() => navigate('/workspace/projects')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-[10px] text-xs font-bold hover:bg-blue-700 transition-colors"
+          variant="kisafres"
+          className="px-4 py-2 text-xs"
         >
           {t('project_detail.back_to_list')}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -296,7 +304,7 @@ export default function ProjectDetail() {
       <div className="flex items-center gap-1.5 px-6 pt-5 text-[11px] font-bold text-muted-foreground uppercase tracking-wider shrink-0">
         <button
           onClick={() => navigate('/workspace/projects')}
-          className="hover:text-blue-600 transition-colors"
+          className="hover:text-primary transition-colors"
         >
           {t('project_detail.project')}
         </button>
@@ -307,7 +315,7 @@ export default function ProjectDetail() {
       {/* Project Title Row */}
       <div className="flex items-center justify-between px-6 pt-3 pb-2 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-[30px] h-[30px] rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-md shadow-blue-500/10">
+          <div className="w-[30px] h-[30px] rounded-lg bg-primary flex items-center justify-center text-white font-black text-sm shrink-0 shadow-md shadow-blue-500/10">
             {currentProject.code?.substring(0, 2).toUpperCase() || 'K'}
           </div>
           {isEditingName ? (
@@ -319,17 +327,17 @@ export default function ProjectDetail() {
               onKeyDown={handleNameKeyDown}
               disabled={isSavingName}
               autoFocus
-              className="text-2xl font-black text-foreground tracking-tight bg-transparent border-b-2 border-blue-500 outline-none px-0 min-w-[120px] max-w-[400px] w-auto"
+              className="text-2xl font-black text-foreground tracking-tight bg-transparent border-b-2 border-primary outline-none px-0 min-w-[120px] max-w-[400px] w-auto"
               style={{ width: `${Math.max(editingName.length, 10)}ch` }}
             />
           ) : (
             <h1
-              className="text-2xl font-black text-foreground tracking-tight cursor-pointer hover:text-blue-600 transition-colors group flex items-center gap-1.5"
+              className="text-2xl font-black text-foreground tracking-tight cursor-pointer hover:text-primary transition-colors group flex items-center gap-1.5"
               onClick={handleStartEditName}
               title={t('project_detail.rename_tooltip')}
             >
               {currentProject.name}
-              <Icons.pencil size={14} className="text-slate-300 group-hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100" />
+              <Icons.pencil size={14} className="text-slate-300 group-hover:text-primary/70 transition-colors opacity-0 group-hover:opacity-100" />
             </h1>
           )}
           {/* Methodology badge */}
@@ -341,63 +349,48 @@ export default function ProjectDetail() {
               ? <><Icons.zap size={12} className="text-violet-500" /> SCRUM</>
               : <><Icons.kanbanSquare size={12} className="text-teal-500" /> KANBAN</>}
           </span>
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors shrink-0"
-            title={t('project_detail.invite_tooltip')}
-          >
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground shrink-0" onClick={() => setShowInviteModal(true)} title={t('project_detail.invite_tooltip')}>
             <Icons.userPlus size={15} />
-          </button>
-          <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setShowDropdown(!showDropdown)}
-              className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors shrink-0"
-            >
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex shrink-0 items-center justify-center rounded-lg hover:bg-muted hover:text-foreground transition-colors size-8 outline-none text-muted-foreground">
               <Icons.moreHorizontal size={15} />
-            </button>
-            {showDropdown && (
-              <div className="absolute right-0 top-full mt-1.5 w-52 bg-card rounded-xl shadow-xl border border-border py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <button onClick={() => { setIsFavorite(!isFavorite); setShowDropdown(false); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5 transition-colors">
-                  <Icons.star size={13} className={isFavorite ? 'text-amber-400' : 'text-muted-foreground'} fill={isFavorite ? 'currentColor' : 'none'} />
-                  <span>{isFavorite ? t('projects.remove_starred') : t('projects.add_starred')}</span>
-                </button>
-                <button onClick={() => { 
-                    setShowDropdown(false); 
-                    resetEditForm({ name: currentProject.name, description: currentProject.description || '', categoryId: categories.find((c: any) => c.name === currentProject.category)?.id || '' }); 
-                    setIsEditingInfo(true); 
-                  }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-background flex items-center gap-2.5 transition-colors">
-                  <Icons.settings size={13} className="text-muted-foreground" />
-                  <span>{t('projects.edit_project')}</span>
-                </button>
-                <div className="h-px bg-muted my-1" />
-                <button onClick={() => { setShowDropdown(false); setIsDeleting(true); setDeleteInput(''); }}
-                  className="w-full px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors">
-                  <Icons.alertCircle size={13} className="text-rose-500" />
-                  <span>{t('projects.delete_project')}</span>
-                </button>
-              </div>
-            )}
-          </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+               <DropdownMenuItem onClick={() => setIsFavorite(!isFavorite)}>
+                 <Icons.star size={14} className={isFavorite ? 'text-amber-400 mr-2' : 'mr-2'} fill={isFavorite ? 'currentColor' : 'none'} />
+                 {isFavorite ? t('projects.remove_starred') : t('projects.add_starred')}
+               </DropdownMenuItem>
+               <DropdownMenuItem onClick={() => {
+                  resetEditForm({ name: currentProject.name, description: currentProject.description || '', categoryId: categories.find((c: any) => c.name === currentProject.category)?.id || '' });
+                  setIsEditingInfo(true);
+                }}>
+                 <Icons.settings size={14} className="mr-2" />
+                 {t('projects.edit_project')}
+               </DropdownMenuItem>
+               <DropdownMenuSeparator />
+               <DropdownMenuItem onClick={() => { setIsDeleting(true); setDeleteInput(''); }} className="text-destructive">
+                 <Icons.alertCircle size={14} className="mr-2" />
+                 {t('projects.delete_project')}
+               </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <button className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors">
+        <div className="flex items-center gap-1 shrink-0">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
             <Icons.share2 size={16} />
-          </button>
-          <button className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors">
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
             <Icons.zap size={16} />
-          </button>
-          <button
-            onClick={() => setIsFavorite(prev => !prev)}
-            className={`p-1.5 rounded-lg transition-colors hover:bg-muted ${isFavorite ? 'text-amber-400' : 'text-muted-foreground hover:text-muted-foreground'}`}
-          >
+          </Button>
+          <Button variant="ghost" size="icon" className={`h-8 w-8 ${isFavorite ? 'text-amber-400' : 'text-muted-foreground'}`} onClick={() => setIsFavorite(prev => !prev)}>
             <Icons.star size={16} fill={isFavorite ? 'currentColor' : 'none'} />
-          </button>
-          <button className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors">
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
             <Icons.maximize2 size={16} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -474,13 +467,13 @@ export default function ProjectDetail() {
             <form onSubmit={handleEditSubmitWrapper(onEditSubmit)} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-foreground">{t('projects.project_name')}</label>
-                <input type="text" className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.name ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-blue-500/20 focus:border-blue-500'}`}
+                <Input type="text" className={editErrors.name ? 'border-destructive focus-visible:ring-destructive' : ''}
                   {...registerEdit('name')} />
                 {editErrors.name && <p className="text-rose-500 text-xs font-medium">{editErrors.name.message}</p>}
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-foreground">{t('projects.category')}</label>
-                <select className={`border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.categoryId ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-blue-500/20 focus:border-blue-500'}`}
+                <select className={`bg-background border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 ${editErrors.categoryId ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500' : 'border-border focus:ring-primary/20 focus:border-primary'}`}
                   {...registerEdit('categoryId')}>
                   <option value="" disabled>{t('projects.select_category')}</option>
                   {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -489,14 +482,16 @@ export default function ProjectDetail() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-foreground">{t('projects.description')}</label>
-                <textarea className="border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" rows={3}
+                <textarea className="bg-background border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none" rows={3}
                   {...registerEdit('description')} />
               </div>
               <div className="flex items-center justify-end gap-3 mt-4">
-                <button type="button" onClick={() => setIsEditingInfo(false)} className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">{t('common.cancel')}</button>
-                <button type="submit" disabled={isUpdating} className="px-4 py-2 text-sm font-bold bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                <Button type="button" variant="ghost" onClick={() => setIsEditingInfo(false)} className="px-4 py-2">
+                  {t('common.cancel')}
+                </Button>
+                <Button type="submit" variant="kisafres" disabled={isUpdating} className="px-4 py-2">
                   {isUpdating ? t('projects.saving') : t('common.save')}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -518,13 +513,15 @@ export default function ProjectDetail() {
             }}>
             </p>
             <form onSubmit={handleDeleteSubmit} className="flex flex-col gap-4">
-              <input required type="text" className="border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+              <Input required type="text" className="mb-2"
                 placeholder={`delete ${currentProject.code}`} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} />
               <div className="flex items-center justify-end gap-3 mt-2">
-                <button type="button" onClick={() => { setIsDeleting(false); setDeleteInput(''); }} className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">{t('common.cancel')}</button>
-                <button type="submit" disabled={deleteInput !== `delete ${currentProject.code}`} className="px-4 py-2 text-sm font-bold bg-rose-600 text-white rounded-xl hover:bg-rose-700 disabled:opacity-50 transition-colors">
+                <Button type="button" variant="ghost" onClick={() => { setIsDeleting(false); setDeleteInput(''); }} className="px-4 py-2">
+                  {t('common.cancel')}
+                </Button>
+                <Button type="submit" variant="destructive" disabled={deleteInput !== `delete ${currentProject.code}`} className="px-4 py-2">
                   {t('projects.confirm_delete')}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

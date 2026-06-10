@@ -3,12 +3,9 @@ import { useNotificationsQuery, useAcceptInvitationMutation, useDeclineInvitatio
 import { Icons } from '../../assets/icons';
 import { X } from 'lucide-react';
 
-interface NotificationDropdownProps {
-  onClose: () => void;
-  onNotificationsCountChange: (count: number) => void;
-  ignoreRef?: React.RefObject<HTMLElement | null>;
-}
 
+
+import type { NotificationDropdownProps } from '../../types/components.interface';
 export default function NotificationDropdown({ onClose, onNotificationsCountChange, ignoreRef }: NotificationDropdownProps) {
   const { data: notifications = [], isLoading: loading } = useNotificationsQuery();
   const acceptInvitationMutation = useAcceptInvitationMutation();
@@ -94,17 +91,17 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
       {/* Header */}
       <div className="px-4 py-3 bg-background border-b border-border flex items-center justify-between">
         <h3 className="font-bold text-foreground text-[0.9rem] flex items-center gap-2">
-          <Icons.bell size={16} className="text-blue-600" />
+          <Icons.bell size={16} className="text-primary" />
           Thông báo của bạn
         </h3>
         {notifications.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-[0.75rem] px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded-full">
+            <span className="text-[0.75rem] px-2 py-0.5 bg-primary/20 text-blue-700 font-bold rounded-full">
               {notifications.filter(n => !n.read).length} mới
             </span>
             <button
               onClick={() => markAllAsReadMutation.mutate()}
-              className="text-muted-foreground hover:text-blue-600 transition-colors"
+              className="text-muted-foreground hover:text-primary transition-colors"
               title="Đánh dấu tất cả đã đọc"
             >
               <Icons.check size={14} strokeWidth={3} />
@@ -117,7 +114,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
       <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-10 gap-3">
-            <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-[0.8rem] text-muted-foreground">Đang tải thông báo...</p>
           </div>
         ) : notifications.length === 0 ? (
@@ -143,7 +140,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
               <div
                 key={item.id}
                 onClick={() => { if (isUnread) markAsReadMutation.mutate(item.id); }}
-                className={`p-4 transition-all flex gap-3 cursor-pointer ${isUnread ? 'bg-blue-50/30 hover:bg-blue-50/50' : 'hover:bg-background/50'
+                className={`p-4 transition-all flex gap-3 cursor-pointer ${isUnread ? 'bg-primary/10/30 hover:bg-primary/10/50' : 'hover:bg-background/50'
                   }`}
               >
                 {/* Avatar */}
@@ -156,7 +153,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
                      
                     />
                   ) : (
-                    <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-[0.85rem] border border-blue-100">
+                    <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[0.85rem] border border-blue-100">
                       {item.senderName ? item.senderName.charAt(0).toUpperCase() : 'S'}
                     </div>
                   )}
@@ -184,7 +181,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
                           <button
                             onClick={(e) => { e.stopPropagation(); handleAccept(item.id); }}
                             disabled={isActioning}
-                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-lg text-[0.75rem] font-bold flex items-center gap-1 transition-all shadow-sm shadow-blue-100"
+                            className="px-3 py-1.5 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white rounded-lg text-[0.75rem] font-bold flex items-center gap-1 transition-all shadow-sm shadow-blue-100"
                           >
                             <Icons.check size={13} />
                             Đồng ý

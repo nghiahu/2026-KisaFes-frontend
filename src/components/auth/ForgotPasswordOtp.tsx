@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearResetPasswordData, setResetPasswordData } from "../../store/slices/authSlice";
 import type { RootState } from "../../store";
 import { useAuthActions } from "../../hooks/useAuthActions";
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 export default function ForgotPasswordOtp() {
   const OTP_LENGTH = 6;
@@ -164,16 +166,17 @@ export default function ForgotPasswordOtp() {
             <p className="mt-2 text-lg">{redirectCountdown} giây</p>
           </div>
 
-          <button
+          <Button
             type="button"
+            variant="kisafres"
             onClick={() => {
               dispatch(clearResetPasswordData());
               navigate('/forgot-password');
             }}
-            className="mt-4 inline-flex w-full items-center justify-center rounded-3xl bg-blue-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-blue-700"
+            className="mt-4 w-full rounded-3xl py-6 text-base"
           >
             Quay về nhập email ngay
-          </button>
+          </Button>
         </div>
       ) : (
         <>
@@ -191,7 +194,7 @@ export default function ForgotPasswordOtp() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex items-center justify-center gap-3">
               {otp.map((digit, index) => (
-                <input
+                <Input
                   key={index}
                   ref={(el) => {
                     inputRefs.current[index] = el;
@@ -203,7 +206,7 @@ export default function ForgotPasswordOtp() {
                   onChange={(e) => handleChange(e.target.value, index)}
                   onPaste={handlePaste}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="h-16 w-16 rounded-2xl border border-slate-300 bg-slate-50 text-center text-2xl font-semibold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="h-16 w-16 rounded-2xl bg-slate-50 text-center text-2xl font-semibold text-slate-900"
                 />
               ))}
             </div>
@@ -214,21 +217,22 @@ export default function ForgotPasswordOtp() {
                 type="button"
                 onClick={handleResend}
                 disabled={countdown > 0 || loading}
-                className={`font-semibold transition ${countdown > 0 ? 'text-slate-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-700'}`}
+                className={`font-semibold transition ${countdown > 0 ? 'text-slate-400 cursor-not-allowed' : 'text-primary hover:text-blue-700'}`}
               >
                 Gửi lại mã
               </button>
               {countdown > 0 && <span className="text-slate-400">{formatTime(countdown)}</span>}
             </div>
 
-            <button
+            <Button
               type="submit"
+              variant="kisafres"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-3xl bg-blue-600 py-4 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+              className="w-full rounded-3xl py-6 text-base flex items-center justify-center gap-2"
             >
               {loading ? 'Đang xác thực...' : 'Xác thực'}
               <span aria-hidden="true">→</span>
-            </button>
+            </Button>
           </form>
 
           <div className="mt-8 border-t border-slate-200 pt-4 text-center text-xs text-slate-400">
@@ -238,7 +242,7 @@ export default function ForgotPasswordOtp() {
                 dispatch(clearResetPasswordData());
                 navigate('/login');
               }}
-              className="text-blue-600 hover:text-blue-700 font-semibold"
+              className="text-primary hover:text-blue-700 font-semibold"
             >
               Quay về đăng nhập
             </button>
