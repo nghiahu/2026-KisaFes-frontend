@@ -55,8 +55,10 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
       {/* Left: Hamburger & Search */}
       <div className="flex flex-1 items-center gap-2 max-w-xl min-w-0 mr-4">
         <Button
+          variant="ghost"
+          size="icon"
           onClick={onOpenMobileMenu}
-          className="md:hidden shrink-0 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-accent rounded-md transition-colors"
+          className="md:hidden shrink-0 text-muted-foreground hover:bg-muted dark:hover:bg-accent rounded-md transition-colors"
         >
           <Icons.menu size={20} />
         </Button>
@@ -93,8 +95,10 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
         <div className="flex items-center gap-1 shrink-0">
           <div className="relative" ref={notificationWrapperRef}>
             <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all relative"
+              className="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all relative"
               title="Notifications"
             >
               <Icons.bell size={18} />
@@ -112,12 +116,14 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
               />
             )}
           </div>
-          <Button className="hidden sm:flex p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all" title="Help">
+          <Button variant="ghost" size="icon" className="hidden sm:flex text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all" title="Help">
             <Icons.helpCircle size={18} />
           </Button>
           <Button
+            variant="ghost"
+            size="icon"
             onClick={() => navigate('/workspace/settings')}
-            className="hidden sm:flex p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all" title="Settings"
+            className="hidden sm:flex text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all" title="Settings"
           >
             <Icons.settings size={18} />
           </Button>

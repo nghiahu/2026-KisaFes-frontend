@@ -100,8 +100,10 @@ export default function WorkspaceSidebar({
             {/* Close button for mobile */}
             {mobileOpen && (
               <Button 
+                variant="ghost"
+                size="icon"
                 onClick={onCloseMobile}
-                className="md:hidden p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:bg-accent dark:hover:text-muted-foreground rounded-md transition-colors"
+                className="md:hidden h-8 w-8 text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:bg-accent dark:hover:text-muted-foreground rounded-md transition-colors"
               >
                 <Icons.x size={16} />
               </Button>
@@ -111,7 +113,8 @@ export default function WorkspaceSidebar({
 
         {/* Collapse Toggle Button (Hidden on mobile) */}
         <Button
-          className="hidden md:flex absolute -right-3 top-6 w-6 h-6 bg-card border border-border rounded-full items-center justify-center text-muted-foreground hover:text-foreground shadow-sm transition-all z-50 hover:border-slate-300"
+          variant="outline"
+          className="hidden md:flex absolute -right-3 top-6 w-6 h-6 p-0 bg-card border border-border rounded-full items-center justify-center text-muted-foreground hover:text-foreground shadow-sm transition-all z-50 hover:border-slate-300"
           onClick={onToggle}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -184,8 +187,10 @@ export default function WorkspaceSidebar({
               )}
               {!collapsed && (
                 <Button 
+                  variant="ghost"
+                  size="icon"
                   onClick={() => navigate('/workspace/projects/new')}
-                  className="text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors"
+                  className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-accent dark:hover:text-muted-foreground transition-colors"
                   title={t('sidebar.create_project')}
                 >
                   <Icons.plus size={12} />
@@ -205,7 +210,7 @@ export default function WorkspaceSidebar({
                       to={projectPath}
                       className={`relative w-full flex items-center gap-[12px] h-[36px] px-3 rounded-[8px] hover:bg-muted hover:text-foreground dark:hover:bg-slate-700/50 dark:hover:text-white transition-all duration-200 group ${
                         collapsed ? 'justify-center px-0' : ''
-                      } ${isProjActive ? 'bg-primary/10 !text-blue-700 dark:bg-blue-900/40 dark:!text-primary/70' : 'text-muted-foreground dark:text-muted-foreground'}`}
+                      } ${isProjActive ? 'bg-primary/10 !text-primary dark:bg-blue-900/40 dark:!text-primary/70' : 'text-muted-foreground dark:text-muted-foreground'}`}
                       title={collapsed ? project.name : undefined}
                     >
                       {/* Active Left Border Indicator */}
@@ -221,7 +226,7 @@ export default function WorkspaceSidebar({
                         {displayInitials}
                       </div>
                       {!collapsed && (
-                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-blue-700 dark:!text-primary/70' : 'text-muted-foreground group-hover:text-foreground dark:text-muted-foreground dark:group-hover:text-white'}`}>
+                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-primary dark:!text-primary/70' : 'text-muted-foreground group-hover:text-foreground dark:text-muted-foreground dark:group-hover:text-white'}`}>
                           {project.name}
                         </span>
                       )}

@@ -113,16 +113,16 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                 style={{ top: typeDropdownPos.top !== undefined ? typeDropdownPos.top : 'auto', bottom: typeDropdownPos.bottom !== undefined ? typeDropdownPos.bottom : 'auto', left: typeDropdownPos.left }}
               >
                 <div className="px-1">
-                  <Button onClick={() => { setNewTaskType('epic'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'epic' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  <Button onClick={() => { setNewTaskType('epic'); setShowTypeDropdown(false); }} className={`w-full flex justify-start items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'epic' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <Zap size={13} className="text-[#8B5CF6] fill-[#8B5CF6]" /> Epic
                   </Button>
-                  <Button onClick={() => { setNewTaskType('task'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'task' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  <Button onClick={() => { setNewTaskType('task'); setShowTypeDropdown(false); }} className={`w-full flex justify-start items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'task' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <CheckSquare size={13} className="text-[#3B82F6]" /> Task
                   </Button>
-                  <Button onClick={() => { setNewTaskType('incident'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'incident' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  <Button onClick={() => { setNewTaskType('incident'); setShowTypeDropdown(false); }} className={`w-full flex justify-start items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'incident' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <AlertCircle size={13} className="text-[#EF4444]" /> Incident
                   </Button>
-                  <Button onClick={() => { setNewTaskType('service request'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'service request' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  <Button onClick={() => { setNewTaskType('service request'); setShowTypeDropdown(false); }} className={`w-full flex justify-start items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'service request' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <AlertCircle size={13} className="text-[#F59E0B]" /> Service
                   </Button>
                 </div>
@@ -176,13 +176,13 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                 </div>
                 <div className="max-h-[200px] overflow-y-auto py-1">
                   {(!assigneeSearch.trim() || 'unassigned'.includes(assigneeSearch.toLowerCase())) && (
-                    <Button type="button" onClick={() => { setNewTaskAssignee(null); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left ${!newTaskAssignee ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
+                    <Button type="button" onClick={() => { setNewTaskAssignee(null); setShowAssigneeDropdown(false); }} className={`w-full flex justify-start items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left ${!newTaskAssignee ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
                       <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center shrink-0"><User size={12} className="text-muted-foreground" /></div>
                       <span className={!newTaskAssignee ? 'text-primary font-medium' : 'text-foreground'}>Unassigned</span>
                     </Button>
                   )}
                   {(!assigneeSearch.trim() || 'automatic'.includes(assigneeSearch.toLowerCase())) && (
-                    <Button type="button" onClick={() => { setNewTaskAssignee('automatic'); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left border-b border-border pb-2 mb-1 ${newTaskAssignee === 'automatic' ? 'bg-primary/10/50 text-primary' : 'hover:bg-background text-foreground'}`}>
+                    <Button type="button" onClick={() => { setNewTaskAssignee('automatic'); setShowAssigneeDropdown(false); }} className={`w-full flex justify-start items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left border-b border-border pb-2 mb-1 ${newTaskAssignee === 'automatic' ? 'bg-primary/10/50 text-primary' : 'hover:bg-background text-foreground'}`}>
                       <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center shrink-0"><User size={12} className="text-muted-foreground" /></div>
                       <span>Automatic</span>
                     </Button>
@@ -190,7 +190,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                   {filteredMembers.map((m: any) => {
                     const isSelected = newTaskAssignee?.id === m.id;
                     return (
-                      <Button type="button" key={m.id} onClick={() => { setNewTaskAssignee(m); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${isSelected ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
+                      <Button type="button" key={m.id} onClick={() => { setNewTaskAssignee(m); setShowAssigneeDropdown(false); }} className={`w-full flex justify-start items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${isSelected ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
                         <img  src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                         <div className="flex flex-col min-w-0">
                           <span className="truncate text-foreground font-medium">{m.name}</span>

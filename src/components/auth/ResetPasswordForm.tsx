@@ -116,8 +116,10 @@ export default function ResetPasswordForm() {
                     />
                     <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? <Icons.eyeOff size={18} /> : <Icons.eye size={18} />}
                     </Button>
@@ -146,8 +148,10 @@ export default function ResetPasswordForm() {
                     />
                     <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
                     >
                       {showConfirm ? <Icons.eyeOff size={18} /> : <Icons.eye size={18} />}
                     </Button>
@@ -179,7 +183,7 @@ export default function ResetPasswordForm() {
             dispatch(clearResetPasswordData());
             navigate('/login');
           }}
-          className="text-primary font-semibold hover:text-blue-700"
+          className="text-primary font-semibold hover:text-primary/80"
         >
           Back to Login
         </a>

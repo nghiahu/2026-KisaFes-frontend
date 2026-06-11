@@ -90,7 +90,7 @@ export default function RegisterForm() {
                       className={`pr-10 ${form.formState.errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                       {...field}
                     />
-                    <Button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground transition-colors">
                       {showPassword ? (<Icons.eyeOff size={18} />) : (<Icons.eye size={18} />)}
                     </Button>
                   </div>
@@ -104,7 +104,7 @@ export default function RegisterForm() {
 
           <div>
             <label className="flex items-center gap-2 cursor-pointer mt-1">
-              <input type="checkbox" {...form.register('agreeTerms')} className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary" />
+              <Input type="checkbox" {...form.register('agreeTerms')} className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary !p-0" />
               <span className="text-xs font-medium text-muted-foreground">
                 {t('auth.register.agree_terms')}{' '}
                 <a href="#" className="text-primary hover:underline">
@@ -136,7 +136,7 @@ export default function RegisterForm() {
             <div className="w-full border-t border-border"></div>
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="px-2 bg-white text-muted-foreground">{t('auth.login.or')}</span>
+            <span className="px-2 bg-background text-muted-foreground">{t('auth.login.or')}</span>
           </div>
         </div>
 
@@ -154,7 +154,7 @@ export default function RegisterForm() {
 
       <p className="mt-3 text-center text-muted-foreground text-xs">
         {t('auth.register.already_have_account')}{' '}
-        <a href="/login" className="text-primary font-semibold hover:text-blue-700">
+        <a href="/login" className="text-primary font-semibold hover:text-primary/80">
           {t('auth.register.log_in')}
         </a>
       </p>

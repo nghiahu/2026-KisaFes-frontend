@@ -29,7 +29,7 @@ export default function PreferencesTab() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="bg-card rounded-2xl shadow-sm border border-border dark:bg-slate-800 dark:border-slate-700">
+      <div className="bg-card rounded-2xl shadow-sm border border-border dark:bg-slate-950 dark:border-slate-700">
         <div className="p-6 border-b border-border dark:border-slate-700">
           <h3 className="text-lg font-bold text-foreground dark:text-white">{t('settings.theme')}</h3>
           <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">{t('settings.theme.desc')}</p>
@@ -105,7 +105,7 @@ export default function PreferencesTab() {
         </div>
       </div>
 
-      <div className="bg-card rounded-2xl shadow-sm border border-border dark:bg-slate-800 dark:border-slate-700">
+      <div className="bg-card rounded-2xl shadow-sm border border-border dark:bg-slate-950 dark:border-slate-700">
         <div className="p-6 border-b border-border dark:border-slate-700">
           <h3 className="text-lg font-bold text-foreground dark:text-white">{t('settings.language')}</h3>
           <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">{t('settings.language.desc')}</p>
@@ -114,7 +114,7 @@ export default function PreferencesTab() {
           <div className="relative max-w-[320px]" ref={langDropdownRef}>
             <button 
               onClick={() => setIsLangOpen(!isLangOpen)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-slate-300 transition-colors bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-slate-300 transition-colors bg-white dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <div className="flex items-center gap-3">
                 <div className={`w-6 h-[18px] ${currentLang.color} rounded flex items-center justify-center text-[10px] text-white font-bold leading-none`}>
@@ -126,7 +126,7 @@ export default function PreferencesTab() {
             </button>
             
             {isLangOpen && (
-              <div className="absolute top-full left-0 mt-1.5 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-20 py-1">
+              <div className="absolute top-full left-0 mt-1.5 w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-20 py-1">
                 {languageOptions.map(option => (
                   <button
                     key={option.id}
@@ -134,7 +134,7 @@ export default function PreferencesTab() {
                       setLanguage(option.id);
                       setIsLangOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${language === option.id ? 'bg-slate-50 dark:bg-slate-700/50' : ''}`}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${language === option.id ? 'bg-slate-50 dark:bg-slate-900/50' : ''}`}
                   >
                     <div className={`w-6 h-[18px] ${option.color} rounded flex items-center justify-center text-[10px] text-white font-bold leading-none`}>
                       {option.flag}

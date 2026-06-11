@@ -114,7 +114,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
           <div className="flex items-center gap-2">
             {/* Project Selector */}
             <div className="relative" ref={projectDropdownRef}>
-              <Button 
+              <Button variant="ghost" 
                 onClick={() => setShowProjectDropdown(!showProjectDropdown)}
                 className="flex items-center gap-2 p-1.5 hover:bg-accent rounded-md transition-colors"
               >
@@ -143,14 +143,14 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                   </div>
                   <div className="max-h-[200px] overflow-y-auto pb-1">
                     {filteredProjects.map((p: any) => (
-                      <Button 
+                      <Button variant="ghost" 
                         key={p.id}
                         onClick={() => {
                           setSelectedProjectId(p.id);
                           setShowProjectDropdown(false);
                           setAssigneeId(null);
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-left transition-colors ${selectedProjectId === p.id ? 'bg-primary/10 text-primary' : 'hover:bg-background text-foreground'}`}
+                        className={`w-full flex justify-start items-center gap-2.5 px-3 py-1.5 text-xs text-left transition-colors ${selectedProjectId === p.id ? 'bg-primary/10 text-primary' : 'hover:bg-background text-foreground'}`}
                       >
                         <div className="w-5 h-5 bg-primary rounded text-white flex items-center justify-center shrink-0">
                           <Icons.cloud size={12} className="fill-white" />
@@ -165,7 +165,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
 
             {/* Task Type Selector */}
             <div className="relative" ref={typeDropdownRef}>
-              <Button 
+              <Button variant="ghost" 
                 onClick={() => setShowTypeDropdown(!showTypeDropdown)}
                 className="flex items-center gap-2 p-1.5 hover:bg-accent rounded-md transition-colors border border-transparent"
               >
@@ -176,10 +176,10 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
               {showTypeDropdown && (
                 <div className="absolute top-full left-0 mt-1 w-[160px] bg-card rounded-lg shadow-xl border border-border py-1 z-50">
                   {TASK_TYPES.map(type => (
-                    <Button
+                    <Button variant="ghost"
                       key={type.id}
                       onClick={() => { setSelectedType(type); setShowTypeDropdown(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors ${selectedType.id === type.id ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'hover:bg-background text-foreground border-l-2 border-transparent'}`}
+                      className={`w-full flex justify-start items-center gap-3 px-3 py-2 text-sm text-left transition-colors ${selectedType.id === type.id ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'hover:bg-background text-foreground border-l-2 border-transparent'}`}
                     >
                       {type.icon}
                       {type.label}
@@ -195,13 +195,13 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
           </div>
           
           <div className="flex items-center gap-1.5">
-            <Button className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
+            <Button variant="ghost" className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
               <Icons.minimize2 size={16} />
             </Button>
-            <Button className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
+            <Button variant="ghost" className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
               <Icons.maximize2 size={16} />
             </Button>
-            <Button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
+            <Button variant="ghost" onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
               <Icons.x size={16} />
             </Button>
           </div>
@@ -226,7 +226,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
           <div className="flex flex-wrap items-center gap-2 mt-4">
             {/* Assignee */}
             <div className="relative" ref={assigneeDropdownRef}>
-              <Button 
+              <Button variant="ghost" 
                 onClick={() => setShowAssigneeDropdown(!showAssigneeDropdown)}
                 className="flex items-center gap-2 px-3 py-1.5 border border-border rounded hover:bg-background transition-colors text-xs font-medium text-foreground"
               >
@@ -240,9 +240,9 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
               
               {showAssigneeDropdown && (
                 <div className="absolute top-full left-0 mt-1 w-[200px] bg-card rounded-lg shadow-xl border border-border py-1 z-50">
-                  <Button
+                  <Button variant="ghost"
                     onClick={() => { setAssigneeId(null); setShowAssigneeDropdown(false); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-background text-left text-xs text-foreground"
+                    className="w-full flex justify-start items-center gap-2 px-3 py-2 hover:bg-background text-left text-xs text-foreground"
                   >
                     <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center border border-dashed border-border">
                       <Icons.user size={10} className="text-muted-foreground" />
@@ -250,10 +250,10 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
                     Automatic
                   </Button>
                   {selectedProject?.members?.map((m: any) => (
-                    <Button
+                    <Button variant="ghost"
                       key={m.id}
                       onClick={() => { setAssigneeId(m.id); setShowAssigneeDropdown(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 hover:bg-background text-left text-xs text-foreground"
+                      className="w-full flex justify-start items-center gap-2 px-3 py-2 hover:bg-background text-left text-xs text-foreground"
                     >
                       <img  src={m.avatar || defaultMan} alt="" className="w-5 h-5 rounded-full" />
                       <span className="truncate">{m.name}</span>
@@ -265,7 +265,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
 
             {/* Due Date */}
             <div className="relative flex items-center">
-              <Button 
+              <Button variant="ghost" 
                 onClick={(e) => {
                   const input = e.currentTarget.nextElementSibling as HTMLInputElement;
                   if (input) {
@@ -298,7 +298,7 @@ export default function GlobalCreateTaskModal({ isOpen, onClose }: GlobalCreateT
             />
             Create another
           </label>
-          <Button 
+          <Button variant="ghost" 
             onClick={onClose}
             className="px-4 py-2 text-sm font-bold text-muted-foreground hover:bg-muted rounded-md transition-colors"
           >

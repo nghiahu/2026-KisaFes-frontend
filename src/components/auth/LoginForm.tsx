@@ -73,7 +73,7 @@ export default function LoginForm() {
               <FormItem className="space-y-1.5">
                 <div className="flex items-center justify-between mb-1.5">
                   <FormLabel className="text-xs font-semibold text-foreground">{t('auth.login.password')}</FormLabel>
-                  <a href="/forgot-password" className="text-xs text-primary hover:text-blue-700 font-semibold">
+                  <a href="/forgot-password" className="text-xs text-primary hover:text-primary/80 font-semibold">
                     {t('auth.login.forgot_password')}
                   </a>
                 </div>
@@ -86,8 +86,8 @@ export default function LoginForm() {
                       className={`pr-10 ${form.formState.errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                       {...field}
                     />
-                    <Button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground transition-colors">
                       {showPassword ? (
                         <Icons.eyeOff size={18} />
                       ) : (
@@ -104,7 +104,7 @@ export default function LoginForm() {
           />
 
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary" />
+            <Input type="checkbox" className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary !p-0" />
             <span className="text-xs font-medium text-muted-foreground">{t('auth.login.remember_me')}</span>
           </label>
 
@@ -125,7 +125,7 @@ export default function LoginForm() {
             <div className="w-full border-t border-border"></div>
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="px-2 bg-white text-muted-foreground">{t('auth.login.or')}</span>
+            <span className="px-2 bg-background text-muted-foreground">{t('auth.login.or')}</span>
           </div>
         </div>
 
@@ -143,7 +143,7 @@ export default function LoginForm() {
 
       <p className="mt-3 text-center text-muted-foreground text-xs">
         {t('auth.login.no_account')}{' '}
-        <a href="/signup" className="text-primary font-semibold hover:text-blue-700">
+        <a href="/signup" className="text-primary font-semibold hover:text-primary/80">
           {t('auth.login.sign_up')}
         </a>
       </p>

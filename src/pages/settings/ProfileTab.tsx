@@ -151,11 +151,11 @@ export default function ProfileTab() {
 
       {/* Left Column - Avatar Card */}
       <div className="lg:col-span-1">
-        <div className="bg-card rounded-2xl p-6 shadow-sm border border-border flex flex-col items-center text-center dark:bg-slate-800 dark:border-slate-700">
+        <div className="bg-card rounded-2xl p-6 shadow-sm border border-border flex flex-col items-center text-center dark:bg-slate-950 dark:border-slate-700">
           <div className="relative mb-4 group">
-            <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-muted dark:border-slate-700 dark:bg-slate-700">
+            <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-muted dark:border-slate-700 dark:bg-slate-900">
               {uploadingAvatar ? (
-                <div className="h-full w-full flex items-center justify-center bg-muted dark:bg-slate-700">
+                <div className="h-full w-full flex items-center justify-center bg-muted dark:bg-slate-900">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
@@ -206,7 +206,7 @@ export default function ProfileTab() {
         )}
 
         {/* Basic Info Form */}
-        <div className="bg-card rounded-2xl shadow-sm border border-border dark:bg-slate-800 dark:border-slate-700">
+        <div className="bg-card rounded-2xl shadow-sm border border-border dark:bg-slate-950 dark:border-slate-700">
           <div className="p-6 border-b border-border dark:border-slate-700">
             <h3 className="text-lg font-bold text-foreground dark:text-white">{t('settings.profile.basic_info')}</h3>
             <p className="text-sm text-muted-foreground mt-1 dark:text-muted-foreground">{t('settings.profile.basic_info.desc')}</p>
@@ -221,7 +221,7 @@ export default function ProfileTab() {
                   <input
                     type="text"
                     {...register('fullName')}
-                    className={`w-full px-4 py-2.5 rounded-xl border ${errors.fullName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors dark:text-white`}
+                    className={`w-full px-4 py-2.5 rounded-xl border ${errors.fullName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors dark:text-white`}
                   />
                   {errors.fullName && <p className="mt-1.5 text-xs text-red-500">{errors.fullName.message}</p>}
                 </div>
@@ -233,7 +233,7 @@ export default function ProfileTab() {
                     <input
                       type="text"
                       {...register('userName')}
-                      className={`w-full pl-8 pr-4 py-2.5 rounded-xl border ${errors.userName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors dark:text-white`}
+                      className={`w-full pl-8 pr-4 py-2.5 rounded-xl border ${errors.userName ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors dark:text-white`}
                     />
                   </div>
                   {errors.userName && <p className="mt-1.5 text-xs text-red-500">{errors.userName.message}</p>}
@@ -246,7 +246,7 @@ export default function ProfileTab() {
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-muted-foreground text-sm cursor-not-allowed dark:bg-slate-800 dark:border-slate-700 dark:text-muted-foreground"
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-muted-foreground text-sm cursor-not-allowed dark:bg-slate-950 dark:border-slate-700 dark:text-muted-foreground"
                 />
                 <p className="mt-2 text-xs text-muted-foreground italic dark:text-muted-foreground">{t('settings.profile.email.desc')}</p>
               </div>
@@ -256,7 +256,7 @@ export default function ProfileTab() {
                 <textarea
                   {...register('bio')}
                   rows={4}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.bio ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none dark:text-white`}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.bio ? 'border-red-500' : 'border-border dark:border-slate-600'} bg-card dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none dark:text-white`}
                   placeholder={t('settings.profile.bio.placeholder')}
                 ></textarea>
                 <div className="flex justify-between items-center mt-1.5">
@@ -269,7 +269,7 @@ export default function ProfileTab() {
             </form>
           </div>
 
-          <div className="px-6 py-4 border-t border-border bg-background/50 flex justify-end gap-3 rounded-b-2xl dark:border-slate-700 dark:bg-slate-800/50">
+          <div className="px-6 py-4 border-t border-border bg-background/50 flex justify-end gap-3 rounded-b-2xl dark:border-slate-700 dark:bg-slate-950/50">
             <button
               type="button"
               onClick={() => {
@@ -298,7 +298,7 @@ export default function ProfileTab() {
         </div>
 
         {/* Privacy Card */}
-        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden dark:bg-slate-800 dark:border-slate-700">
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden dark:bg-slate-950 dark:border-slate-700">
           <div className="p-6 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-foreground dark:text-white">{t('settings.profile.privacy')}</h3>
@@ -319,7 +319,7 @@ export default function ProfileTab() {
           </div>
 
           <div className="px-6 pb-6">
-            <div className="bg-background rounded-xl p-4 flex gap-4 dark:bg-slate-700/50">
+            <div className="bg-background rounded-xl p-4 flex gap-4 dark:bg-slate-900/50">
               <div className="mt-0.5 text-primary dark:text-primary/70">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

@@ -69,7 +69,7 @@ export default function Teams() {
           <Input
             type="text"
             placeholder={t('teams.search_placeholder')}
-            className="w-full pl-10 pr-4 py-5 bg-card border-border rounded-xl text-sm"
+            className="w-full pl-10 pr-4 py-5 bg-card dark:bg-slate-950 border-border dark:border-slate-900 rounded-xl text-sm"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -79,7 +79,7 @@ export default function Teams() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-card rounded-2xl p-6 border border-border h-[220px] flex flex-col">
+            <div key={i} className="bg-card dark:bg-slate-950 rounded-2xl p-6 border border-border dark:border-slate-900 h-[220px] flex flex-col">
               <div className="flex items-center gap-4 mb-4">
                 <Skeleton className="w-12 h-12 rounded-xl bg-muted" />
                 <div className="flex flex-col gap-2 flex-1">
@@ -101,7 +101,7 @@ export default function Teams() {
             <div
               key={team.id}
               onClick={() => navigate(`/workspace/teams/${team.id}`)}
-              className="bg-card rounded-2xl p-6 border border-border shadow-sm hover:shadow-md hover:border-primary/20 transition-all cursor-pointer flex flex-col group h-[220px]"
+              className="bg-card dark:bg-slate-950 rounded-2xl p-6 border border-border dark:border-slate-900 shadow-sm hover:shadow-md hover:border-primary/20 transition-all cursor-pointer flex flex-col group h-[220px]"
             >
               <div className="flex items-start gap-4 mb-3">
                 <div className="w-14 h-14 bg-muted rounded-xl flex items-center justify-center shrink-0 border border-border shadow-sm relative group overflow-hidden transition-all hover:scale-105">

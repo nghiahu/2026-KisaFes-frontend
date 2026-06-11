@@ -100,7 +100,7 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
             <span className="text-[0.75rem] px-2 py-0.5 bg-primary/20 text-primary font-bold rounded-full">
               {notifications.filter(n => !n.read).length} mới
             </span>
-            <Button
+            <Button variant="ghost"
               onClick={() => markAllAsReadMutation.mutate()}
               className="text-muted-foreground hover:text-primary transition-colors"
               title="Đánh dấu tất cả đã đọc"

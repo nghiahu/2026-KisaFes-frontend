@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -40,11 +41,13 @@ export default function UserDropdown({ user, variant = 'landing' }: UserDropdown
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider truncate">{user.email}</p>
-            </div>
-          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider truncate">{user.email}</p>
+              </div>
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => navigate('/workspace/settings')}>
             <Icons.user className="mr-2 h-4 w-4" />
@@ -73,11 +76,13 @@ export default function UserDropdown({ user, variant = 'landing' }: UserDropdown
         <Icons.chevronDown size={16} className="hidden sm:block text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-xs font-bold text-foreground uppercase tracking-wide truncate">{user.email}</p>
-          </div>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-xs font-bold text-foreground uppercase tracking-wide truncate">{user.email}</p>
+            </div>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/login')}>
           <Icons.users className="mr-2 h-4 w-4" />

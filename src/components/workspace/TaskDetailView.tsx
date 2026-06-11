@@ -465,11 +465,11 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
           <div className="flex-1 flex flex-col overflow-y-auto border-r border-border p-8 scrollbar-thin">
             {/* Breadcrumb & Actions */}
             <div className="flex items-center text-[13px] text-muted-foreground mb-6 gap-2 font-medium">
-              <Button onClick={onClose} className="hover:bg-muted p-1.5 rounded-lg flex items-center gap-1 transition-colors">
+              <Button variant="ghost" onClick={onClose} className="hover:bg-muted p-1.5 rounded-lg flex items-center gap-1 transition-colors">
                 <Icons.chevronLeft size={16} /> Back
               </Button>
               <div className="w-px h-4 bg-accent mx-2"></div>
-              <Button className="hover:bg-muted px-2 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
+              <Button variant="ghost" className="hover:bg-muted px-2 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
                 <Icons.gitBranch size={14} /> Add epic
               </Button>
               <span className="text-muted-foreground">/</span>
@@ -512,16 +512,16 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
 
             {/* Main Action Buttons */}
             <div className="flex items-center gap-2 mb-8">
-              <Button className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
+              <Button variant="outline" className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
                 <Icons.link size={16} />
               </Button>
-              <Button className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
+              <Button variant="outline" className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
                 <Icons.gitBranch size={16} />
               </Button>
-              <Button className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
+              <Button variant="outline" className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
                 <Icons.link size={16} />
               </Button>
-              <Button className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
+              <Button variant="outline" className="p-1.5 hover:bg-muted text-muted-foreground rounded-md border border-border transition-colors shadow-sm">
                 <Icons.moreHorizontal size={16} />
               </Button>
             </div>
@@ -580,7 +580,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     <span className={`text-[14px] flex-1 ${st.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                       {st.title}
                     </span>
-                    <Button 
+                    <Button variant="ghost" 
                       onClick={() => handleDeleteSubtask(st.id)}
                       className="opacity-0 group-hover:opacity-100 p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-all"
                     >
@@ -603,7 +603,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                   <Button type="submit" className="px-3 py-1.5 bg-primary text-white text-[13px] font-semibold rounded-md hover:bg-primary/90 transition-colors">
                     Add
                   </Button>
-                  <Button 
+                  <Button variant="ghost" 
                     type="button" 
                     onClick={() => {
                       setShowAddSubtask(false);
@@ -615,7 +615,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                   </Button>
                 </form>
               ) : (
-                <Button 
+                <Button variant="ghost" 
                   onClick={() => setShowAddSubtask(true)}
                   className="text-[14px] font-semibold text-muted-foreground hover:bg-muted p-2 rounded-lg transition-colors flex items-center gap-2"
                 >
@@ -634,7 +634,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
 
               <div className="flex gap-2 border-b border-border mb-4">
                 {['All', 'Comments', 'History'].map(tab => (
-                  <Button
+                  <Button variant="ghost"
                     key={tab}
                     onClick={() => setActiveTab(tab as any)}
                     className={`px-3 py-2 text-[13px] font-bold border-b-2 transition-colors ${activeTab === tab
@@ -665,7 +665,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                           {attachedImages.map((url, index) => (
                             <div key={index} className="relative group/img w-16 h-16 border rounded-lg overflow-hidden">
                               <img src={url} className="w-full h-full object-cover" alt="" />
-                              <Button
+                              <Button variant="ghost"
                                 type="button"
                                 onClick={() => setAttachedImages(prev => prev.filter((_, idx) => idx !== index))}
                                 className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity text-white"
@@ -687,7 +687,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                             ref={fileInputRef} 
                             onChange={handleImageFileChange} 
                           />
-                          <Button 
+                          <Button variant="ghost" 
                             type="button" 
                             onClick={() => fileInputRef.current?.click()} 
                             disabled={uploadingImage}
@@ -696,9 +696,9 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                           >
                             <Icons.pencil size={14} />
                           </Button>
-                          <Button type="button" className="hover:bg-muted p-1.5 rounded transition-colors"><Icons.listTodo size={14} /></Button>
-                          <Button type="button" className="hover:bg-muted p-1.5 rounded transition-colors"><Icons.link size={14} /></Button>
-                          <Button type="button" className="hover:bg-muted p-1.5 rounded transition-colors"><Icons.user size={14} /></Button>
+                          <Button variant="ghost" type="button" className="hover:bg-muted p-1.5 rounded transition-colors"><Icons.listTodo size={14} /></Button>
+                          <Button variant="ghost" type="button" className="hover:bg-muted p-1.5 rounded transition-colors"><Icons.link size={14} /></Button>
+                          <Button variant="ghost" type="button" className="hover:bg-muted p-1.5 rounded transition-colors"><Icons.user size={14} /></Button>
                           {uploadingImage && <span className="text-xs text-muted-foreground animate-pulse">Uploading...</span>}
                         </div>
                         <Button 
@@ -786,7 +786,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                     {/* Actions Bar (Reply, Reaction Pill, Smile Picker, Edit, More) */}
                                     <div className="mt-2 flex items-center gap-2.5 text-xs text-muted-foreground">
                                       {/* Reply Button (CornerDownLeft Arrow) */}
-                                      <Button 
+                                      <Button variant="ghost" 
                                         type="button"
                                         onClick={() => setReplyToCommentId(replyToCommentId === c.id ? null : c.id)}
                                         className="reply-btn text-muted-foreground hover:text-[#0052cc] transition-colors p-1"
@@ -802,7 +802,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                           if (count === 0) return null;
                                           const active = getReactedEmoji(emoji);
                                           return (
-                                            <Button
+                                            <Button variant="ghost"
                                               key={emoji}
                                               type="button"
                                               onClick={() => handleToggleReaction(c.id, emoji)}
@@ -825,7 +825,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                         onMouseEnter={() => setHoveredCommentId(c.id)}
                                         onMouseLeave={() => setHoveredCommentId(null)}
                                       >
-                                        <Button 
+                                        <Button variant="ghost" 
                                           type="button"
                                           className="text-muted-foreground hover:text-[#0052cc] transition-colors p-1"
                                           title="Thêm cảm xúc"
@@ -835,7 +835,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                         {hoveredCommentId === c.id && (
                                           <div className="absolute bottom-[80%] left-0 mb-0 bg-card border border-border shadow-xl rounded-full px-3 py-1.5 flex gap-2.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
                                             {['👍', '❤️', '😄', '🎉', '😮'].map(emoji => (
-                                              <Button
+                                              <Button variant="ghost"
                                                 key={emoji}
                                                 type="button"
                                                 onClick={() => {
@@ -853,7 +853,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
 
                                       {/* Edit Comment (optional/only owner) */}
                                       {currentUser && c.userId === currentUser.id && (
-                                        <Button 
+                                        <Button variant="ghost" 
                                           type="button"
                                           className="text-muted-foreground hover:text-[#0052cc] transition-colors p-1"
                                           title="Chỉnh sửa"
@@ -865,7 +865,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                       {/* More Action (3-Dots dropdown) */}
                                       {currentUser && c.userId === currentUser.id && (
                                         <div className="relative comment-dropdown-container">
-                                          <Button
+                                          <Button variant="ghost"
                                             type="button"
                                             onClick={(e) => {
                                               e.stopPropagation();
@@ -878,7 +878,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                           </Button>
                                           {activeDropdownCommentId === c.id && (
                                             <div className="absolute left-0 mt-1 bg-card border border-border shadow-xl rounded-md py-1 z-[60] w-24">
-                                              <Button
+                                              <Button variant="ghost"
                                                 type="button"
                                                 onClick={() => {
                                                   handleDeleteComment(c.id);
@@ -915,33 +915,33 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                       <div className="border border-[#dfe1e6] rounded-lg bg-card focus-within:border-[#4c9aff] focus-within:shadow-[0_0_0_1px_#4c9aff] overflow-hidden transition-all shadow-sm">
                                         {/* Rich Text Editor Toolbar styled like Image 2 */}
                                         <div className="flex items-center gap-2 border-b border-[#dfe1e6] p-2 px-3 bg-background text-muted-foreground text-[11px] flex-wrap select-none">
-                                          <Button type="button" className="hover:bg-accent p-0.5 rounded transition-colors flex items-center" title="Format painter"><Sparkles size={13} className="text-muted-foreground" /><ChevronDown size={10} /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-0.5 rounded transition-colors flex items-center" title="Format painter"><Sparkles size={13} className="text-muted-foreground" /><ChevronDown size={10} /></Button>
                                           
                                           <div className="w-px h-3 bg-accent mx-0.5"></div>
                                           
-                                          <Button type="button" className="font-serif hover:bg-accent p-0.5 px-1 rounded font-bold text-muted-foreground transition-colors flex items-center" title="Font size">Tt<ChevronDown size={10} /></Button>
+                                          <Button variant="ghost" type="button" className="font-serif hover:bg-accent p-0.5 px-1 rounded font-bold text-muted-foreground transition-colors flex items-center" title="Font size">Tt<ChevronDown size={10} /></Button>
                                           
-                                          <Button type="button" className="hover:bg-accent p-0.5 px-1.5 rounded font-bold text-muted-foreground transition-colors flex items-center" title="Bold">B<ChevronDown size={10} /></Button>
-                                          
-                                          <div className="w-px h-3 bg-accent mx-0.5"></div>
-                                          
-                                          <Button type="button" className="hover:bg-accent p-0.5 rounded transition-colors flex items-center" title="Bullet list"><ListTodo size={13} className="text-muted-foreground" /><ChevronDown size={10} /></Button>
-                                          
-                                          <Button type="button" className="hover:bg-accent p-0.5 px-1.5 rounded font-bold bg-slate-200/50 text-primary transition-colors" title="Text highlight">A</Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-0.5 px-1.5 rounded font-bold text-muted-foreground transition-colors flex items-center" title="Bold">B<ChevronDown size={10} /></Button>
                                           
                                           <div className="w-px h-3 bg-accent mx-0.5"></div>
                                           
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Insert image"><Image size={13} className="text-muted-foreground" /></Button>
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Insert code"><Code size={13} className="text-muted-foreground" /></Button>
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Emojis"><SmilePlus size={13} className="text-muted-foreground" /></Button>
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Add attachment"><Plus size={13} className="text-muted-foreground" /></Button>
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Link"><Link size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-0.5 rounded transition-colors flex items-center" title="Bullet list"><ListTodo size={13} className="text-muted-foreground" /><ChevronDown size={10} /></Button>
+                                          
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-0.5 px-1.5 rounded font-bold bg-slate-200/50 text-primary transition-colors" title="Text highlight">A</Button>
                                           
                                           <div className="w-px h-3 bg-accent mx-0.5"></div>
                                           
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Undo"><Undo2 size={13} className="text-muted-foreground" /></Button>
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Redo"><Redo2 size={13} className="text-muted-foreground" /></Button>
-                                          <Button type="button" className="hover:bg-accent p-1 rounded transition-colors" title="History"><History size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Insert image"><Image size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Insert code"><Code size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Emojis"><SmilePlus size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Add attachment"><Plus size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Link"><Link size={13} className="text-muted-foreground" /></Button>
+                                          
+                                          <div className="w-px h-3 bg-accent mx-0.5"></div>
+                                          
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Undo"><Undo2 size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="Redo"><Redo2 size={13} className="text-muted-foreground" /></Button>
+                                          <Button variant="ghost" type="button" className="hover:bg-accent p-1 rounded transition-colors" title="History"><History size={13} className="text-muted-foreground" /></Button>
                                         </div>
                                         
                                         <div className="p-3 min-h-[90px] text-sm flex flex-col">
@@ -969,7 +969,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                       </div>
                                       
                                       <div className="flex items-center gap-2 mt-1">
-                                        <Button 
+                                        <Button variant="ghost" 
                                           type="button"
                                           disabled={isSubmittingReply}
                                           onClick={() => handleAddReply(c)}
@@ -977,7 +977,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                         >
                                           {isSubmittingReply ? 'Saving...' : 'Save'}
                                         </Button>
-                                        <Button 
+                                        <Button variant="ghost" 
                                           type="button"
                                           onClick={() => {
                                             setReplyToCommentId(null);
@@ -1111,7 +1111,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                           if (count === 0) return null;
                                           const active = getReactedEmoji(emoji);
                                           return (
-                                            <Button
+                                            <Button variant="ghost"
                                               key={emoji}
                                               type="button"
                                               onClick={() => handleToggleReaction(item.id, emoji)}
@@ -1134,7 +1134,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                         onMouseEnter={() => setHoveredCommentId(item.id)}
                                         onMouseLeave={() => setHoveredCommentId(null)}
                                       >
-                                        <Button 
+                                        <Button variant="ghost" 
                                           type="button"
                                           className="font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 py-1"
                                         >
@@ -1143,7 +1143,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                                         {hoveredCommentId === item.id && (
                                           <div className="absolute bottom-[80%] left-0 mb-0 bg-card border border-border shadow-xl rounded-full px-3 py-1.5 flex gap-2.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
                                             {['👍', '❤️', '😄', '🎉', '😮'].map(emoji => (
-                                              <Button
+                                              <Button variant="ghost"
                                                 key={emoji}
                                                 type="button"
                                                 onClick={() => {
@@ -1181,17 +1181,17 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
           <div className="w-[360px] bg-card p-6 overflow-y-auto scrollbar-thin flex flex-col">
             {/* Top actions */}
             <div className="flex items-center justify-end gap-2 mb-8">
-              <Button className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm" title="Lock">
+              <Button variant="outline" className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm" title="Lock">
                 <Icons.lockKeyhole size={16} />
               </Button>
-              <Button className="p-1.5 text-primary hover:bg-muted rounded-md border border-border transition-colors shadow-sm flex items-center gap-1.5 font-semibold text-xs px-2.5">
+              <Button variant="outline" className="p-1.5 text-primary hover:bg-muted rounded-md border border-border transition-colors shadow-sm flex items-center gap-1.5 font-semibold text-xs px-2.5">
                 <Icons.eye size={14} /> 1
               </Button>
-              <Button className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm" title="Share">
+              <Button variant="outline" className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm" title="Share">
                 <Icons.share2 size={16} />
               </Button>
               <div className="relative">
-                <Button 
+                <Button variant="ghost" 
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm focus:outline-none"
                 >
@@ -1201,7 +1201,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)}></div>
                     <div className="absolute right-0 mt-1 w-36 bg-card rounded-xl shadow-lg border border-border py-1 z-20">
-                      <Button
+                      <Button variant="ghost"
                         onClick={() => {
                           setIsMenuOpen(false);
                           if (onDeleteRequest) {
@@ -1222,7 +1222,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
             {/* Status & Actions */}
             <div className="flex items-center gap-2 mb-6">
               <div className="relative" ref={statusDropdownRef}>
-                <Button
+                <Button variant="ghost"
                   onClick={() => setShowStatusDropdown(!showStatusDropdown)}
                   className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-md text-[13px] font-bold hover:bg-primary/90 transition-colors shadow-sm shadow-blue-500/20"
                 >
@@ -1236,7 +1236,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                       const statusLabel = typeof s === 'string' ? s : (s.label || s.name);
                       const statusId = typeof s === 'string' ? s : (s.statusId || s.id);
                       return (
-                        <Button
+                        <Button variant="ghost"
                           key={statusId || idx}
                           onClick={() => handleStatusUpdate(statusId, statusLabel)}
                           className="w-full text-left px-4 py-2 text-[13px] font-semibold text-foreground hover:bg-background hover:text-primary transition-colors flex items-center justify-between"
@@ -1249,7 +1249,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                   </div>
                 )}
               </div>
-              <Button className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm">
+              <Button variant="outline" className="p-1.5 text-muted-foreground hover:bg-muted rounded-md border border-border transition-colors shadow-sm">
                 <Icons.zap size={16} />
               </Button>
             </div>
@@ -1261,7 +1261,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                   <Icons.chevronDown size={14} className="text-muted-foreground" />
                   Details
                 </h3>
-                <Button className="text-muted-foreground hover:text-muted-foreground"><Icons.settings size={14} /></Button>
+                <Button variant="ghost" className="text-muted-foreground hover:text-muted-foreground"><Icons.settings size={14} /></Button>
               </div>
 
               <div className="p-4 flex flex-col gap-4">
@@ -1269,7 +1269,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <div className="flex items-center">
                   <div className="w-[120px] text-[13px] font-semibold text-muted-foreground shrink-0">Assignee</div>
                   <div className="relative flex-1" ref={assigneeDropdownRef}>
-                    <Button
+                    <Button variant="ghost"
                       onClick={() => setShowAssigneeDropdown(!showAssigneeDropdown)}
                       className="flex items-center gap-2 hover:bg-muted p-1 -ml-1 rounded transition-colors w-full"
                     >
@@ -1285,18 +1285,18 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
 
                     {showAssigneeDropdown && (
                       <div className="absolute top-full left-0 mt-1 w-[220px] bg-card border border-border shadow-xl rounded-lg py-1 z-50">
-                        <Button
+                        <Button variant="ghost"
                           onClick={() => handleAssigneeUpdate(null)}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
+                          className="w-full flex justify-start items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
                         >
                           <div className="w-6 h-6 rounded-full bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground shrink-0"><Icons.user size={12} /></div>
                           Unassigned
                         </Button>
                         {projectMembers.map((m: any) => (
-                          <Button
+                          <Button variant="ghost"
                             key={m.id}
                             onClick={() => handleAssigneeUpdate(m)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
+                            className="w-full flex justify-start items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
                           >
                             <img  src={m.avatar || defaultAvatar} className="w-6 h-6 rounded-full border border-border object-cover shrink-0" alt="" />
                             <span className="truncate">{m.name}</span>
@@ -1310,7 +1310,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <div className="flex items-center">
                   <div className="w-[120px] text-[13px] font-semibold text-muted-foreground shrink-0">Team</div>
                   <div className="relative flex-1" ref={teamDropdownRef}>
-                    <Button
+                    <Button variant="ghost"
                       onClick={() => setShowTeamDropdown(!showTeamDropdown)}
                       className="flex items-center gap-2 hover:bg-muted p-1 -ml-1 rounded transition-colors w-full text-left"
                     >
@@ -1323,18 +1323,18 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
 
                     {showTeamDropdown && (
                       <div className="absolute top-full left-0 mt-1 w-[220px] bg-card border border-border shadow-xl rounded-lg py-1 z-50">
-                        <Button
+                        <Button variant="ghost"
                           onClick={() => handleTeamUpdate(null)}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
+                          className="w-full flex justify-start items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
                         >
                           <div className="w-6 h-6 rounded-md bg-muted border border-dashed border-border flex items-center justify-center text-muted-foreground shrink-0"><Icons.x size={12} /></div>
                           None
                         </Button>
                         {projectTeams.map((t: any) => (
-                          <Button
+                          <Button variant="ghost"
                             key={t.id}
                             onClick={() => handleTeamUpdate(t)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
+                            className="w-full flex justify-start items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
                           >
                             <div className="w-6 h-6 rounded-md bg-primary/20 text-primary flex items-center justify-center shrink-0 font-bold text-[10px]">
                               {t.name.substring(0, 2).toUpperCase()}
@@ -1351,7 +1351,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <div className="flex items-center">
                   <div className="w-[120px] text-[13px] font-semibold text-muted-foreground shrink-0">Priority</div>
                   <div className="relative flex-1" ref={priorityDropdownRef}>
-                    <Button
+                    <Button variant="ghost"
                       onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
                       className="flex items-center gap-2 hover:bg-muted p-1.5 -ml-1.5 rounded transition-colors w-full"
                     >
@@ -1362,10 +1362,10 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                     {showPriorityDropdown && (
                       <div className="absolute top-full left-0 mt-1 w-[160px] bg-card border border-border shadow-xl rounded-lg py-1 z-50">
                         {PRIORITIES.map(p => (
-                          <Button
+                          <Button variant="ghost"
                             key={p.label}
                             onClick={() => handlePriorityUpdate(p.label)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
+                            className="w-full flex justify-start items-center gap-2 px-3 py-2 text-[13px] font-medium text-foreground hover:bg-background transition-colors"
                           >
                             {p.icon}
                             {p.label}
@@ -1380,7 +1380,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center">
                     <div className="w-[120px] text-[13px] font-semibold text-muted-foreground shrink-0">Attachment</div>
-                    <Button 
+                    <Button variant="ghost" 
                       className="text-[13px] font-medium text-muted-foreground hover:bg-muted p-1 -ml-1 rounded transition-colors flex-1 text-left flex items-center gap-1.5"
                       onClick={() => attachmentInputRef.current?.click()}
                       disabled={uploadingAttachment}
@@ -1403,7 +1403,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                             <Icons.fileText size={14} className="shrink-0" />
                             <span className="truncate max-w-[150px]">{file.fileName}</span>
                           </a>
-                          <Button 
+                          <Button variant="ghost" 
                             onClick={() => handleDeleteAttachment(file.fileId)}
                             className="text-muted-foreground hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
                             title="Delete attachment"
@@ -1413,7 +1413,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                         </div>
                       ))}
                       {task.attachments.length > 3 && (
-                        <Button
+                        <Button variant="ghost"
                           onClick={() => setShowAllAttachments(true)}
                           className="text-[12px] font-semibold text-muted-foreground hover:text-primary transition-colors self-start mt-1 bg-muted px-3 py-1 rounded-md flex items-center gap-1"
                         >
@@ -1429,7 +1429,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <div className="flex items-center relative group">
                   <div className="w-[120px] text-[13px] font-semibold text-muted-foreground shrink-0">Due date</div>
                   <div className="flex-1 flex items-center relative">
-                    <Button
+                    <Button variant="ghost"
                       className={`text-[13px] font-medium hover:bg-muted p-1 -ml-1 rounded transition-colors flex-1 text-left ${task.dueDate ? 'text-foreground' : 'text-muted-foreground'}`}
                       onClick={(e) => {
                         const input = e.currentTarget.nextElementSibling as HTMLInputElement;
@@ -1447,7 +1447,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                       className="absolute w-0 h-0 opacity-0 pointer-events-none"
                     />
                     {task.dueDate && (
-                      <Button
+                      <Button variant="ghost"
                         onClick={() => handleDueDateUpdate('')}
                         className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-rose-500 transition-opacity absolute right-2"
                       >
@@ -1466,7 +1466,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 {/* Reporter */}
                 <div className="flex items-center">
                   <div className="w-[120px] text-[13px] font-semibold text-muted-foreground shrink-0">Reporter</div>
-                  <Button className="flex items-center gap-2 hover:bg-muted p-1 -ml-1 rounded transition-colors flex-1">
+                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-muted p-1 -ml-1 rounded transition-colors flex-1">
                     <img  src={task.reporterAvatar || defaultAvatar} alt="Reporter" className="w-6 h-6 rounded-full border border-border shrink-0 object-cover" />
                     <span className="text-[13px] font-semibold text-foreground truncate">{task.reporterName || 'nghĩa Ngô'}</span>
                   </Button>
@@ -1496,7 +1496,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                   Are you sure you want to delete this subtask? This action cannot be undone.
                 </p>
                 <div className="flex justify-end gap-2">
-                  <Button 
+                  <Button variant="ghost" 
                     onClick={() => setSubtaskIdToDelete(null)}
                     className="px-4 py-2 text-[14px] font-semibold text-muted-foreground hover:bg-muted rounded-md transition-colors"
                   >
@@ -1521,7 +1521,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                 <Icons.paperclip size={18} className="text-primary" />
                 Tất cả tệp đính kèm ({task.attachments?.length || 0})
               </h3>
-              <Button 
+              <Button variant="ghost" 
                 onClick={() => setShowAllAttachments(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
@@ -1544,7 +1544,7 @@ export default function TaskDetailView({ task, currentProject, onClose, onUpdate
                         <span className="text-[11px] text-muted-foreground mt-0.5 block">Đính kèm vào dự án</span>
                       </div>
                     </div>
-                    <Button 
+                    <Button variant="ghost" 
                       onClick={() => {
                         handleDeleteAttachment(file.fileId);
                         if (task.attachments?.length <= 4) {

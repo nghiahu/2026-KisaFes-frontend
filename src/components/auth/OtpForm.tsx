@@ -130,7 +130,7 @@ export default function OtpForm() {
   };
 
   return (
-    <div className="w-full max-w-xl rounded-[32px] bg-white p-8 shadow-[0_30px_60px_rgba(15,23,42,0.12)] sm:p-10">
+    <div className="w-full max-w-xl rounded-[32px] bg-background p-8 shadow-[0_30px_60px_rgba(15,23,42,0.12)] sm:p-10">
       {tokenExpired ? (
         <div className="space-y-6 text-center">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20 text-destructive text-2xl font-semibold">
@@ -201,7 +201,7 @@ export default function OtpForm() {
                 type="button"
                 onClick={handleResend}
                 disabled={countdown > 0 || loading}
-                className={`font-semibold transition ${countdown > 0 ? 'text-muted-foreground cursor-not-allowed' : 'text-primary hover:text-blue-700'}`}
+                className={`font-semibold transition ${countdown > 0 ? 'text-muted-foreground cursor-not-allowed' : 'text-primary hover:text-primary/80'}`}
               >
                 Gửi lại mã
               </Button>
