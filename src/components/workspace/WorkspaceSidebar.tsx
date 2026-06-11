@@ -5,6 +5,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { useProjects } from '../../hooks/api/useProjects';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+import { Button } from '@/components/ui/Button';
 import type { WorkspaceSidebarProps } from '../../types/components.interface';
 const getProjectColor = (name: string) => {
   const colors = ['#3B82F6', '#22C55E', '#F97316', '#A855F7', '#EC4899', '#06B6D4', '#EAB308'];
@@ -98,18 +99,18 @@ export default function WorkspaceSidebar({
             )}
             {/* Close button for mobile */}
             {mobileOpen && (
-              <button 
+              <Button 
                 onClick={onCloseMobile}
-                className="md:hidden p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:bg-slate-700 dark:hover:text-slate-200 rounded-md transition-colors"
+                className="md:hidden p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:bg-accent dark:hover:text-muted-foreground rounded-md transition-colors"
               >
                 <Icons.x size={16} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
 
         {/* Collapse Toggle Button (Hidden on mobile) */}
-        <button
+        <Button
           className="hidden md:flex absolute -right-3 top-6 w-6 h-6 bg-card border border-border rounded-full items-center justify-center text-muted-foreground hover:text-foreground shadow-sm transition-all z-50 hover:border-slate-300"
           onClick={onToggle}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -118,7 +119,7 @@ export default function WorkspaceSidebar({
             size={12}
             className={`transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
           />
-        </button>
+        </Button>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-[16px] py-[14px] sidebar-nav space-y-[16px]">
@@ -138,8 +139,8 @@ export default function WorkspaceSidebar({
                         to={item.path}
                         className={`relative flex items-center gap-[12px] h-[34px] px-3 rounded-[8px] font-medium text-[13px] transition-all duration-200 group ${
                           isItemActive
-                            ? 'bg-primary/10 text-blue-700 dark:bg-blue-900/40 dark:text-primary/70'
-                            : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white'
+                            ? 'bg-primary/10 text-primary dark:bg-blue-900/40 dark:text-primary/70'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-muted-foreground dark:hover:bg-slate-700/50 dark:hover:text-white'
                         } ${collapsed ? 'justify-center px-0' : ''}`}
                         title={collapsed ? item.label : undefined}
                       >
@@ -182,13 +183,13 @@ export default function WorkspaceSidebar({
                 </span>
               )}
               {!collapsed && (
-                <button 
+                <Button 
                   onClick={() => navigate('/workspace/projects/new')}
-                  className="text-muted-foreground hover:text-muted-foreground dark:hover:text-slate-200 transition-colors"
+                  className="text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors"
                   title={t('sidebar.create_project')}
                 >
                   <Icons.plus size={12} />
-                </button>
+                </Button>
               )}
             </div>
             <ul className="space-y-[2px]">
@@ -204,7 +205,7 @@ export default function WorkspaceSidebar({
                       to={projectPath}
                       className={`relative w-full flex items-center gap-[12px] h-[36px] px-3 rounded-[8px] hover:bg-muted hover:text-foreground dark:hover:bg-slate-700/50 dark:hover:text-white transition-all duration-200 group ${
                         collapsed ? 'justify-center px-0' : ''
-                      } ${isProjActive ? 'bg-primary/10 !text-blue-700 dark:bg-blue-900/40 dark:!text-primary/70' : 'text-muted-foreground dark:text-slate-300'}`}
+                      } ${isProjActive ? 'bg-primary/10 !text-blue-700 dark:bg-blue-900/40 dark:!text-primary/70' : 'text-muted-foreground dark:text-muted-foreground'}`}
                       title={collapsed ? project.name : undefined}
                     >
                       {/* Active Left Border Indicator */}
@@ -220,7 +221,7 @@ export default function WorkspaceSidebar({
                         {displayInitials}
                       </div>
                       {!collapsed && (
-                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-blue-700 dark:!text-primary/70' : 'text-muted-foreground group-hover:text-foreground dark:text-slate-300 dark:group-hover:text-white'}`}>
+                        <span className={`text-[13px] font-medium truncate ${isProjActive ? '!text-blue-700 dark:!text-primary/70' : 'text-muted-foreground group-hover:text-foreground dark:text-muted-foreground dark:group-hover:text-white'}`}>
                           {project.name}
                         </span>
                       )}

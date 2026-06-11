@@ -5,7 +5,7 @@ type Language = 'en' | 'vi';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: { defaultValue?: string }) => string;
 }
 
 import enTranslations from '../i18n/locales/en.json';
@@ -29,7 +29,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('app_lang', lang);
   };
 
-  const t = (key: string): string => {
+  const t = (key: string, options?: { defaultValue?: string }): string => {
     // 1. Try old behavior: one top-level group, and subKey containing dots.
     // e.g. "settings" -> "profile.basic_info"
     const parts = key.split('.');
@@ -56,7 +56,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
 
     // 3. Fallback if the key doesn't have a group or is just a flat top-level key
-    return translations[language]?.[key] || key;
+    return translations[language]?.[key] || options?.defaultValue || key;
   };
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

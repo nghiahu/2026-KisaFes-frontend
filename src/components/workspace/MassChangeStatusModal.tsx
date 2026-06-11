@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { MassChangeStatusModalProps } from '../../types/components.interface';
 export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
   isOpen,
@@ -29,7 +30,7 @@ export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
             value={selectedStatusId}
             onChange={(e) => setSelectedStatusId(e.target.value)}
             disabled={isSubmitting}
-            className="w-full appearance-none bg-[#2C2D33] text-slate-200 px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-[13px] hover:bg-[#34353B] transition-colors"
+            className="w-full appearance-none bg-[#2C2D33] text-muted-foreground px-3 py-2 border border-slate-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-[13px] hover:bg-[#34353B] transition-colors"
           >
             <option value="" disabled>Select status</option>
             {statuses.map(s => (
@@ -46,14 +47,14 @@ export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
         </div>
         
         <div className="flex items-center justify-end gap-2">
-          <button 
+          <Button 
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-3 py-1.5 text-[13px] font-medium text-slate-300 hover:bg-card/10 rounded-md transition-colors"
+            className="px-3 py-1.5 text-[13px] font-medium text-muted-foreground hover:bg-card/10 rounded-md transition-colors"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={!selectedStatusId || isSubmitting}
             onClick={() => onSubmit(selectedStatusId)}
             className="px-3 py-1.5 text-[13px] font-medium text-white bg-primary hover:bg-primary/90 disabled:bg-primary/30 disabled:text-white/40 rounded-md transition-colors flex items-center gap-2"
@@ -65,7 +66,7 @@ export const MassChangeStatusModal: React.FC<MassChangeStatusModalProps> = ({
               </svg>
             )}
             Submit
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

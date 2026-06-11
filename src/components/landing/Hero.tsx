@@ -1,6 +1,7 @@
 import dashboardImage from "../../assets/dashboard.png";
 import boardImage from "../../assets/board.png";
 import reportImage from "../../assets/report.png"
+import { Button } from '@/components/ui/Button';
 import { useLanguage } from "../../contexts/LanguageContext"
 
 export default function Hero() {
@@ -18,18 +19,18 @@ export default function Hero() {
                 {t('landing.hero.title_1')} <span className="gradient-text">{t('landing.hero.title_work')}</span>{t('landing.hero.title_2')} <span className="text-orange-600">{t('landing.hero.title_tasks')}</span> {t('landing.hero.title_3')}
               </h1>
             </div>
-            <p className="text-xl text-gray-600 max-w-2xl leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
               {t('landing.hero.desc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="px-8 py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition duration-200 shadow-md">
+              <Button className="px-8 py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition duration-200 shadow-md">
                 {t('landing.hero.btn_start')}
-              </button>
-              <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:border-gray-400 hover:bg-gray-50 transition duration-200">
+              </Button>
+              <Button className="px-8 py-4 border-2 border-border text-foreground font-semibold rounded-lg hover:border-gray-400 hover:bg-gray-50 transition duration-200">
                 {t('landing.hero.btn_demo')}
-              </button>
+              </Button>
             </div>
-            <p className="text-sm text-gray-500">{t('landing.hero.trusted_by')} <span className="font-semibold">QUANTUM • VERTEX • NEXUS</span></p>
+            <p className="text-sm text-muted-foreground">{t('landing.hero.trusted_by')} <span className="font-semibold">QUANTUM • VERTEX • NEXUS</span></p>
           </div>
           <div className="relative animate-fade-in flex justify-center lg:justify-end">
             <div className="relative w-full max-w-[680px]">

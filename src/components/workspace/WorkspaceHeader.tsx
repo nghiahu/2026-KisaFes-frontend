@@ -13,6 +13,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { WorkspaceHeaderProps } from '../../types/components.interface';
 export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,15 +54,15 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
     <header className="h-18 bg-card border-b border-border flex items-center justify-between px-4 sticky top-0 z-30 shrink-0 transition-colors">
       {/* Left: Hamburger & Search */}
       <div className="flex flex-1 items-center gap-2 max-w-xl min-w-0 mr-4">
-        <button
+        <Button
           onClick={onOpenMobileMenu}
-          className="md:hidden shrink-0 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-slate-700 rounded-md transition-colors"
+          className="md:hidden shrink-0 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-accent rounded-md transition-colors"
         >
           <Icons.menu size={20} />
-        </button>
+        </Button>
 
         <div className="relative flex-1 max-w-[280px]">
-          <div className={`flex items-center bg-muted dark:bg-slate-700/50 rounded-lg px-3 py-1.5 transition-all ${isSearchFocused ? 'w-full sm:w-96 ring-2 ring-primary/20 bg-card dark:bg-slate-700 border-primary' : 'w-full sm:w-64 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'} border`}>
+          <div className={`flex items-center bg-muted dark:bg-slate-700/50 rounded-lg px-3 py-1.5 transition-all ${isSearchFocused ? 'w-full sm:w-96 ring-2 ring-primary/20 bg-card dark:bg-accent border-primary' : 'w-full sm:w-64 border-transparent hover:bg-accent dark:hover:bg-accent'} border`}>
             <Icons.search size={16} className={`${isSearchFocused ? 'text-primary' : 'text-muted-foreground dark:text-muted-foreground'}`} />
             <input
               type="text"
@@ -69,7 +70,7 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
               onChange={(e) => setSearchTerm(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               placeholder={t('header.search')}
-              className="bg-transparent border-none outline-none text-sm ml-2 w-full placeholder:text-muted-foreground dark:text-slate-200"
+              className="bg-transparent border-none outline-none text-sm ml-2 w-full placeholder:text-muted-foreground dark:text-muted-foreground"
             />
           </div>
 
@@ -81,28 +82,28 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
 
       {/* Right: Actions */}
       <div className="flex items-center justify-end gap-1.5 sm:gap-3 md:gap-4 shrink-0">
-        <button
+        <Button
           onClick={() => setShowCreateModal(true)}
           className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-2 py-2 sm:px-4 sm:py-2 rounded-lg text-[0.85rem] font-bold transition-all shadow-sm shadow-primary/20 dark:shadow-none dark:shadow-none dark:shadow-none shrink-0"
         >
           <Icons.plus size={16} />
           <span className="hidden sm:inline">{t('common.create') || 'Create'}</span>
-        </button>
+        </Button>
 
         <div className="flex items-center gap-1 shrink-0">
           <div className="relative" ref={notificationWrapperRef}>
-            <button
+            <Button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-slate-200 hover:bg-background dark:hover:bg-slate-700 rounded-lg transition-all relative"
+              className="p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all relative"
               title="Notifications"
             >
               <Icons.bell size={18} />
               {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 min-w-[14px] h-[14px] bg-rose-500 border border-white dark:border-slate-800 rounded-full flex items-center justify-center text-[0.6rem] font-bold text-white px-0.5">
+                <span className="absolute top-1.5 right-1.5 min-w-[14px] h-[14px] bg-destructive border border-white dark:border-border rounded-full flex items-center justify-center text-[0.6rem] font-bold text-white px-0.5">
                   {unreadCount}
                 </span>
               )}
-            </button>
+            </Button>
             {showNotifications && (
               <NotificationDropdown
                 onClose={() => setShowNotifications(false)}
@@ -111,15 +112,15 @@ export default function WorkspaceHeader({ onOpenMobileMenu }: WorkspaceHeaderPro
               />
             )}
           </div>
-          <button className="hidden sm:flex p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-slate-200 hover:bg-background dark:hover:bg-slate-700 rounded-lg transition-all" title="Help">
+          <Button className="hidden sm:flex p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all" title="Help">
             <Icons.helpCircle size={18} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigate('/workspace/settings')}
-            className="hidden sm:flex p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-slate-200 hover:bg-background dark:hover:bg-slate-700 rounded-lg transition-all" title="Settings"
+            className="hidden sm:flex p-2 text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-muted-foreground hover:bg-background dark:hover:bg-accent rounded-lg transition-all" title="Settings"
           >
             <Icons.settings size={18} />
-          </button>
+          </Button>
         </div>
 
         {/* Avatar */}

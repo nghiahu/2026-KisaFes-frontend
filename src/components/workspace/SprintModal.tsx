@@ -7,6 +7,7 @@ import { sprintService, type Sprint, type SprintCreateRequest } from '../../serv
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { SprintModalProps } from '../../types/components.interface';
 const sprintSchema = z.object({
   name: z.string().min(1, 'Tên sprint không được để trống'),
@@ -76,15 +77,15 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
             </div>
             <h2 className="text-base font-black text-foreground">{isEdit ? 'Chỉnh sửa Sprint' : 'Tạo Sprint mới'}</h2>
           </div>
-          <button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg transition-colors">
+          <Button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg transition-colors">
             <Icons.x size={16} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex flex-col gap-4">
           {/* Sprint name */}
           <div>
-            <label className="block text-xs font-bold text-muted-foreground mb-1.5">Tên Sprint <span className="text-rose-500">*</span></label>
+            <label className="block text-xs font-bold text-muted-foreground mb-1.5">Tên Sprint <span className="text-destructive">*</span></label>
             <input
               type="text"
               {...register('name')}
@@ -92,7 +93,7 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
               className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold ${errors.name ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-border focus:ring-violet-400/30 focus:border-violet-400'}`}
               autoFocus
             />
-            {errors.name && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.name.message}</p>}
+            {errors.name && <p className="text-destructive text-xs mt-1 font-medium">{errors.name.message}</p>}
           </div>
 
           {/* Goal */}
@@ -104,7 +105,7 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
               rows={2}
               className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold resize-none ${errors.goal ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-border focus:ring-violet-400/30 focus:border-violet-400'}`}
             />
-            {errors.goal && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.goal.message}</p>}
+            {errors.goal && <p className="text-destructive text-xs mt-1 font-medium">{errors.goal.message}</p>}
           </div>
 
           {/* Dates */}
@@ -116,7 +117,7 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
                 {...register('startDate')}
                 className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold ${errors.startDate ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-border focus:ring-violet-400/30 focus:border-violet-400'}`}
               />
-              {errors.startDate && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.startDate.message}</p>}
+              {errors.startDate && <p className="text-destructive text-xs mt-1 font-medium">{errors.startDate.message}</p>}
             </div>
             <div>
               <label className="block text-xs font-bold text-muted-foreground mb-1.5">Ngày kết thúc</label>
@@ -125,7 +126,7 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
                 {...register('endDate')}
                 className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 font-semibold ${errors.endDate ? 'border-rose-500 focus:ring-rose-400/30 focus:border-rose-500' : 'border-border focus:ring-violet-400/30 focus:border-violet-400'}`}
               />
-              {errors.endDate && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.endDate.message}</p>}
+              {errors.endDate && <p className="text-destructive text-xs mt-1 font-medium">{errors.endDate.message}</p>}
             </div>
           </div>
 
@@ -133,20 +134,20 @@ export default function SprintModal({ projectId, sprint, onClose, onSuccess }: S
 
           {/* Actions */}
           <div className="flex gap-2 pt-1">
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-black transition-colors disabled:bg-violet-300"
             >
               {isSubmitting ? 'Đang lưu...' : isEdit ? 'Lưu thay đổi' : 'Tạo Sprint'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={onClose}
               className="px-5 py-2.5 text-muted-foreground hover:bg-muted rounded-xl text-sm font-bold transition-colors"
             >
               Hủy
-            </button>
+            </Button>
           </div>
         </form>
       </div>

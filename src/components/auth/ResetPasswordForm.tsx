@@ -75,11 +75,11 @@ export default function ResetPasswordForm() {
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 text-3xl">
             ✓
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Password Reset Successfully</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-2xl font-bold text-foreground">Password Reset Successfully</h2>
+          <p className="text-sm text-muted-foreground">
             Your password has been changed. Redirecting to login...
           </p>
-          <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden mt-4">
+          <div className="w-full h-1 bg-accent rounded-full overflow-hidden mt-4">
             <div className="h-full bg-primary rounded-full animate-[shrink_2s_linear_forwards]" />
           </div>
         </div>
@@ -90,13 +90,13 @@ export default function ResetPasswordForm() {
   return (
     <>
       <div className="mb-5">
-        <h2 className="text-2xl font-bold text-gray-900">Set New Password</h2>
-        <p className="text-sm text-gray-600 mt-1">
-          Create a new password for <span className="font-medium text-gray-800">{resetData.email}</span>
+        <h2 className="text-2xl font-bold text-foreground">Set New Password</h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Create a new password for <span className="font-medium text-foreground">{resetData.email}</span>
         </p>
       </div>
 
-      {errorMsg && <div className="mb-3 p-2 bg-red-100 text-red-600 text-sm rounded">{errorMsg}</div>}
+      {errorMsg && <div className="mb-3 p-2 bg-destructive/20 text-destructive text-sm rounded">{errorMsg}</div>}
 
       <Form {...form}>
         <form className="space-y-4 mt-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -105,7 +105,7 @@ export default function ResetPasswordForm() {
             name="newPassword"
             render={({ field }) => (
               <FormItem className="space-y-1.5">
-                <FormLabel className="text-xs font-semibold text-gray-700">NEW PASSWORD</FormLabel>
+                <FormLabel className="text-xs font-semibold text-foreground">NEW PASSWORD</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -114,13 +114,13 @@ export default function ResetPasswordForm() {
                       className={`pr-10 ${form.formState.errors.newPassword ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                       {...field}
                     />
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? <Icons.eyeOff size={18} /> : <Icons.eye size={18} />}
-                    </button>
+                    </Button>
                   </div>
                 </FormControl>
                 {form.formState.errors.newPassword && (
@@ -135,7 +135,7 @@ export default function ResetPasswordForm() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem className="space-y-1.5">
-                <FormLabel className="text-xs font-semibold text-gray-700">CONFIRM NEW PASSWORD</FormLabel>
+                <FormLabel className="text-xs font-semibold text-foreground">CONFIRM NEW PASSWORD</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -144,13 +144,13 @@ export default function ResetPasswordForm() {
                       className={`pr-10 ${form.formState.errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                       {...field}
                     />
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       {showConfirm ? <Icons.eyeOff size={18} /> : <Icons.eye size={18} />}
-                    </button>
+                    </Button>
                   </div>
                 </FormControl>
                 {form.formState.errors.confirmPassword && (
@@ -171,7 +171,7 @@ export default function ResetPasswordForm() {
         </form>
       </Form>
 
-      <p className="mt-5 text-center text-gray-600 text-xs">
+      <p className="mt-5 text-center text-muted-foreground text-xs">
         <a
           href="/login"
           onClick={(e) => {
@@ -185,8 +185,8 @@ export default function ResetPasswordForm() {
         </a>
       </p>
 
-      <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-center gap-2 text-xs text-gray-500">
-        <a href="#" className="hover:text-gray-700">
+      <div className="mt-3 pt-3 border-t border-border flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <a href="#" className="hover:text-foreground">
           Privacy
         </a>
         <span>•</span>

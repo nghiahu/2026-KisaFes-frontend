@@ -89,7 +89,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
         <div className="flex items-center gap-1.5">
           {/* Type Dropdown */}
           <div className="relative">
-            <button
+            <Button
               ref={typeTriggerRef}
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -105,7 +105,7 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
               {newTaskType === 'incident' && <AlertCircle size={14} className="text-[#EF4444]" />}
               {newTaskType === 'service request' && <AlertCircle size={14} className="text-[#F59E0B]" />}
               <ChevronDown size={12} className="text-muted-foreground" />
-            </button>
+            </Button>
             {showTypeDropdown && createPortal(
               <div
                 ref={typeDropdownRef}
@@ -113,18 +113,18 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
                 style={{ top: typeDropdownPos.top !== undefined ? typeDropdownPos.top : 'auto', bottom: typeDropdownPos.bottom !== undefined ? typeDropdownPos.bottom : 'auto', left: typeDropdownPos.left }}
               >
                 <div className="px-1">
-                  <button onClick={() => { setNewTaskType('epic'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'epic' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  <Button onClick={() => { setNewTaskType('epic'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'epic' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <Zap size={13} className="text-[#8B5CF6] fill-[#8B5CF6]" /> Epic
-                  </button>
-                  <button onClick={() => { setNewTaskType('task'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'task' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  </Button>
+                  <Button onClick={() => { setNewTaskType('task'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'task' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <CheckSquare size={13} className="text-[#3B82F6]" /> Task
-                  </button>
-                  <button onClick={() => { setNewTaskType('incident'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'incident' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  </Button>
+                  <Button onClick={() => { setNewTaskType('incident'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'incident' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <AlertCircle size={13} className="text-[#EF4444]" /> Incident
-                  </button>
-                  <button onClick={() => { setNewTaskType('service request'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'service request' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
+                  </Button>
+                  <Button onClick={() => { setNewTaskType('service request'); setShowTypeDropdown(false); }} className={`w-full flex items-center gap-2 px-2 py-1.5 text-[13px] rounded text-left ${newTaskType === 'service request' ? 'bg-[#EEF2FF] text-[#3B82F6]' : 'text-foreground hover:bg-background'}`}>
                     <AlertCircle size={13} className="text-[#F59E0B]" /> Service
-                  </button>
+                  </Button>
                 </div>
               </div>,
               document.body
@@ -134,20 +134,20 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
           {/* Due Date Picker */}
           {!hideDueDate && (
             <div className="relative">
-              <button type="button" 
+              <Button type="button" 
                 onClick={() => {
                   try { dateInputRef.current?.showPicker(); } catch (e) { dateInputRef.current?.focus(); }
                 }}
                 className={`p-1 rounded transition-colors border ${newTaskDueDate ? 'bg-primary/10 text-primary border-primary/20' : 'text-muted-foreground hover:text-foreground hover:bg-muted border-border'}`} title={newTaskDueDate ? `Due date: ${newTaskDueDate}` : 'Set due date'}>
                 <Calendar size={14} />
-              </button>
+              </Button>
               <input type="date" ref={dateInputRef} value={newTaskDueDate} onChange={(e) => setNewTaskDueDate(e.target.value)} className="absolute opacity-0 pointer-events-none w-0 h-0" style={{ top: '100%', right: 0 }} />
             </div>
           )}
 
           {/* Assignee Picker */}
           <div className="relative">
-            <button type="button" ref={assigneeTriggerRef}
+            <Button type="button" ref={assigneeTriggerRef}
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const spaceBelow = window.innerHeight - rect.bottom;
@@ -164,38 +164,38 @@ export const InlineTaskCreator: React.FC<InlineTaskCreatorProps> = ({
               ) : (
                 <User size={13} />
               )}
-            </button>
+            </Button>
             {showAssigneeDropdown && createPortal(
               <div ref={assigneeDropdownRef} className="fixed w-[220px] bg-card border border-border shadow-xl rounded-md py-1 z-[9999]" style={{ top: assigneeDropdownPos.top !== undefined ? assigneeDropdownPos.top : 'auto', bottom: assigneeDropdownPos.bottom !== undefined ? assigneeDropdownPos.bottom : 'auto', left: assigneeDropdownPos.left }}>
                 <div className="px-2 pb-2 border-b border-border mt-1">
                   <div className="flex items-center gap-1.5 bg-background border border-border rounded-md px-2 py-1.5 focus-within:border-blue-400 focus-within:bg-card transition-all">
                     <Search size={12} className="text-muted-foreground shrink-0" />
                     <input value={assigneeSearch} onChange={(e) => setAssigneeSearch(e.target.value)} type="text" placeholder="Find user..." className="flex-1 text-[12px] text-foreground bg-transparent outline-none placeholder:text-muted-foreground" />
-                    {assigneeSearch && <button type="button" onClick={() => setAssigneeSearch('')} className="text-muted-foreground hover:text-muted-foreground shrink-0"><X size={11} /></button>}
+                    {assigneeSearch && <Button type="button" onClick={() => setAssigneeSearch('')} className="text-muted-foreground hover:text-muted-foreground shrink-0"><X size={11} /></Button>}
                   </div>
                 </div>
                 <div className="max-h-[200px] overflow-y-auto py-1">
                   {(!assigneeSearch.trim() || 'unassigned'.includes(assigneeSearch.toLowerCase())) && (
-                    <button type="button" onClick={() => { setNewTaskAssignee(null); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left ${!newTaskAssignee ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
+                    <Button type="button" onClick={() => { setNewTaskAssignee(null); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left ${!newTaskAssignee ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
                       <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center shrink-0"><User size={12} className="text-muted-foreground" /></div>
                       <span className={!newTaskAssignee ? 'text-primary font-medium' : 'text-foreground'}>Unassigned</span>
-                    </button>
+                    </Button>
                   )}
                   {(!assigneeSearch.trim() || 'automatic'.includes(assigneeSearch.toLowerCase())) && (
-                    <button type="button" onClick={() => { setNewTaskAssignee('automatic'); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left border-b border-border pb-2 mb-1 ${newTaskAssignee === 'automatic' ? 'bg-primary/10/50 text-primary' : 'hover:bg-background text-foreground'}`}>
+                    <Button type="button" onClick={() => { setNewTaskAssignee('automatic'); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors text-left border-b border-border pb-2 mb-1 ${newTaskAssignee === 'automatic' ? 'bg-primary/10/50 text-primary' : 'hover:bg-background text-foreground'}`}>
                       <div className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center shrink-0"><User size={12} className="text-muted-foreground" /></div>
                       <span>Automatic</span>
-                    </button>
+                    </Button>
                   )}
                   {filteredMembers.map((m: any) => {
                     const isSelected = newTaskAssignee?.id === m.id;
                     return (
-                      <button type="button" key={m.id} onClick={() => { setNewTaskAssignee(m); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${isSelected ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
+                      <Button type="button" key={m.id} onClick={() => { setNewTaskAssignee(m); setShowAssigneeDropdown(false); }} className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left ${isSelected ? 'bg-primary/10/50' : 'hover:bg-background'}`}>
                         <img  src={m.avatar || defaultMan} alt={m.name} className="w-6 h-6 rounded-full object-cover shrink-0 border border-border" />
                         <div className="flex flex-col min-w-0">
                           <span className="truncate text-foreground font-medium">{m.name}</span>
                         </div>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>

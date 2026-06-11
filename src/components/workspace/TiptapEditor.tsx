@@ -8,49 +8,50 @@ import { Icons } from '../../assets/icons';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { TiptapEditorProps } from '../../types/components.interface';
 const MenuBar = ({ editor }: { editor: any }) => {
   if (!editor) return null;
 
   return (
     <div className="flex items-center gap-1 border-b border-[#dfe1e6] p-1 px-2 bg-background/50 flex-wrap text-[#42526e]">
-      <button 
+      <Button 
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-xs ${editor.isActive('heading', { level: 1 }) ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Heading 1"
       >
         H1
-      </button>
-      <button 
+      </Button>
+      <Button 
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-xs ${editor.isActive('heading', { level: 2 }) ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Heading 2"
       >
         H2
-      </button>
-      <div className="w-px h-4 bg-slate-300 mx-1"></div>
-      <button 
+      </Button>
+      <div className="w-px h-4 bg-accent mx-1"></div>
+      <Button 
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-sm ${editor.isActive('bold') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Bold"
       >
         B
-      </button>
-      <button 
+      </Button>
+      <Button 
         onClick={() => editor.chain().focus().toggleItalic().run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-serif italic text-sm ${editor.isActive('italic') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Italic"
       >
         I
-      </button>
-      <button 
+      </Button>
+      <Button 
         onClick={() => editor.chain().focus().toggleStrike().run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-serif text-sm line-through ${editor.isActive('strike') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Strikethrough"
       >
         S
-      </button>
-      <div className="w-px h-4 bg-slate-300 mx-1"></div>
+      </Button>
+      <div className="w-px h-4 bg-accent mx-1"></div>
       
       {/* Color Picker */}
       <div className="relative flex items-center group">
@@ -62,43 +63,43 @@ const MenuBar = ({ editor }: { editor: any }) => {
           title="Text Color"
         />
       </div>
-      <button 
+      <Button 
         onClick={() => editor.chain().focus().unsetColor().run()}
         className="p-1.5 rounded hover:bg-[#091e4214] text-xs font-medium"
         title="Reset Color"
       >
         <Icons.refreshCw size={12} />
-      </button>
+      </Button>
 
-      <div className="w-px h-4 bg-slate-300 mx-1"></div>
-      <button 
+      <div className="w-px h-4 bg-accent mx-1"></div>
+      <Button 
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] ${editor.isActive('bulletList') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Bullet List"
       >
         <Icons.listTodo size={14} />
-      </button>
-      <button 
+      </Button>
+      <Button 
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-bold text-xs ${editor.isActive('orderedList') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Ordered List"
       >
         1.
-      </button>
-      <button 
+      </Button>
+      <Button 
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] font-serif font-bold text-sm ${editor.isActive('blockquote') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Quote"
       >
         "
-      </button>
-      <button 
+      </Button>
+      <Button 
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         className={`p-1.5 rounded hover:bg-[#091e4214] ${editor.isActive('codeBlock') ? 'bg-[#091e4214] text-primary' : ''}`}
         title="Code Block"
       >
         <Icons.code size={14} />
-      </button>
+      </Button>
     </div>
   );
 };
@@ -131,18 +132,18 @@ export default function TiptapEditor({ content, onChange, onSave, onCancel }: Ti
       <EditorContent editor={editor} className="tiptap-editor-content" />
       
       <div className="flex items-center gap-2 p-2 border-t border-border bg-background/50">
-        <button 
+        <Button 
           onClick={onSave}
           className="px-3 py-1.5 bg-[#0052cc] hover:bg-[#0047b3] text-white font-medium text-[13px] rounded-[3px] transition-colors"
         >
           Save
-        </button>
-        <button 
+        </Button>
+        <Button 
           onClick={onCancel}
           className="px-3 py-1.5 text-[#42526e] hover:bg-[#091e420f] font-medium text-[13px] rounded-[3px] transition-colors"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

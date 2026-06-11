@@ -3,7 +3,7 @@ import { useLanguage } from "../../contexts/LanguageContext"
 export default function Footer() {
   const { t } = useLanguage()
   return (
-    <footer className="bg-slate-900 dark:bg-slate-950 text-gray-300 py-16 px-4 border-t dark:border-slate-800">
+    <footer className="bg-slate-900 dark:bg-slate-950 text-gray-300 py-16 px-4 border-t dark:border-border">
       <div className="container-custom">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
           <div className="space-y-4">
@@ -57,12 +57,12 @@ export default function Footer() {
             <input
               type="email"
               placeholder={t('landing.footer.sub_placeholder')}
-              className="w-full px-4 py-2 bg-slate-800 dark:bg-slate-900 border border-transparent dark:border-slate-800 text-white placeholder-gray-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full px-4 py-2 bg-muted dark:bg-slate-900 border border-transparent dark:border-border text-white placeholder-gray-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
           <p>{t('landing.footer.copyright')}</p>
           <p>{t('landing.footer.status')}</p>
         </div>

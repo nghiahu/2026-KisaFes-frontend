@@ -5,6 +5,7 @@ import type { AiTaskEditAction } from '../../services/task.service';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { GlobalEditTaskModalProps } from '../../types/components.interface';
 export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm, isSubmitting }: GlobalEditTaskModalProps) {
   const [selectedEdits, setSelectedEdits] = useState<Set<number>>(new Set(edits.map((_, i) => i)));
@@ -43,9 +44,9 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
               <p className="text-xs text-muted-foreground mt-0.5">Review and apply the suggested changes</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-muted-foreground hover:bg-slate-200 rounded-md transition-colors">
+          <Button onClick={onClose} className="p-2 text-muted-foreground hover:bg-accent rounded-md transition-colors">
             <Icons.x size={16} />
-          </button>
+          </Button>
         </div>
 
         {/* Body */}
@@ -68,7 +69,7 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
                         setSelectedEdits(new Set());
                       }
                     }}
-                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
                   />
                   Select All ({edits.length} tasks)
                 </label>
@@ -87,7 +88,7 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
                       type="checkbox"
                       checked={selectedEdits.has(idx)}
                       onChange={() => toggleEdit(idx)}
-                      className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -97,7 +98,7 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
                       </div>
                     </div>
                     <div className="mt-2 flex items-center gap-3 text-xs">
-                      <div className="px-2 py-1 bg-red-50 text-red-600 rounded line-through opacity-70 truncate max-w-[200px]">
+                      <div className="px-2 py-1 bg-destructive/10 text-destructive rounded line-through opacity-70 truncate max-w-[200px]">
                         {edit.oldValueDisplay || edit.oldValue || 'Empty'}
                       </div>
                       <Icons.arrowRight size={14} className="text-muted-foreground" />
@@ -122,19 +123,19 @@ export default function GlobalEditTaskModal({ isOpen, onClose, edits, onConfirm,
             {selectedEdits.size} of {edits.length} selected
           </div>
           <div className="flex items-center gap-3">
-            <button 
+            <Button 
               onClick={onClose}
               className="px-4 py-2 text-sm font-bold text-muted-foreground hover:bg-muted rounded-md transition-colors"
             >
               Cancel
-            </button>
-            <button 
+            </Button>
+            <Button 
               onClick={handleConfirm}
               disabled={selectedEdits.size === 0 || isSubmitting}
               className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center gap-2"
             >
               {isSubmitting ? 'Applying...' : 'Apply Changes'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

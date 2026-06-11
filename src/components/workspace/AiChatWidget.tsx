@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/Button';
 import { Icons } from '../../assets/icons';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import { aiService } from '../../services/task.service';
@@ -13,8 +14,8 @@ const PRIORITY_COLORS: Record<string, string> = {
   Highest:  'bg-rose-100 text-rose-700 border-rose-200',
   High:     'bg-orange-100 text-orange-700 border-orange-200',
   Medium:   'bg-yellow-100 text-yellow-700 border-yellow-200',
-  Low:      'bg-slate-100 text-slate-600 border-slate-200',
-  Lowest:   'bg-slate-50 text-slate-400 border-slate-100',
+  Low:      'bg-muted text-muted-foreground border-border',
+  Lowest:   'bg-muted/50 text-muted-foreground border-slate-100',
 };
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
@@ -298,7 +299,7 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
         <div ref={draggableNodeRef} className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-4">
           {isOpen && (
             <div
-              className="w-[400px] h-[600px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800"
+              className="w-[400px] h-[600px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-border dark:border-border"
               style={{ animation: 'aiChatSlideUp 0.2s ease-out' }}
             >
               <div className="drag-handle cursor-move flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white shrink-0">
@@ -312,12 +313,12 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setMessages([])} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors" title="Xóa lịch sử chat">
+                  <Button onClick={() => setMessages([])} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors" title="Xóa lịch sử chat">
                     <Icons.refreshCw size={15} />
-                  </button>
-                  <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors" title="Đóng chat">
+                  </Button>
+                  <Button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors" title="Đóng chat">
                     <Icons.x size={15} />
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -327,8 +328,8 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                     <div className="w-16 h-16 bg-primary/20 dark:bg-blue-900/30 text-primary dark:text-primary/70 rounded-full flex items-center justify-center mb-4">
                       <Icons.sparkles size={32} />
                     </div>
-                    <h4 className="font-semibold text-slate-700 dark:text-slate-200 mb-2">Xin chào! Tôi là KisaFres AI</h4>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <h4 className="font-semibold text-foreground dark:text-muted-foreground mb-2">Xin chào! Tôi là KisaFres AI</h4>
+                    <p className="text-sm text-muted-foreground dark:text-slate-400">
                       Tôi có thể giúp bạn tạo hàng loạt công việc mới, chỉnh sửa công việc hiện tại hoặc trả lời các câu hỏi về dự án này.
                     </p>
                   </div>
@@ -338,7 +339,7 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                       <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                         msg.role === 'user' 
                           ? 'bg-primary text-white shadow-sm shadow-blue-500/20 rounded-br-none' 
-                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-sm border border-slate-100 dark:border-slate-700/50 rounded-bl-none'
+                          : 'bg-white dark:bg-slate-800 text-foreground dark:text-muted-foreground shadow-sm border border-slate-100 dark:border-slate-700/50 rounded-bl-none'
                       }`}>
                         <div className={`text-sm ${msg.role === 'user' ? 'whitespace-pre-wrap' : 'prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-slate-100 dark:prose-pre:bg-slate-800/50 prose-pre:text-slate-800 dark:prose-pre:text-slate-200'}`}>
                           {msg.role === 'ai' ? (
@@ -361,15 +362,15 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                               <div className="divide-y divide-slate-100 dark:divide-slate-700/50 max-h-48 overflow-y-auto">
                                 {msg.taskResult.tasks.map((t, i) => (
                                   <div key={i} className="px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                                    <div className="text-[13px] font-medium text-slate-700 dark:text-slate-200 line-clamp-1">{t.title}</div>
+                                    <div className="text-[13px] font-medium text-foreground dark:text-muted-foreground line-clamp-1">{t.title}</div>
                                     <div className="flex items-center gap-3 mt-1.5">
-                                      <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                         <Icons.tag size={10} />
                                         <span className="capitalize">{t.type || 'Task'}</span>
                                       </div>
-                                      <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                         <Icons.alertCircle size={10} className={
-                                          (t.priority === 'Highest' || t.priority === 'High') ? 'text-rose-500' : 
+                                          (t.priority === 'Highest' || t.priority === 'High') ? 'text-destructive' : 
                                           t.priority === 'Medium' ? 'text-amber-500' : 'text-primary'
                                         } />
                                         <span>{t.priority || 'Medium'}</span>
@@ -378,14 +379,14 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                   </div>
                                 ))}
                               </div>
-                              <div className="px-3 py-2 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-700">
+                              <div className="px-3 py-2 flex flex-col gap-2 border-t border-slate-100 dark:border-border">
                                 {projectMethodology === 'SCRUM' && (
                                   <div className="flex flex-col gap-1.5 mb-1">
-                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nơi lưu trữ</label>
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Nơi lưu trữ</label>
                                     <select
                                       value={selectedSprint}
                                       onChange={(e) => setSelectedSprint(e.target.value)}
-                                      className="text-xs border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg px-2 py-1.5 focus:outline-none focus:border-primary w-full"
+                                      className="text-xs border border-border dark:border-border bg-muted/50 dark:bg-slate-800 rounded-lg px-2 py-1.5 focus:outline-none focus:border-primary w-full"
                                     >
                                       <option value="BACKLOG">Backlog</option>
                                       {sprints.map((s: any) => (
@@ -400,12 +401,12 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                         placeholder="Nhập tên Sprint mới"
                                         value={newSprintName}
                                         onChange={(e) => setNewSprintName(e.target.value)}
-                                        className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-primary w-full mt-1"
+                                        className="text-xs border border-border dark:border-border rounded-lg px-2 py-1.5 focus:outline-none focus:border-primary w-full mt-1"
                                       />
                                     )}
                                   </div>
                                 )}
-                                <button
+                                <Button
                                   onClick={() => handleConfirmTasks(msg.taskResult!)}
                                   disabled={isConfirming || (selectedSprint === 'NEW' && !newSprintName.trim())}
                                   className="flex-1 py-1.5 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5"
@@ -414,13 +415,13 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                     ? <><Icons.loader size={11} className="animate-spin" /> Đang tạo...</>
                                     : <><Icons.check size={11} /> Tạo tất cả tasks</>
                                   }
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                   onClick={() => setChatMode('generate')}
-                                  className="text-[11px] text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 py-1"
+                                  className="text-[11px] text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground py-1"
                                 >
                                   Hoặc yêu cầu AI chỉnh sửa lại danh sách
-                                </button>
+                                </Button>
                               </div>
                             </div>
                           </div>
@@ -434,8 +435,8 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                 <span className="text-xs font-semibold text-[#3B82F6] dark:text-blue-300">Đề xuất thay đổi</span>
                                 <span className="ml-auto text-[10px] text-primary">{msg.editResult.edits.length} tasks</span>
                               </div>
-                              <div className="px-3 py-2 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-700">
-                                <button
+                              <div className="px-3 py-2 flex flex-col gap-2 border-t border-slate-100 dark:border-border">
+                                <Button
                                   onClick={() => {
                                     setPendingEdits(msg.editResult!.edits);
                                     setShowEditModal(true);
@@ -443,7 +444,7 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                   className="w-full py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5"
                                 >
                                   <Icons.edit3 size={11} /> Xem và Xác nhận Thay đổi
-                                </button>
+                                </Button>
                               </div>
                             </div>
                           </div>
@@ -458,23 +459,23 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                   Đề xuất Kế hoạch Sprint
                                 </span>
                               </div>
-                              <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-700">
+                              <div className="px-3 py-2 border-b border-slate-100 dark:border-border">
                                 {msg.planResult.sprintGoal && (
-                                  <div className="text-[11px] text-slate-600 dark:text-slate-300 mb-2 whitespace-pre-wrap"><span className="font-semibold text-slate-700 dark:text-slate-200">Mục tiêu:</span> {msg.planResult.sprintGoal}</div>
+                                  <div className="text-[11px] text-muted-foreground dark:text-muted-foreground mb-2 whitespace-pre-wrap"><span className="font-semibold text-foreground dark:text-muted-foreground">Mục tiêu:</span> {msg.planResult.sprintGoal}</div>
                                 )}
                                 <div className="text-[10px] text-purple-700 dark:text-purple-300 italic mb-2">"{msg.planResult.reasoning}"</div>
                               </div>
                               <div className="max-h-[150px] overflow-y-auto divide-y divide-slate-50 dark:divide-slate-700/50">
                                 {msg.planResult.selectedTasks.map((t, i) => (
                                   <div key={i} className="px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors flex items-center gap-2 justify-between">
-                                    <div className="text-[12px] text-slate-700 dark:text-slate-200 line-clamp-1 flex-1">{t.title}</div>
+                                    <div className="text-[12px] text-foreground dark:text-muted-foreground line-clamp-1 flex-1">{t.title}</div>
                                     <div className="flex items-center gap-2 shrink-0">
-                                      <div className="flex items-center gap-1 text-[9px] text-slate-500">
+                                      <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
                                         {TYPE_ICONS[t.type.toLowerCase()] || <Icons.checkSquare size={10} />}
                                       </div>
-                                      <div className="flex items-center gap-1 text-[9px] text-slate-500">
+                                      <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
                                         <Icons.alertCircle size={10} className={
-                                          (t.priority === 'Highest' || t.priority === 'High') ? 'text-rose-500' : 
+                                          (t.priority === 'Highest' || t.priority === 'High') ? 'text-destructive' : 
                                           t.priority === 'Medium' ? 'text-amber-500' : 'text-primary'
                                         } />
                                       </div>
@@ -482,13 +483,13 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                   </div>
                                 ))}
                               </div>
-                              <div className="px-3 py-2 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-700">
+                              <div className="px-3 py-2 flex flex-col gap-2 border-t border-slate-100 dark:border-border">
                                 <div className="flex flex-col gap-1.5 mb-1">
-                                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Chuyển vào Sprint</label>
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Chuyển vào Sprint</label>
                                   <select
                                     value={selectedSprint === 'BACKLOG' ? 'NEW' : selectedSprint}
                                     onChange={(e) => setSelectedSprint(e.target.value)}
-                                    className="text-xs border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg px-2 py-1.5 focus:outline-none focus:border-purple-500 w-full"
+                                    className="text-xs border border-border dark:border-border bg-muted/50 dark:bg-slate-800 rounded-lg px-2 py-1.5 focus:outline-none focus:border-purple-500 w-full"
                                   >
                                     <option value="NEW">Tạo Sprint mới...</option>
                                     {sprints.map((s: any) => (
@@ -502,11 +503,11 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                       placeholder="Nhập tên Sprint mới"
                                       value={newSprintName}
                                       onChange={(e) => setNewSprintName(e.target.value)}
-                                      className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1.5 focus:outline-none focus:border-purple-500 w-full mt-1"
+                                      className="text-xs border border-border dark:border-border rounded-lg px-2 py-1.5 focus:outline-none focus:border-purple-500 w-full mt-1"
                                     />
                                   )}
                                 </div>
-                                <button
+                                <Button
                                   onClick={() => handleConfirmSprintPlan(msg.planResult!)}
                                   disabled={isConfirming || ((selectedSprint === 'NEW' || selectedSprint === 'BACKLOG') && !newSprintName.trim())}
                                   className="w-full py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5"
@@ -515,12 +516,12 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                                     ? <><Icons.loader size={11} className="animate-spin" /> Đang xử lý...</>
                                     : <><Icons.check size={11} /> Xác nhận Kéo Task</>
                                   }
-                                </button>
+                                </Button>
                               </div>
                             </div>
                           </div>
                         )}
-                        <span className={`text-[9px] block mt-1.5 ${msg.role === 'user' ? 'text-blue-100 text-right' : 'text-slate-400'}`}>
+                        <span className={`text-[9px] block mt-1.5 ${msg.role === 'user' ? 'text-blue-100 text-right' : 'text-muted-foreground'}`}>
                           {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
@@ -529,7 +530,7 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                 )}
                 {isTyping && (
                   <div className="flex justify-start">
-                    <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-4 py-3 rounded-bl-none shadow-sm">
+                    <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-border rounded-2xl px-4 py-3 rounded-bl-none shadow-sm">
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" />
                         <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
@@ -542,26 +543,26 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
               </div>
 
               {/* Chat Input */}
-              <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
+              <div className="p-3 bg-white dark:bg-slate-900 border-t border-border dark:border-border shrink-0">
                 {/* Generate mode hint */}
                 {chatMode === 'generate' && (
                   <div className="mb-2 px-2 py-1.5 bg-[#EEF2FF] dark:bg-blue-950/30 border border-primary/20 dark:border-blue-800 rounded-lg flex items-center gap-1.5">
                     <Icons.wand2 size={11} className="text-[#3B82F6] shrink-0" />
                     <span className="text-[11px] text-[#3B82F6] dark:text-primary/70 font-medium">Chế độ tạo Tasks — mô tả tính năng bạn muốn làm</span>
-                    <button onClick={() => setChatMode('chat')} className="ml-auto text-[#3B82F6] hover:text-primary">
+                    <Button onClick={() => setChatMode('chat')} className="ml-auto text-[#3B82F6] hover:text-primary">
                       <Icons.x size={11} />
-                    </button>
+                    </Button>
                   </div>
                 )}
 
                 {/* Edit mode hint */}
                 {chatMode === 'edit' && (
-                  <div className="mb-2 px-2 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center gap-1.5">
-                    <Icons.edit3 size={11} className="text-slate-500 shrink-0" />
-                    <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Chế độ sửa Tasks — chọn task và thay đổi muốn làm</span>
-                    <button onClick={() => setChatMode('chat')} className="ml-auto text-slate-400 hover:text-slate-600">
+                  <div className="mb-2 px-2 py-1.5 bg-muted/50 dark:bg-slate-800/50 border border-border dark:border-border rounded-lg flex items-center gap-1.5">
+                    <Icons.edit3 size={11} className="text-muted-foreground shrink-0" />
+                    <span className="text-[11px] text-muted-foreground dark:text-slate-400 font-medium">Chế độ sửa Tasks — chọn task và thay đổi muốn làm</span>
+                    <Button onClick={() => setChatMode('chat')} className="ml-auto text-muted-foreground hover:text-slate-600">
                       <Icons.x size={11} />
-                    </button>
+                    </Button>
                   </div>
                 )}
 
@@ -570,47 +571,47 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                   <div className="mb-2 px-2 py-1.5 bg-[#F5F3FF] dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg flex items-center gap-1.5">
                     <Icons.target size={11} className="text-[#8B5CF6] shrink-0" />
                     <span className="text-[11px] text-[#8B5CF6] dark:text-purple-400 font-medium">Lên kế hoạch Sprint — gom task liên quan</span>
-                    <button onClick={() => setChatMode('chat')} className="ml-auto text-[#8B5CF6] hover:text-purple-600">
+                    <Button onClick={() => setChatMode('chat')} className="ml-auto text-[#8B5CF6] hover:text-purple-600">
                       <Icons.x size={11} />
-                    </button>
+                    </Button>
                   </div>
                 )}
 
                 <div className="flex items-end gap-2">
-                  <button
+                  <Button
                     onClick={() => setChatMode(prev => prev === 'generate' ? 'chat' : 'generate')}
                     title={chatMode === 'generate' ? 'Tắt chế độ tạo Tasks' : 'Bật chế độ tạo Tasks'}
                     className={`p-2 rounded-xl transition-all shrink-0 ${
                       chatMode === 'generate'
                         ? 'bg-primary text-white shadow-md shadow-blue-500/30'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-[#3B82F6] hover:bg-[#EEF2FF] dark:hover:bg-blue-950/30'
+                        : 'bg-muted dark:bg-slate-800 text-muted-foreground hover:text-[#3B82F6] hover:bg-[#EEF2FF] dark:hover:bg-blue-950/30'
                     }`}
                   >
                     <Icons.wand2 size={16} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setChatMode(prev => prev === 'edit' ? 'chat' : 'edit')}
                     title={chatMode === 'edit' ? 'Tắt chế độ sửa Tasks' : 'Bật chế độ sửa Tasks'}
                     className={`p-2 rounded-xl transition-all shrink-0 ${
                       chatMode === 'edit'
                         ? 'bg-slate-600 text-white shadow-md shadow-slate-500/30'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                        : 'bg-muted dark:bg-slate-800 text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent'
                     }`}
                   >
                     <Icons.edit3 size={16} />
-                  </button>
+                  </Button>
                   {projectMethodology === 'SCRUM' && (
-                    <button
+                    <Button
                       onClick={() => setChatMode(prev => prev === 'plan' ? 'chat' : 'plan')}
                       title={chatMode === 'plan' ? 'Tắt chế độ lên kế hoạch' : 'Bật chế độ lên kế hoạch'}
                       className={`p-2 rounded-xl transition-all shrink-0 ${
                         chatMode === 'plan'
                           ? 'bg-purple-600 text-white shadow-md shadow-purple-500/30'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30'
+                          : 'bg-muted dark:bg-slate-800 text-muted-foreground hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30'
                       }`}
                     >
                       <Icons.target size={16} />
-                    </button>
+                    </Button>
                   )}
                   <div className="relative flex-1">
                     <input
@@ -619,37 +620,37 @@ export default function AiChatWidget({ projectId, projectName, projectMethodolog
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder={chatMode === 'generate' ? 'Mô tả tính năng cần tạo tasks...' : chatMode === 'edit' ? 'Mô tả chỉnh sửa...' : 'Hỏi về dự án này...'}
-                      className="w-full pl-4 pr-12 py-2.5 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow dark:text-white placeholder:text-slate-400"
+                      className="w-full pl-4 pr-12 py-2.5 bg-muted dark:bg-slate-800 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow dark:text-white placeholder:text-slate-400"
                     />
-                    <button
+                    <Button
                       onClick={handleSend}
                       disabled={!input.trim() || isTyping}
                       className={`absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors ${
-                        chatMode === 'generate' ? 'bg-primary hover:bg-primary/90' : chatMode === 'edit' ? 'bg-slate-600 hover:bg-slate-700' : 'bg-primary hover:bg-primary/90'
+                        chatMode === 'generate' ? 'bg-primary hover:bg-primary/90' : chatMode === 'edit' ? 'bg-slate-600 hover:bg-accent' : 'bg-primary hover:bg-primary/90'
                       }`}
                     >
                       <Icons.monitorUp size={15} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
-                <p className="text-center text-[10px] text-slate-400 mt-2">AI có thể mắc lỗi. Vui lòng kiểm tra lại thông tin.</p>
+                <p className="text-center text-[10px] text-muted-foreground mt-2">AI có thể mắc lỗi. Vui lòng kiểm tra lại thông tin.</p>
               </div>
             </div>
           )}
 
-          <button
+          <Button
             onClick={() => {
               if (isDragging) return;
               setIsOpen(!isOpen);
             }}
             className={`drag-handle cursor-move p-4 rounded-full shadow-xl transition-all duration-300 pointer-events-auto ${
               isOpen
-                ? 'bg-slate-800 hover:bg-slate-900 shadow-slate-500/30 rotate-90 scale-90'
+                ? 'bg-muted hover:bg-slate-900 shadow-slate-500/30 rotate-90 scale-90'
                 : 'bg-gradient-to-br from-blue-600 to-blue-700 hover:scale-105 shadow-blue-500/30'
             }`}
           >
             {isOpen ? <Icons.x size={24} className="text-white" /> : <Icons.sparkles size={24} className="text-white" />}
-          </button>
+          </Button>
         </div>
       </Draggable>
 

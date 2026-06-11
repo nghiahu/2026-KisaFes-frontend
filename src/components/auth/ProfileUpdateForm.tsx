@@ -60,13 +60,13 @@ export default function ProfileUpdateForm() {
         <div className="flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-slate-500">Cập nhật hồ sơ cá nhân</p>
+              <p className="text-sm font-medium text-muted-foreground">Cập nhật hồ sơ cá nhân</p>
             </div>
           </div>
           
-          {errorMsg && <div className="p-3 bg-red-100 text-red-600 text-sm rounded-lg">{errorMsg}</div>}
+          {errorMsg && <div className="p-3 bg-destructive/20 text-destructive text-sm rounded-lg">{errorMsg}</div>}
 
-          <div className="grid grid-cols-1 gap-6 rounded-[24px] border border-slate-200 bg-slate-50 p-6 sm:grid-cols-[100px_1fr]">
+          <div className="grid grid-cols-1 gap-6 rounded-[24px] border border-border bg-muted/50 p-6 sm:grid-cols-[100px_1fr]">
             <div className="flex items-center justify-center">
               <div 
                 className="relative flex h-24 w-24 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-white overflow-hidden cursor-pointer"
@@ -77,12 +77,12 @@ export default function ProfileUpdateForm() {
                 ) : (
                    nameInitial
                 )}
-                <button
+                <Button
                   type="button"
                   className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-white text-primary shadow-sm ring-1 ring-slate-200"
                 >
                   +
-                </button>
+                </Button>
               </div>
               <input 
                 type="file" 
@@ -93,7 +93,7 @@ export default function ProfileUpdateForm() {
               />
             </div>
             <div className="space-y-3">
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Thay đổi ảnh đại diện và thông tin hiển thị của bạn.
               </p>
             </div>
@@ -101,7 +101,7 @@ export default function ProfileUpdateForm() {
 
           <div className="space-y-5">
             <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Tên công khai
               </label>
               <Input
@@ -114,7 +114,7 @@ export default function ProfileUpdateForm() {
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Tiểu sử
               </label>
               <Textarea
@@ -149,7 +149,7 @@ export default function ProfileUpdateForm() {
             </Button>
           </div>
 
-          <p className="text-center text-xs text-slate-400">
+          <p className="text-center text-xs text-muted-foreground">
             Dữ liệu cá nhân của bạn được bảo mật theo chuẩn doanh nghiệp.
           </p>
         </div>

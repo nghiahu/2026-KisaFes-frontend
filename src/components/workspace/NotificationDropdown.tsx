@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { NotificationDropdownProps } from '../../types/components.interface';
 export default function NotificationDropdown({ onClose, onNotificationsCountChange, ignoreRef }: NotificationDropdownProps) {
   const { data: notifications = [], isLoading: loading } = useNotificationsQuery();
@@ -96,16 +97,16 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
         </h3>
         {notifications.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-[0.75rem] px-2 py-0.5 bg-primary/20 text-blue-700 font-bold rounded-full">
+            <span className="text-[0.75rem] px-2 py-0.5 bg-primary/20 text-primary font-bold rounded-full">
               {notifications.filter(n => !n.read).length} mới
             </span>
-            <button
+            <Button
               onClick={() => markAllAsReadMutation.mutate()}
               className="text-muted-foreground hover:text-primary transition-colors"
               title="Đánh dấu tất cả đã đọc"
             >
               <Icons.check size={14} strokeWidth={3} />
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -178,21 +179,21 @@ export default function NotificationDropdown({ onClose, onNotificationsCountChan
                     <div className="mt-3">
                       {effectiveStatus === 'PENDING' ? (
                         <div className="flex gap-2">
-                          <button
+                          <Button
                             onClick={(e) => { e.stopPropagation(); handleAccept(item.id); }}
                             disabled={isActioning}
                             className="px-3 py-1.5 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white rounded-lg text-[0.75rem] font-bold flex items-center gap-1 transition-all shadow-sm shadow-blue-100"
                           >
                             <Icons.check size={13} />
                             Đồng ý
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={(e) => { e.stopPropagation(); handleDecline(item.id); }}
                             disabled={isActioning}
-                            className="px-3 py-1.5 bg-muted hover:bg-slate-200 disabled:opacity-60 text-muted-foreground rounded-lg text-[0.75rem] font-bold flex items-center gap-1 transition-all"
+                            className="px-3 py-1.5 bg-muted hover:bg-accent disabled:opacity-60 text-muted-foreground rounded-lg text-[0.75rem] font-bold flex items-center gap-1 transition-all"
                           >
                             Từ chối
-                          </button>
+                          </Button>
                         </div>
                       ) : effectiveStatus === 'ACCEPTED' ? (
                         <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[0.72rem] font-bold rounded-lg border border-emerald-100">

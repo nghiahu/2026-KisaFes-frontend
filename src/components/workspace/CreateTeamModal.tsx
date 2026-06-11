@@ -8,6 +8,7 @@ import { teamService } from '../../services/team.service';
 import { authService } from '../../services/auth.service';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+import { Button } from '@/components/ui/Button';
 import type { CreateTeamModalProps } from '../../types/components.interface';
 const createTeamSchema = z.object({
   name: z.string().min(1, 'Team name is required'),
@@ -75,12 +76,12 @@ export default function CreateTeamModal({ onClose, onSuccess }: CreateTeamModalP
               <p className="text-sm text-muted-foreground">{t('teams.create_desc')}</p>
             </div>
           </div>
-          <button 
+          <Button 
             onClick={onClose}
             className="text-muted-foreground hover:text-muted-foreground p-2 rounded-xl hover:bg-muted transition-colors"
           >
             <Icons.x size={20} />
-          </button>
+          </Button>
         </div>
 
         <div className="p-6">
@@ -142,7 +143,7 @@ export default function CreateTeamModal({ onClose, onSuccess }: CreateTeamModalP
                 className={`w-full px-4 py-2.5 bg-background border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${errors.name ? 'border-rose-500 focus:ring-rose-500/20' : 'border-border focus:border-primary focus:ring-primary/20'}`}
                 {...register('name')}
               />
-              {errors.name && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.name.message}</p>}
+              {errors.name && <p className="text-destructive text-xs mt-1 font-medium">{errors.name.message}</p>}
             </div>
 
             <div>
@@ -165,21 +166,21 @@ export default function CreateTeamModal({ onClose, onSuccess }: CreateTeamModalP
         </div>
 
         <div className="px-6 py-4 border-t border-border bg-background/50 flex items-center justify-end gap-3">
-          <button
+          <Button
             type="button"
             onClick={onClose}
             className="px-5 py-2.5 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
           >
             {t('common.cancel')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             form="create-team-form"
             disabled={isSubmitting}
             className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-600/20"
           >
             {isSubmitting ? t('teams.creating') : t('teams.create_team')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

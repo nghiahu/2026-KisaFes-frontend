@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Icons } from '../../assets/icons';
 import { projectService } from '../../services/project.service';
 
+import { Button } from '@/components/ui/Button';
 import type { CreateRoleModalProps } from '../../types/components.interface';
 const roleSchema = z.object({
   name: z.string().min(1, 'Tên Role không được để trống'),
@@ -189,12 +190,12 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
               </p>
             </div>
           </div>
-          <button 
+          <Button 
             onClick={onClose}
             className="text-muted-foreground hover:text-muted-foreground p-2 rounded-xl hover:bg-muted transition-colors"
           >
             <Icons.x size={24} />
-          </button>
+          </Button>
         </div>
 
         <div className="overflow-y-auto p-6 flex-1 bg-background/30">
@@ -212,7 +213,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                   className={`w-full px-4 py-3 bg-background border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all font-medium ${errors.name ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20' : 'border-border focus:border-primary focus:ring-primary/20'}`}
                   {...register('name')}
                 />
-                {errors.name && <p className="text-rose-500 text-xs mt-2 font-medium">{errors.name.message}</p>}
+                {errors.name && <p className="text-destructive text-xs mt-2 font-medium">{errors.name.message}</p>}
               </div>
 
               {/* Mẫu có sẵn */}
@@ -223,18 +224,18 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {PRESET_TEMPLATES.map((preset) => (
-                    <button
+                    <Button
                       key={preset.id}
                       type="button"
                       onClick={() => setSelectedPreset(preset.id)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
                         selectedPreset === preset.id
-                          ? 'border-primary bg-primary/10 text-blue-700'
+                          ? 'border-primary bg-primary/10 text-primary'
                           : 'border-border bg-card text-muted-foreground hover:border-slate-300 hover:bg-background'
                       }`}
                     >
                       {preset.name}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -248,7 +249,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                   Chi tiết phân quyền
                 </label>
                 <div className="flex items-center gap-3">
-                  {errors.permissions && <span className="text-rose-500 text-xs font-medium">{errors.permissions.message}</span>}
+                  {errors.permissions && <span className="text-destructive text-xs font-medium">{errors.permissions.message}</span>}
                   <span className="text-sm font-medium text-muted-foreground bg-card px-3 py-1 rounded-full border border-border shadow-sm">
                     Đã chọn {selectedPermissions.length} quyền
                   </span>
@@ -265,16 +266,16 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                     <div key={group.name} className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
                         <h4 className="font-bold text-sm text-foreground">{group.name}</h4>
-                        <button
+                        <Button
                           type="button"
                           onClick={() => handleToggleGroup(groupPermIds)}
                           className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
-                            allIncluded ? 'bg-primary/20 text-blue-700' : 
-                            someIncluded ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground hover:bg-slate-200'
+                            allIncluded ? 'bg-primary/20 text-primary' : 
+                            someIncluded ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground hover:bg-accent'
                           }`}
                         >
                           {allIncluded ? 'Bỏ chọn hết' : 'Chọn tất cả'}
-                        </button>
+                        </Button>
                       </div>
                       <div className="space-y-2.5">
                         {group.permissions.map((perm) => {
@@ -286,7 +287,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
                               className="flex items-center gap-3 cursor-pointer group"
                             >
                               <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                                isChecked ? 'bg-primary border-primary' : 'bg-card border-slate-300 group-hover:border-blue-400'
+                                isChecked ? 'bg-primary border-primary' : 'bg-card border-border group-hover:border-blue-400'
                               }`}>
                                 {isChecked && <Icons.check size={12} className="text-white" />}
                               </div>
@@ -304,7 +305,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 text-red-600 text-sm font-medium rounded-xl flex items-center gap-2 border border-red-100">
+              <div className="p-4 bg-destructive/10 text-destructive text-sm font-medium rounded-xl flex items-center gap-2 border border-red-100">
                 <Icons.alertCircle size={16} />
                 {error}
               </div>
@@ -313,14 +314,14 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
         </div>
         
         <div className="p-6 border-t border-border bg-card shrink-0 flex items-center justify-end gap-3">
-          <button
+          <Button
             type="button"
             onClick={onClose}
             className="px-5 py-2.5 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
           >
             Hủy
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             form="create-role-form"
             disabled={isSubmitting}
@@ -334,7 +335,7 @@ export default function CreateRoleModal({ projectId, onClose, onSuccess, roleToE
             ) : (
               roleToEdit ? 'Cập nhật Role' : 'Tạo Role Mới'
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

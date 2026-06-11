@@ -36,13 +36,13 @@ export default function ForgotPasswordEmail() {
   return (
     <>
       <div className="mb-5">
-        <h2 className="text-2xl font-bold text-gray-900">Forgot Password</h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <h2 className="text-2xl font-bold text-foreground">Forgot Password</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Enter your email address and we'll send you a verification code.
         </p>
       </div>
 
-      {errorMsg && <div className="mb-3 p-2 bg-red-100 text-red-600 text-sm rounded">{errorMsg}</div>}
+      {errorMsg && <div className="mb-3 p-2 bg-destructive/15 text-destructive text-sm rounded">{errorMsg}</div>}
 
       <Form {...form}>
         <form className="space-y-4 mt-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -51,7 +51,7 @@ export default function ForgotPasswordEmail() {
             name="email"
             render={({ field }) => (
               <FormItem className="space-y-1.5">
-                <FormLabel className="text-xs font-semibold text-gray-700">EMAIL ADDRESS</FormLabel>
+                <FormLabel className="text-xs font-semibold text-foreground">EMAIL ADDRESS</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="name@company.com" {...field} className={form.formState.errors.email ? "border-destructive focus-visible:ring-destructive" : ""} />
                 </FormControl>
@@ -73,15 +73,15 @@ export default function ForgotPasswordEmail() {
         </form>
       </Form>
 
-      <p className="mt-5 text-center text-gray-600 text-xs">
+      <p className="mt-5 text-center text-muted-foreground text-xs">
         Remember your password?{' '}
-        <a href="/login" className="text-primary font-semibold hover:text-blue-700">
+        <a href="/login" className="text-primary font-semibold hover:opacity-80">
           Back to Login
         </a>
       </p>
 
-      <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-center gap-2 text-xs text-gray-500">
-        <a href="#" className="hover:text-gray-700">
+      <div className="mt-3 pt-3 border-t border-border flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <a href="#" className="hover:text-foreground">
           Privacy
         </a>
         <span>•</span>

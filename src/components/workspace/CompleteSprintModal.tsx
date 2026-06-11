@@ -4,6 +4,7 @@ import { sprintService, type Sprint } from '../../services/sprint.service';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { CompleteSprintModalProps } from '../../types/components.interface';
 export default function CompleteSprintModal({ projectId, sprint, sprints, onClose, onSuccess }: CompleteSprintModalProps) {
   const [isCompleting, setIsCompleting] = useState(false);
@@ -32,9 +33,9 @@ export default function CompleteSprintModal({ projectId, sprint, sprints, onClos
             </div>
             <h2 className="text-base font-black text-foreground">Hoàn thành Sprint</h2>
           </div>
-          <button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg transition-colors">
+          <Button onClick={onClose} className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg transition-colors">
             <X size={16} />
-          </button>
+          </Button>
         </div>
 
         <div className="p-6 flex flex-col gap-4">
@@ -74,19 +75,19 @@ export default function CompleteSprintModal({ projectId, sprint, sprints, onClos
 
           {/* Actions */}
           <div className="flex gap-2 pt-1">
-            <button
+            <Button
               onClick={handleComplete}
               disabled={isCompleting}
               className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-black transition-colors disabled:bg-emerald-300"
             >
               {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành Sprint'}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onClose}
               className="px-5 py-2.5 text-muted-foreground hover:bg-muted rounded-xl text-sm font-bold transition-colors"
             >
               Hủy
-            </button>
+            </Button>
           </div>
         </div>
       </div>

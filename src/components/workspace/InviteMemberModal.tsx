@@ -9,6 +9,7 @@ import { teamService } from '../../services/team.service';
 import defaultMan from '../../assets/avatar_def_man.png';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { Button } from '@/components/ui/Button';
 import type { InviteMemberModalProps } from '../../types/components.interface';
 
 const inviteSchema = z.object({
@@ -122,30 +123,30 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             <h2 className="text-lg font-bold text-foreground">Add to project</h2>
             <p className="text-xs font-semibold text-muted-foreground mt-0.5">{projectName}</p>
           </div>
-          <button 
+          <Button 
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
             <Icons.plus size={20} className="rotate-45" />
-          </button>
+          </Button>
         </div>
         
         {/* Tabs */}
         <div className="flex border-b border-border px-6 pt-4">
-          <button
+          <Button
             type="button"
             className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'user' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('user')}
           >
             Mời cá nhân
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             className={`pb-3 px-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'team' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('team')}
           >
             Thêm nhóm (Team)
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit(onInviteSubmit)} className="p-6">
@@ -181,7 +182,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             </div>
             
             {errors.query && (
-              <p className="text-rose-500 text-xs mt-2 font-medium flex items-center gap-1">
+              <p className="text-destructive text-xs mt-2 font-medium flex items-center gap-1">
                 <Icons.alertCircle size={12} />
                 {errors.query.message}
               </p>
@@ -209,7 +210,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                   {searchResults.length > 0 ? (
                     <div className="p-1">
                       {searchResults.map((item) => (
-                        <button
+                        <Button
                           key={item.id}
                           type="button"
                           onClick={() => selectItem(item)}
@@ -223,7 +224,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
                             <div className="font-bold text-xs text-foreground truncate">{item.fullName || item.name}</div>
                             <div className="text-[10px] text-muted-foreground truncate">{item.email || `${item.members?.length || 0} thành viên`}</div>
                           </div>
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   ) : (
@@ -238,7 +239,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
             )}
 
             {error && (
-              <p className="text-red-500 text-xs mt-2 font-medium flex items-center gap-1">
+              <p className="text-destructive text-xs mt-2 font-medium flex items-center gap-1">
                 <Icons.alertCircle size={12} />
                 {error}
               </p>
@@ -246,15 +247,15 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
           </div>
           
           <div className="flex items-center justify-end gap-3 mt-6">
-            <button
+            <Button
               type="button"
               onClick={onClose}
               className="px-4 py-2 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-colors"
               disabled={isSending || success}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isSending || success || !selectedItem}
               className="px-5 py-2 bg-primary hover:bg-primary/90 disabled:bg-blue-400 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center gap-2"
@@ -272,7 +273,7 @@ export default function InviteMemberModal({ onClose, projectName, projectId }: I
               ) : (
                 <span>{activeTab === 'user' ? 'Send Invite' : 'Add Team'}</span>
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -26,6 +26,7 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
                 queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               }
               queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
+              queryClient.invalidateQueries({ queryKey: ['my-tasks'] });
               break;
 
             case "UPDATE_TASK":
@@ -40,6 +41,7 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
                 queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               }
               queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
+              queryClient.invalidateQueries({ queryKey: ['my-tasks'] });
               break;
 
             case "DELETE_TASK":
@@ -57,6 +59,7 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
                 queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               }
               queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
+              queryClient.invalidateQueries({ queryKey: ['my-tasks'] });
               break;
 
             case "UPDATE_PROJECT":
@@ -77,6 +80,14 @@ export const useProjectWebSocket = (projectId: string | undefined) => {
             case "SPRINT_DELETED":
               // Invalidate sprints explicitly if needed
               queryClient.invalidateQueries({ queryKey: ['sprints', projectId] });
+              queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
+              break;
+
+            case "EPIC_CREATED":
+            case "EPIC_UPDATED":
+            case "EPIC_DELETED":
+              queryClient.invalidateQueries({ queryKey: ['epics', projectId] });
+              queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
               queryClient.invalidateQueries({ queryKey: ['projectBacklog', projectId] });
               break;
 

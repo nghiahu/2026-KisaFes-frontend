@@ -149,20 +149,20 @@ export default function ForgotPasswordOtp() {
     <div className="w-full max-w-xl rounded-[32px] bg-white p-8 shadow-[0_30px_60px_rgba(15,23,42,0.12)] sm:p-10">
       {tokenExpired ? (
         <div className="space-y-6 text-center">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 text-2xl font-semibold">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20 text-destructive text-2xl font-semibold">
             !
           </div>
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
               Mã đã hết hạn
             </h1>
-            <p className="mt-3 text-sm leading-6 text-slate-500">
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Mã xác thực của bạn đã hết hạn. Vui lòng thử lại.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-left text-sm text-slate-700">
-            <p className="font-semibold text-slate-900">Chuyển về nhập email sau:</p>
+          <div className="rounded-3xl border border-border bg-muted/50 p-5 text-left text-sm text-foreground">
+            <p className="font-semibold text-foreground">Chuyển về nhập email sau:</p>
             <p className="mt-2 text-lg">{redirectCountdown} giây</p>
           </div>
 
@@ -181,15 +181,15 @@ export default function ForgotPasswordOtp() {
       ) : (
         <>
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
               Xác thực OTP
             </h1>
-            <p className="mt-3 text-sm leading-6 text-slate-500">
-              Mã 6 chữ số đã được gửi đến <span className="font-medium text-slate-700">{email}</span>. Vui lòng kiểm tra và nhập vào bên dưới.
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              Mã 6 chữ số đã được gửi đến <span className="font-medium text-foreground">{email}</span>. Vui lòng kiểm tra và nhập vào bên dưới.
             </p>
           </div>
 
-          {errorMsg && <div className="mb-6 p-3 bg-red-100 text-red-600 text-sm rounded-lg">{errorMsg}</div>}
+          {errorMsg && <div className="mb-6 p-3 bg-destructive/20 text-destructive text-sm rounded-lg">{errorMsg}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex items-center justify-center gap-3">
@@ -206,22 +206,22 @@ export default function ForgotPasswordOtp() {
                   onChange={(e) => handleChange(e.target.value, index)}
                   onPaste={handlePaste}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="h-16 w-16 rounded-2xl bg-slate-50 text-center text-2xl font-semibold text-slate-900"
+                  className="h-16 w-16 rounded-2xl bg-muted/50 text-center text-2xl font-semibold text-foreground"
                 />
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">
               <span>Chưa nhận được mã?</span>
-              <button
+              <Button
                 type="button"
                 onClick={handleResend}
                 disabled={countdown > 0 || loading}
-                className={`font-semibold transition ${countdown > 0 ? 'text-slate-400 cursor-not-allowed' : 'text-primary hover:text-blue-700'}`}
+                className={`font-semibold transition ${countdown > 0 ? 'text-muted-foreground cursor-not-allowed' : 'text-primary hover:text-blue-700'}`}
               >
                 Gửi lại mã
-              </button>
-              {countdown > 0 && <span className="text-slate-400">{formatTime(countdown)}</span>}
+              </Button>
+              {countdown > 0 && <span className="text-muted-foreground">{formatTime(countdown)}</span>}
             </div>
 
             <Button
@@ -235,8 +235,8 @@ export default function ForgotPasswordOtp() {
             </Button>
           </form>
 
-          <div className="mt-8 border-t border-slate-200 pt-4 text-center text-xs text-slate-400">
-            <button
+          <div className="mt-8 border-t border-border pt-4 text-center text-xs text-muted-foreground">
+            <Button
               type="button"
               onClick={() => {
                 dispatch(clearResetPasswordData());
@@ -245,7 +245,7 @@ export default function ForgotPasswordOtp() {
               className="text-primary hover:text-blue-700 font-semibold"
             >
               Quay về đăng nhập
-            </button>
+            </Button>
           </div>
         </>
       )}

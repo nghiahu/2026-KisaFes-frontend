@@ -4,6 +4,7 @@ import HeaderNav from "./HeaderNav"
 import { Icons } from "../../assets/icons"
 import type { User } from "../../types/user.interface"
 import UserDropdown from "../common/UserDropdown"
+import { Button } from '@/components/ui/Button';
 import { useLanguage } from "../../contexts/LanguageContext"
 const SearchIcon = Icons.search
 
@@ -55,7 +56,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {searchOpen ? (
             <div className="flex items-center gap-2 rounded-full border border-primary/20 dark:border-blue-800 bg-background px-3 py-2 shadow-sm transition-all duration-300 lg:w-[32%] w-[32vw] max-w-[420px] min-w-[240px]">
-              <SearchIcon className="h-5 w-5 text-gray-500" />
+              <SearchIcon className="h-5 w-5 text-muted-foreground" />
 
               <input
                 type="search"
@@ -66,7 +67,7 @@ export default function Header() {
                 className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
 
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setSearchOpen(false)
@@ -75,16 +76,16 @@ export default function Header() {
                 className="rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
               >
                 ×
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
+            <Button
               type="button"
               onClick={() => setSearchOpen(true)}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/20 dark:border-blue-800 bg-background text-primary dark:text-primary/70 shadow-sm transition hover:border-blue-400 dark:hover:border-primary hover:shadow-md"
             >
               <SearchIcon className="h-5 w-5" />
-            </button>
+            </Button>
           )}
 
           <span className="hidden h-6 w-px bg-border sm:block" />

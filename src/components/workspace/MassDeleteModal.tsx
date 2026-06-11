@@ -4,6 +4,7 @@ import { AlertCircle, X, RefreshCw } from 'lucide-react';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { MassDeleteModalProps } from '../../types/components.interface';
 export const MassDeleteModal: React.FC<MassDeleteModalProps> = ({
   isOpen,
@@ -25,9 +26,9 @@ export const MassDeleteModal: React.FC<MassDeleteModalProps> = ({
             <AlertCircle size={22} className="text-rose-600 fill-rose-100" />
             <h2 className="text-lg font-bold text-foreground">Delete selected tasks?</h2>
           </div>
-          <button onClick={onClose} disabled={isDeleting} className="text-muted-foreground hover:text-muted-foreground">
+          <Button onClick={onClose} disabled={isDeleting} className="text-muted-foreground hover:text-muted-foreground">
             <X size={20} />
-          </button>
+          </Button>
         </div>
         
         <p className="text-muted-foreground text-sm leading-relaxed mb-6 pl-8">
@@ -46,19 +47,19 @@ export const MassDeleteModal: React.FC<MassDeleteModalProps> = ({
             value={deleteConfirmText}
             onChange={(e) => setDeleteConfirmText(e.target.value)}
             disabled={isDeleting}
-            className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm"
+            className="w-full px-3 py-2 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm"
           />
         </div>
         
         <div className="flex items-center justify-end gap-3">
-          <button 
+          <Button 
             onClick={onClose}
             disabled={isDeleting}
             className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted rounded transition-colors"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={deleteConfirmText !== 'delete' || isDeleting}
             onClick={async () => {
               try {
@@ -72,7 +73,7 @@ export const MassDeleteModal: React.FC<MassDeleteModalProps> = ({
           >
             {isDeleting ? <RefreshCw className="animate-spin" size={16} /> : null}
             Delete
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

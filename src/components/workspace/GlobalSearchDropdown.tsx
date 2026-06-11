@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 
+import { Button } from '@/components/ui/Button';
 import type { GlobalSearchDropdownProps } from '../../types/components.interface';
 export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSearchDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -52,7 +53,7 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
             </h3>
             <div className="flex flex-col">
               {filteredTasks.slice(0, 10).map((task: any) => (
-                <button 
+                <Button 
                   key={task.id}
                   onClick={() => {
                     navigate(`/workspace/projects/${task.projectId}`, { state: { tab: 'list', openTask: task } });
@@ -67,7 +68,7 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
                     <span className="text-muted-foreground mr-2 font-normal">{task.taskKey || task.id.substring(0, 8)}</span>
                     {task.title}
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -81,7 +82,7 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
             </h3>
             <div className="flex flex-col">
               {filteredProjects.slice(0, 5).map((project: any) => (
-                <button 
+                <Button 
                   key={project.id}
                   onClick={() => {
                     navigate(`/workspace/projects/${project.id}`);
@@ -100,7 +101,7 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
                   <div className="text-[0.75rem] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
                     {project.key || project.name.substring(0, 2).toUpperCase()}..
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -109,7 +110,7 @@ export default function GlobalSearchDropdown({ searchTerm, onClose }: GlobalSear
         {/* No results */}
         {filteredTasks.length === 0 && filteredProjects.length === 0 && (
           <div className="px-4 py-8 text-center">
-            <Icons.search size={24} className="mx-auto text-slate-300 mb-2" />
+            <Icons.search size={24} className="mx-auto text-muted-foreground mb-2" />
             <p className="text-muted-foreground text-sm">No results found for "{searchTerm}"</p>
           </div>
         )}

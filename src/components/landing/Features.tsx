@@ -39,11 +39,11 @@ export default function Features() {
   ]
 
   return (
-    <section className="py-20 px-4 bg-gray-50">
+    <section className="py-20 px-4 bg-muted/50">
       <div className="container-custom">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold mb-4">{t('landing.features.title')}</h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             {t('landing.features.desc')}
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function Features() {
                 className={`rounded-2xl p-8 transition-all duration-200 ${
                   card.highlight
                     ? "bg-primary text-white shadow-xl lg:col-span-1 lg:row-span-2 flex flex-col justify-between"
-                    : "bg-white border border-gray-200 hover:shadow-lg"
+                    : "bg-white border border-border hover:shadow-lg"
                 }`}
               >
                 <div>
@@ -65,7 +65,7 @@ export default function Features() {
                     <IconComponent className="w-10 h-10" style={{ color: card.highlight ? "white" : "#2563eb" }} />
                   </div>
                   <h3 className="text-2xl font-bold mb-3">{card.title}</h3>
-                  <p className={card.highlight ? "text-blue-100" : "text-gray-600"}>
+                  <p className={card.highlight ? "text-blue-100" : "text-muted-foreground"}>
                     {card.description}
                   </p>
                 </div>
@@ -80,12 +80,12 @@ export default function Features() {
             )
           })}
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-lg transition-all duration-200 flex items-center justify-center">
+          <div className="bg-white border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-200 flex items-center justify-center">
             <div className="text-center">
               <div className="mb-4">
                 <Icons.badgePlus className="w-12 h-12 mx-auto text-primary" />
               </div>
-              <p className="text-gray-600 font-semibold">{t('landing.features.add_more')}</p>
+              <p className="text-muted-foreground font-semibold">{t('landing.features.add_more')}</p>
             </div>
           </div>
         </div>
